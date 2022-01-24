@@ -10,6 +10,7 @@ import {
 import NaverMapView, {Marker} from 'react-native-nmap';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Geolocation from 'react-native-geolocation-service';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 type Location = {
   latitude: number;
@@ -19,7 +20,10 @@ const statusBarHeight =
   Platform.OS === 'ios' ? getStatusBarHeight(true) : StatusBar.currentHeight;
 
 const HomeMap = () => {
-  const [location, setLocation] = useState<Location | undefined>(undefined);
+  const [location, setLocation] = useState<Location>({
+    latitude: 37.51721372684746,
+    longitude: 127.05220125548395,
+  });
 
   async function requestPermission() {
     try {
@@ -60,18 +64,15 @@ const HomeMap = () => {
     <View style={{flex: 1}}>
       <View style={styles.statusBar} />
       <View style={styles.header}>
-        <Text>HogangNoNo</Text>
+        <Icon name={'home-filled'} size={20} style={{color: 'white'}} />
       </View>
-      {location ? (
-        <NaverMapView
-          style={{width: '100%', height: '90%'}}
-          center={{...location, zoom: 16}}
-          zoomControl={false}>
-          <Marker coordinate={location} />
-        </NaverMapView>
-      ) : (
-        <Text>Loading..</Text>
-      )}
+      <NaverMapView
+        style={{width: '100%', height: '90%'}}
+        center={{...location, zoom: 16}}
+        zoomControl={false}>
+        <Marker coordinate={location} />
+      </NaverMapView>
+      <Icon name={'my-location'} size={20} style={styles.myLocation} />
     </View>
   );
 };
@@ -86,6 +87,14 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  myLocation: {
+    position: 'absolute',
+    right: 10,
+    top: statusBarHeight + 50,
+    borderWidth: 1,
+    backgroundColor: 'white',
+    padding: 4,
   },
 });
 
