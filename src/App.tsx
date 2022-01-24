@@ -1,7 +1,8 @@
 import React from 'react';
+import HomeMap from './components/HomeMap';
 
 const App = () => {
-  return;
+  return <HomeMap />;
 };
 
 export default App;
