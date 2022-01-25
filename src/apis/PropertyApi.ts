@@ -23,11 +23,28 @@ export const propertyApi = async () => {
     })
     .catch(err => console.log(err.message));
 
-  console.log(item);
+  let items = item.map((obj: any) => {
+    return {
+      dealAmount: obj['거래금액'],
+      buildYear: obj['건축년도'],
+      dealYear: obj['년'],
+      dealMonth: obj['월'],
+      dealDate: obj['일'],
+      roadName: obj['도로명'],
+      roadNameNumber: obj['도로명건물본번호코드'],
+      dong: obj['법정동'],
+      apartmentName: obj['아파트'],
+      area: obj['전용면적'],
+    };
+  });
 
-  const location = item.map((value: any) =>
-    geocodeApi(value['도로명'], value['도로명건물본번호코드']),
+  items = await Promise.all(
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    items.map(async (item: any) => {
+      const {x, y} = await geocodeApi(item.roadName, item.roadNameNumber);
+      return {...item, x, y};
+    }),
   );
 
-  return item;
+  return items;
 };
