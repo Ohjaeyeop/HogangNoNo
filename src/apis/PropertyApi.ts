@@ -41,7 +41,7 @@ export const propertyApi = async (code: string) => {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     items.map(async (item: any) => {
       const {x, y} = await addrToCoord(item.dong, item.addressNumber);
-      return {...item, x, y};
+      return {...item, longitude: parseFloat(x), latitude: parseFloat(y)};
     }),
   );
 
