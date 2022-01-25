@@ -4,7 +4,7 @@ import {SafeAreaView, Text} from 'react-native';
 
 const Home = () => {
   useEffect(() => {
-    propertyApi().then(items => console.log(items));
+    propertyApi();
   }, []);
 
   return (
