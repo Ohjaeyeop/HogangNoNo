@@ -14,7 +14,7 @@ export const propertyApi = async (code: string) => {
       },
     },
   } = await fetch(
-    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=202101`,
+    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=202101&numOfRows=50`,
   )
     .then(res => res.text())
     .then(resText => {

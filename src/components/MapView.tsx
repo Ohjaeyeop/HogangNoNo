@@ -3,6 +3,7 @@ import NaverMapView, {Coord, Marker} from 'react-native-nmap';
 import {coordToAddr} from '../apis/GeocodeApi';
 import {codes} from '../data/codes';
 import {propertyApi} from '../apis/PropertyApi';
+import {Image, ImageBackground, View, Text, Platform} from 'react-native';
 
 type Props = {
   location: Coord | undefined;
@@ -37,7 +38,22 @@ const MapView = ({location}: Props) => {
                 latitude: item.latitude,
                 longitude: item.longitude,
               }}
-              key={index}></Marker>
+              key={index}
+              width={96}
+              height={96}>
+              {Platform.OS === 'android' && (
+                <Image
+                  source={{
+                    uri: 'https://raw.githubusercontent.com/yijunmin0/TuringNoNo/%ED%99%88%ED%99%94%EB%A9%B4%EA%B0%9C%EB%B0%9C/src/assets/images/marker.png',
+                  }}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    resizeMode: 'stretch',
+                  }}
+                />
+              )}
+            </Marker>
           ))}
       </NaverMapView>
     </>
