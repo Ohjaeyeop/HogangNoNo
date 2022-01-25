@@ -1,12 +1,12 @@
 import {XMLParser} from 'fast-xml-parser';
-import {geocodeApi} from './GeocodeApi';
+import {addrToCoord} from './GeocodeApi';
 
 const uri =
   'http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev';
 const SERVICE_KEY =
   'Os0BvUN73dbFsXA8O3jtA4bPKaxXGxoW7C88n6DpgNyVrssis9u3RLTGl7yxRCJimPkKY0yCD9dUeK4M8vK1BA%3D%3D';
 
-export const propertyApi = async () => {
+export const propertyApi = async (code: string) => {
   const {
     response: {
       body: {
@@ -14,7 +14,7 @@ export const propertyApi = async () => {
       },
     },
   } = await fetch(
-    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=11110&DEAL_YMD=202101`,
+    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=202101`,
   )
     .then(res => res.text())
     .then(resText => {
@@ -40,12 +40,10 @@ export const propertyApi = async () => {
   items = await Promise.all(
     // eslint-disable-next-line @typescript-eslint/no-shadow
     items.map(async (item: any) => {
-      const {x, y} = await geocodeApi(item.dong, item.addressNumber);
+      const {x, y} = await addrToCoord(item.dong, item.addressNumber);
       return {...item, x, y};
     }),
   );
-
-  console.log(items);
 
   return items;
 };

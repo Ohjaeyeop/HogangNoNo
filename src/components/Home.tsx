@@ -1,23 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {PermissionsAndroid, Platform, StyleSheet, View} from 'react-native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MapView from './MapView';
-import {propertyApi} from '../apis/PropertyApi';
+import {Coord} from 'react-native-nmap';
 
-type Location = {
-  latitude: number;
-  longitude: number;
-};
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
 const Home = () => {
-  const [location, setLocation] = useState<Location | undefined>();
-
-  useEffect(() => {
-    propertyApi();
-  }, []);
+  const [location, setLocation] = useState<Coord | undefined>();
 
   async function requestPermission() {
     try {
