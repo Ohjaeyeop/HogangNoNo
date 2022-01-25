@@ -1,17 +1,26 @@
-import React from 'react';
-import NaverMapView, {Marker} from 'react-native-nmap';
+import React, {useState} from 'react';
+import NaverMapView, {Coord, Marker} from 'react-native-nmap';
+import {coordToAddr} from '../apis/GeocodeApi';
+import {codes} from '../data/codes';
+import {propertyApi} from '../apis/PropertyApi';
 
 type Props = {
-  location:
-    | {
-        latitude: number;
-        longitude: number;
-      }
-    | undefined;
+  location: Coord | undefined;
 };
 
 const MapView = ({location}: Props) => {
-  function getAddress(event: any) {}
+  const [propertyItems, setPropertyItems] = useState();
+
+  async function getAddress(event: any) {
+    const region = event.contentRegion;
+    // 좌표 -> 주소 -> 코드
+    const code = await coordToAddr(
+      region[0].longitude,
+      region[0].latitude,
+    ).then(addr => codes[addr]);
+
+    propertyApi(code).then(items => setPropertyItems(items));
+  }
 
   return (
     <>
@@ -21,7 +30,15 @@ const MapView = ({location}: Props) => {
         compass={false}
         center={location ? {...location, zoom: 16} : undefined}
         onCameraChange={getAddress}>
-        {location && <Marker coordinate={location}></Marker>}
+        {propertyItems &&
+          propertyItems.map((item, index) => (
+            <Marker
+              coordinate={{
+                latitude: item.latitude,
+                longitude: item.longitude,
+              }}
+              key={index}></Marker>
+          ))}
       </NaverMapView>
     </>
   );
