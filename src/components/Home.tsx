@@ -1,29 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-  StatusBar,
-  PermissionsAndroid,
-} from 'react-native';
+import React, {useState} from 'react';
+import {PermissionsAndroid, Platform, StyleSheet, View} from 'react-native';
 import NaverMapView, {Marker} from 'react-native-nmap';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MapView from './MapView';
 
 type Location = {
   latitude: number;
   longitude: number;
 };
-const statusBarHeight =
-  Platform.OS === 'ios' ? getStatusBarHeight(true) : StatusBar.currentHeight;
+const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
-const HomeMap = () => {
-  const [location, setLocation] = useState<Location>({
-    latitude: 37.51721372684746,
-    longitude: 127.05220125548395,
-  });
+const Home = () => {
+  const [location, setLocation] = useState<Location | undefined>();
 
   async function requestPermission() {
     try {
@@ -35,12 +25,12 @@ const HomeMap = () => {
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         );
       }
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
     }
   }
 
-  useEffect(() => {
+  function getMyLocation() {
     requestPermission().then(result => {
       if (result === 'granted') {
         Geolocation.getCurrentPosition(
@@ -58,21 +48,21 @@ const HomeMap = () => {
         );
       }
     });
-  }, []);
+  }
 
   return (
     <View style={{flex: 1}}>
-      <View style={styles.statusBar} />
+      {Platform.OS === 'ios' && <View style={styles.statusBar} />}
       <View style={styles.header}>
         <Icon name={'home-filled'} size={20} style={{color: 'white'}} />
       </View>
-      <NaverMapView
-        style={{width: '100%', height: '90%'}}
-        center={{...location, zoom: 16}}
-        zoomControl={false}>
-        <Marker coordinate={location} />
-      </NaverMapView>
-      <Icon name={'my-location'} size={20} style={styles.myLocation} />
+      <MapView location={location} />
+      <Icon
+        name={'my-location'}
+        size={20}
+        style={styles.myLocation}
+        onPress={() => getMyLocation()}
+      />
     </View>
   );
 };
@@ -90,12 +80,12 @@ const styles = StyleSheet.create({
   },
   myLocation: {
     position: 'absolute',
-    right: 10,
-    top: statusBarHeight + 50,
+    right: 15,
+    top: statusBarHeight + 60,
     borderWidth: 1,
     backgroundColor: 'white',
     padding: 4,
   },
 });
 
-export default HomeMap;
+export default Home;

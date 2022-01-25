@@ -1,8 +1,8 @@
 import React from 'react';
-import HomeMap from './components/HomeMap';
+import Home from './components/Home';
 
 const App = () => {
-  return <HomeMap />;
+  return <Home />;
 };
 
 export default App;
