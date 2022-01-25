@@ -2,16 +2,16 @@ import React from 'react';
 import NaverMapView, {Marker} from 'react-native-nmap';
 
 type Props = {
-  location: {
-    latitude: number;
-    longitude: number;
-  };
+  location:
+    | {
+        latitude: number;
+        longitude: number;
+      }
+    | undefined;
 };
 
 const MapView = ({location}: Props) => {
-  function getAddress(event: any) {
-    console.log(event.contentRegion);
-  }
+  function getAddress(event: any) {}
 
   return (
     <>
