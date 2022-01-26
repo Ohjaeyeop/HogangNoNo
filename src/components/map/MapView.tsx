@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
-import {coordToAddr} from '../apis/GeocodeApi';
-import {codes} from '../data/codes';
-import {ItemType, propertyApi} from '../apis/PropertyApi';
+import {coordToAddr} from '../../apis/GeocodeApi';
+import {codes} from '../../data/codes';
+import {ItemType, propertyApi} from '../../apis/PropertyApi';
 import ItemMarker from './ItemMarker';
 
 type Props = {
@@ -14,7 +14,6 @@ const MapView = ({location}: Props) => {
 
   async function getAddress(event: any) {
     const region = event.contentRegion;
-    console.log(region);
     // 좌표 -> 주소 -> 코드
     const code = await coordToAddr(
       region[0].longitude,

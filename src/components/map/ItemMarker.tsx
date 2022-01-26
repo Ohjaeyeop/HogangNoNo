@@ -1,7 +1,7 @@
 import React from 'react';
 import {ImageBackground, Platform, Text} from 'react-native';
 import {Align, Marker} from 'react-native-nmap';
-import {ItemType} from '../apis/PropertyApi';
+import {ItemType} from '../../apis/PropertyApi';
 
 const ItemMarker = ({item}: {item: ItemType}) => {
   return (
@@ -12,7 +12,7 @@ const ItemMarker = ({item}: {item: ItemType}) => {
           width={64}
           height={54}>
           <ImageBackground
-            source={require('../assets/images/marker.png')}
+            source={require('../../assets/images/marker.png')}
             resizeMode="stretch"
             style={{
               width: '100%',
@@ -28,7 +28,7 @@ const ItemMarker = ({item}: {item: ItemType}) => {
         </Marker>
       ) : (
         <Marker
-          image={require('../assets/images/marker.png')}
+          image={require('../../assets/images/marker.png')}
           coordinate={{
             latitude: item.latitude,
             longitude: item.longitude,

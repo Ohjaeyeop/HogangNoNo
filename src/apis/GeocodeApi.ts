@@ -1,6 +1,6 @@
-export const addrToCoord = async (dong: string, addressNumber: string) => {
+export const addrToCoord = async (addr: string) => {
   const {addresses} = await fetch(
-    `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${dong} ${addressNumber}`,
+    `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${addr}`,
     {
       headers: {
         'X-Ncp-Apigw-Api-Key': 'iJe3buh1uq99KV0ZthmvechyGxinnrvXGTrRp8E1',

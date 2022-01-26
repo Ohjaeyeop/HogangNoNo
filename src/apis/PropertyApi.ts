@@ -1,5 +1,6 @@
 import {XMLParser} from 'fast-xml-parser';
 import {addrToCoord} from './GeocodeApi';
+import {getCoord} from '../libs/getCoord';
 
 const uri =
   'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTrade';
@@ -40,7 +41,7 @@ export const propertyApi = async (code: string) => {
   items = await Promise.all(
     // eslint-disable-next-line @typescript-eslint/no-shadow
     items.map(async (item: any) => {
-      const {x, y} = await addrToCoord(item.dong, item.addressNumber);
+      const {x, y} = await getCoord(`${item.dong} ${item.addressNumber}`);
       return {...item, longitude: parseFloat(x), latitude: parseFloat(y)};
     }),
   );
