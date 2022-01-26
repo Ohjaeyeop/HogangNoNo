@@ -3,7 +3,8 @@ import NaverMapView, {Coord, Marker} from 'react-native-nmap';
 import {coordToAddr} from '../apis/GeocodeApi';
 import {codes} from '../data/codes';
 import {propertyApi} from '../apis/PropertyApi';
-import {Image, Text, Platform} from 'react-native';
+import {Image, Text, Platform, View} from 'react-native';
+import ItemMarker from './ItemMarker';
 
 type Props = {
   location: Coord | undefined;
@@ -14,6 +15,7 @@ const MapView = ({location}: Props) => {
 
   async function getAddress(event: any) {
     const region = event.contentRegion;
+    console.log(region);
     // 좌표 -> 주소 -> 코드
     const code = await coordToAddr(
       region[0].longitude,
@@ -33,31 +35,7 @@ const MapView = ({location}: Props) => {
         onCameraChange={getAddress}>
         {propertyItems &&
           propertyItems.map((item, index) => (
-            <Marker
-              coordinate={{
-                latitude: item.latitude,
-                longitude: item.longitude,
-              }}
-              key={index}
-              width={96}
-              height={96}>
-              {Platform.OS === 'android' && (
-                <>
-                  <Text>{item.area}평</Text>
-                  <Text>{parseInt(item.dealAmount) / 10}억</Text>
-                  <Image
-                    source={{
-                      uri: 'https://raw.githubusercontent.com/yijunmin0/TuringNoNo/%ED%99%88%ED%99%94%EB%A9%B4%EA%B0%9C%EB%B0%9C/src/assets/images/marker.png',
-                    }}
-                    style={{
-                      width: 48,
-                      height: 48,
-                      resizeMode: 'stretch',
-                    }}
-                  />
-                </>
-              )}
-            </Marker>
+            <ItemMarker key={index} item={item} />
           ))}
       </NaverMapView>
     </>
