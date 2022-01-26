@@ -4,7 +4,7 @@ import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
 import ItemMarker from './ItemMarker';
 import {useAppDispatch, useAppSelector} from '../../hooks';
-import {deleteEntity, deleteId, fetchItems} from '../../propertySlice';
+import {deleteRegions, fetchItems} from '../../propertySlice';
 
 type Props = {
   location: Coord | undefined;
@@ -34,8 +34,7 @@ const MapView = ({location}: Props) => {
       );
       const toRemove = currentCodes.filter(code => !newCodes.has(code));
       if (toRemove.length > 0) {
-        dispatch(deleteId(toRemove));
-        dispatch(deleteEntity(toRemove));
+        dispatch(deleteRegions(toRemove));
       }
 
       // 부동산 정보 불러오기

@@ -31,13 +31,9 @@ const propertySlice = createSlice({
   name: 'property',
   initialState,
   reducers: {
-    deleteId(state, action: PayloadAction<string[]>) {
+    deleteRegions(state, action: PayloadAction<string[]>) {
       action.payload.forEach(value => {
         state.ids = state.ids.filter(id => id !== value);
-      });
-    },
-    deleteEntity(state, action: PayloadAction<string[]>) {
-      action.payload.forEach(value => {
         delete state.entities[value];
       });
     },
@@ -52,5 +48,5 @@ const propertySlice = createSlice({
   },
 });
 
-export const {deleteId, deleteEntity} = propertySlice.actions;
+export const {deleteRegions} = propertySlice.actions;
 export default propertySlice.reducer;
