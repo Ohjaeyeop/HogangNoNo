@@ -1,5 +1,4 @@
 import {XMLParser} from 'fast-xml-parser';
-import {addrToCoord} from './GeocodeApi';
 import {getCoord} from '../libs/getCoord';
 
 const uri =
@@ -40,7 +39,7 @@ export const propertyApi = async (code: string) => {
 
   items = await Promise.all(
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    items.map(async (item: any) => {
+    items.map(async (item: ItemType) => {
       const {x, y} = await getCoord(`${item.dong} ${item.addressNumber}`);
       return {...item, longitude: parseFloat(x), latitude: parseFloat(y)};
     }),
