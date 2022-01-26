@@ -10,18 +10,36 @@ type Props = {
 };
 
 const MapView = ({location}: Props) => {
-  const [propertyItems, setPropertyItems] = useState<ItemType[]>();
+  const [propertyItems, setPropertyItems] = useState<ItemType[]>([]);
+  const [currentCodes, setCurrentCodes] = useState<Set<string>>(new Set());
 
   async function getAddress(event: any) {
-    const region = event.contentRegion;
-    // 좌표 -> 주소 -> 코드
-    const code = await coordToAddr(
-      region[0].longitude,
-      region[0].latitude,
-      // @ts-ignore
-    ).then(addr => codes[addr]);
+    if (event.zoom > 13) {
+      const regions = event.contentRegion.slice(0, 4);
+      // 좌표 -> 주소 -> 코드
+      const tempCodes = await Promise.all(
+        regions.map(async (region: Coord) => {
+          return await coordToAddr(
+            region.longitude,
+            region.latitude,
+            // @ts-ignore
+          ).then(addr => codes[addr]);
+        }),
+      );
+      const newCodes = new Set(tempCodes);
+      console.log(newCodes);
+      const addedCodes = [...newCodes].filter(code => !currentCodes.has(code));
+      console.log(addedCodes);
 
-    propertyApi(code).then(items => setPropertyItems(items));
+      // 부동산 정보 불러오기
+      await Promise.all(
+        addedCodes.map(async code => {
+          propertyApi(code).then(items => setPropertyItems(items));
+        }),
+      );
+
+      setCurrentCodes(newCodes);
+    }
   }
 
   return (
