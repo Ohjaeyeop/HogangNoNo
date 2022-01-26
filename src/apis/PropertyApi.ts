@@ -39,15 +39,20 @@ export const propertyApi = async (code: string) => {
     };
   });
 
-  items = await Promise.all(
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    items.map(async (item: ItemType) => {
-      const {x, y} = await getCoord(`${item.dong} ${item.addressNumber}`);
-      return {...item, longitude: parseFloat(x), latitude: parseFloat(y)};
-    }),
-  );
+  let res = [];
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  for (const item of items) {
+    const coord = await getCoord(`${item.dong} ${item.addressNumber}`);
+    if (coord) {
+      res.push({
+        ...item,
+        longitude: parseFloat(coord.x),
+        latitude: parseFloat(coord.y),
+      });
+    }
+  }
 
-  return items;
+  return res;
 };
 
 export type ItemType = {

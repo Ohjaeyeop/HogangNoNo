@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
@@ -11,9 +11,9 @@ type Props = {
 };
 
 const MapView = ({location}: Props) => {
-  const [currentCodes, setCurrentCodes] = useState<string[]>([]);
   const dispatch = useAppDispatch();
   const propertyItems = useAppSelector(state => state.property.entities);
+  const currentCodes = useAppSelector(state => state.property.ids);
 
   async function handleCameraChange(event: any) {
     if (event.zoom > 13) {
@@ -38,11 +38,8 @@ const MapView = ({location}: Props) => {
         dispatch(deleteEntity(toRemove));
       }
 
-      console.log(newCodes);
-
       // 부동산 정보 불러오기
       addedCodes.length && dispatch(fetchItems(addedCodes));
-      setCurrentCodes([...newCodes]);
     }
   }
 
