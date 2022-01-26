@@ -4,7 +4,7 @@ import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
 import ItemMarker from './ItemMarker';
 import {useAppDispatch, useAppSelector} from '../../hooks';
-import {fetchItems} from '../../propertySlice';
+import {deleteEntity, deleteId, fetchItems} from '../../propertySlice';
 
 type Props = {
   location: Coord | undefined;
@@ -15,7 +15,7 @@ const MapView = ({location}: Props) => {
   const dispatch = useAppDispatch();
   const propertyItems = useAppSelector(state => state.property.entities);
 
-  async function getAddress(event: any) {
+  async function handleCameraChange(event: any) {
     if (event.zoom > 13) {
       const regions = event.contentRegion.slice(0, 4);
       // 좌표 -> 주소 -> 코드
@@ -32,6 +32,13 @@ const MapView = ({location}: Props) => {
       const addedCodes = [...newCodes].filter(
         code => !currentCodes.includes(code),
       );
+      const toRemove = currentCodes.filter(code => !newCodes.has(code));
+      if (toRemove.length > 0) {
+        dispatch(deleteId(toRemove));
+        dispatch(deleteEntity(toRemove));
+      }
+
+      console.log(newCodes);
 
       // 부동산 정보 불러오기
       addedCodes.length && dispatch(fetchItems(addedCodes));
@@ -46,7 +53,7 @@ const MapView = ({location}: Props) => {
         zoomControl={false}
         compass={false}
         center={location ? {...location, zoom: 16} : undefined}
-        onCameraChange={getAddress}>
+        onCameraChange={handleCameraChange}>
         {propertyItems &&
           Object.entries(propertyItems).map(value =>
             value[1].map((item, index) => {

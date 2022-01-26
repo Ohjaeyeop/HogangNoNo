@@ -1,4 +1,4 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {ItemType, propertyApi} from './apis/PropertyApi';
 
 type EntityType = {
@@ -30,7 +30,18 @@ export const fetchItems = createAsyncThunk(
 const propertySlice = createSlice({
   name: 'property',
   initialState,
-  reducers: {},
+  reducers: {
+    deleteId(state, action: PayloadAction<string[]>) {
+      action.payload.forEach(value => {
+        state.ids = state.ids.filter(id => id !== value);
+      });
+    },
+    deleteEntity(state, action: PayloadAction<string[]>) {
+      action.payload.forEach(value => {
+        delete state.entities[value];
+      });
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchItems.fulfilled, (state, action) => {
       action.payload.forEach(value => {
@@ -41,4 +52,5 @@ const propertySlice = createSlice({
   },
 });
 
+export const {deleteId, deleteEntity} = propertySlice.actions;
 export default propertySlice.reducer;
