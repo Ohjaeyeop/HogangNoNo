@@ -27,9 +27,7 @@ const MapView = ({location}: Props) => {
         }),
       );
       const newCodes = new Set(tempCodes);
-      console.log(newCodes);
       const addedCodes = [...newCodes].filter(code => !currentCodes.has(code));
-      console.log(addedCodes);
 
       // 부동산 정보 불러오기
       await Promise.all(
@@ -45,7 +43,7 @@ const MapView = ({location}: Props) => {
   return (
     <>
       <NaverMapView
-        style={{width: '100%', height: '90%'}}
+        style={{flex: 1}}
         zoomControl={false}
         compass={false}
         center={location ? {...location, zoom: 16} : undefined}
