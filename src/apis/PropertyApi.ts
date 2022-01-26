@@ -25,27 +25,34 @@ export const propertyApi = async (code: string) => {
 
   let items = item.map((obj: any) => {
     return {
-      dealAmount: parseInt(obj['거래금액'].replace(',', '')) / 10000,
+      dealAmount:
+        Math.round(parseInt(obj['거래금액'].replace(',', '')) / 1000) / 10,
       buildYear: obj['건축년도'],
       dealYear: obj['년'],
       dealMonth: obj['월'],
       dealDate: obj['일'],
       dong: obj['법정동'],
       apartmentName: obj['아파트'],
-      area: Math.ceil(obj['전용면적'] / 3.3058 + 0.5),
+      area: Math.round(obj['전용면적'] / 3.3058),
       addressNumber: obj['지번'],
+      code: obj['지역코드'],
     };
   });
 
-  items = await Promise.all(
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    items.map(async (item: ItemType) => {
-      const {x, y} = await getCoord(`${item.dong} ${item.addressNumber}`);
-      return {...item, longitude: parseFloat(x), latitude: parseFloat(y)};
-    }),
-  );
+  let res = [];
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  for (const item of items) {
+    const coord = await getCoord(`${item.dong} ${item.addressNumber}`);
+    if (coord) {
+      res.push({
+        ...item,
+        longitude: parseFloat(coord.x),
+        latitude: parseFloat(coord.y),
+      });
+    }
+  }
 
-  return items;
+  return res;
 };
 
 export type ItemType = {
@@ -60,4 +67,5 @@ export type ItemType = {
   addressNumber: number;
   latitude: number;
   longitude: number;
+  code: number;
 };

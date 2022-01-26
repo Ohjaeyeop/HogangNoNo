@@ -79,8 +79,10 @@ const styles = StyleSheet.create({
     right: 15,
     top: statusBarHeight + 60,
     borderWidth: 1,
+    borderColor: '#835eeb',
     backgroundColor: 'white',
     padding: 4,
+    color: '#835eeb',
   },
 });
 

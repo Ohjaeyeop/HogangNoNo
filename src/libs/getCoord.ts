@@ -7,9 +7,13 @@ export const getCoord = async (key: string) => {
     if (jsonValue !== null) {
       return JSON.parse(jsonValue);
     } else {
-      const {x, y} = await addrToCoord(key);
-      await AsyncStorage.setItem(key, JSON.stringify({x, y}));
-      return {x, y};
+      const res = await addrToCoord(key);
+      if (res) {
+        const {x, y} = res;
+        await AsyncStorage.setItem(key, JSON.stringify({x, y}));
+        return {x, y};
+      }
+      return undefined;
     }
   } catch (err) {
     console.log(err);

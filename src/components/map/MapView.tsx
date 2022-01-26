@@ -1,41 +1,66 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
-import {ItemType, propertyApi} from '../../apis/PropertyApi';
 import ItemMarker from './ItemMarker';
+import {useAppDispatch, useAppSelector} from '../../hooks';
+import {deleteRegions, fetchItems} from '../../propertySlice';
 
 type Props = {
   location: Coord | undefined;
 };
 
 const MapView = ({location}: Props) => {
-  const [propertyItems, setPropertyItems] = useState<ItemType[]>();
+  const dispatch = useAppDispatch();
+  const propertyItems = useAppSelector(state => state.property.entities);
+  const currentCodes = useAppSelector(state => state.property.ids);
+  const [regions, setRegions] = useState<Coord[]>([]);
 
-  async function getAddress(event: any) {
-    const region = event.contentRegion;
-    // 좌표 -> 주소 -> 코드
-    const code = await coordToAddr(
-      region[0].longitude,
-      region[0].latitude,
-      // @ts-ignore
-    ).then(addr => codes[addr]);
-
-    propertyApi(code).then(items => setPropertyItems(items));
+  async function handleCameraChange(event: any) {
+    if (event.zoom > 13) {
+      setRegions(event.contentRegion.slice(0, 4));
+      // 좌표 -> 주소 -> 코드
+      const tempCodes = await Promise.all(
+        regions.map(async (region: Coord) => {
+          return await coordToAddr(
+            region.longitude,
+            region.latitude,
+            // @ts-ignore
+          ).then(addr => codes[addr]);
+        }),
+      );
+      const newCodes = new Set(tempCodes);
+      const addedCodes = [...newCodes].filter(
+        code => !currentCodes.includes(code),
+      );
+      const toRemove = currentCodes.filter(code => !newCodes.has(code));
+      toRemove.length && dispatch(deleteRegions(toRemove));
+      // 부동산 정보 불러오기
+      addedCodes.length && dispatch(fetchItems(addedCodes));
+    }
   }
 
   return (
     <>
       <NaverMapView
-        style={{width: '100%', height: '90%'}}
+        style={{flex: 1}}
         zoomControl={false}
         compass={false}
         center={location ? {...location, zoom: 16} : undefined}
-        onCameraChange={getAddress}>
+        onCameraChange={handleCameraChange}>
         {propertyItems &&
-          propertyItems.map((item: ItemType, index: number) => (
-            <ItemMarker key={index} item={item} />
-          ))}
+          Object.entries(propertyItems).map(value =>
+            value[1].map((item, index) => {
+              if (
+                item.latitude > regions[0].latitude &&
+                item.latitude < regions[1].latitude &&
+                item.longitude > regions[0].longitude &&
+                item.longitude < regions[2].longitude
+              ) {
+                return <ItemMarker key={index} item={item} />;
+              }
+            }),
+          )}
       </NaverMapView>
     </>
   );

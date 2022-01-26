@@ -11,9 +11,12 @@ export const addrToCoord = async (addr: string) => {
     .then(res => res.json())
     .catch(err => console.log(err.message));
 
-  const {x, y} = addresses[0];
+  const res = addresses[0];
+  if (res) {
+    return {x: res.x, y: res.y};
+  }
 
-  return {x, y};
+  return undefined;
 };
 
 export const coordToAddr = async (lon: number, lat: number) => {
