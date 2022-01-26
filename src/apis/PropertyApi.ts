@@ -35,6 +35,7 @@ export const propertyApi = async (code: string) => {
       apartmentName: obj['아파트'],
       area: Math.round(obj['전용면적'] / 3.3058),
       addressNumber: obj['지번'],
+      code: obj['지역코드'],
     };
   });
 
@@ -61,4 +62,5 @@ export type ItemType = {
   addressNumber: number;
   latitude: number;
   longitude: number;
+  code: number;
 };

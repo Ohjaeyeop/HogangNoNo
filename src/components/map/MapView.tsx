@@ -2,16 +2,18 @@ import React, {useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
-import {ItemType, propertyApi} from '../../apis/PropertyApi';
 import ItemMarker from './ItemMarker';
+import {useAppDispatch, useAppSelector} from '../../hooks';
+import {fetchItems} from '../../propertySlice';
 
 type Props = {
   location: Coord | undefined;
 };
 
 const MapView = ({location}: Props) => {
-  const [propertyItems, setPropertyItems] = useState<ItemType[]>([]);
-  const [currentCodes, setCurrentCodes] = useState<Set<string>>(new Set());
+  const [currentCodes, setCurrentCodes] = useState<string[]>([]);
+  const dispatch = useAppDispatch();
+  const propertyItems = useAppSelector(state => state.property.entities);
 
   async function getAddress(event: any) {
     if (event.zoom > 13) {
@@ -27,16 +29,13 @@ const MapView = ({location}: Props) => {
         }),
       );
       const newCodes = new Set(tempCodes);
-      const addedCodes = [...newCodes].filter(code => !currentCodes.has(code));
-
-      // 부동산 정보 불러오기
-      await Promise.all(
-        addedCodes.map(async code => {
-          propertyApi(code).then(items => setPropertyItems(items));
-        }),
+      const addedCodes = [...newCodes].filter(
+        code => !currentCodes.includes(code),
       );
 
-      setCurrentCodes(newCodes);
+      // 부동산 정보 불러오기
+      addedCodes.length && dispatch(fetchItems(addedCodes));
+      setCurrentCodes([...newCodes]);
     }
   }
 
@@ -49,9 +48,11 @@ const MapView = ({location}: Props) => {
         center={location ? {...location, zoom: 16} : undefined}
         onCameraChange={getAddress}>
         {propertyItems &&
-          propertyItems.map((item: ItemType, index: number) => (
-            <ItemMarker key={index} item={item} />
-          ))}
+          Object.entries(propertyItems).map(value =>
+            value[1].map((item, index) => {
+              return <ItemMarker key={index} item={item} />;
+            }),
+          )}
       </NaverMapView>
     </>
   );
