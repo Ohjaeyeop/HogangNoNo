@@ -25,14 +25,15 @@ export const propertyApi = async (code: string) => {
 
   let items = item.map((obj: any) => {
     return {
-      dealAmount: parseInt(obj['거래금액'].replace(',', '')) / 10000,
+      dealAmount:
+        Math.round(parseInt(obj['거래금액'].replace(',', '')) / 1000) / 10,
       buildYear: obj['건축년도'],
       dealYear: obj['년'],
       dealMonth: obj['월'],
       dealDate: obj['일'],
       dong: obj['법정동'],
       apartmentName: obj['아파트'],
-      area: Math.ceil(obj['전용면적'] / 3.3058 + 0.5),
+      area: Math.round(obj['전용면적'] / 3.3058),
       addressNumber: obj['지번'],
     };
   });
