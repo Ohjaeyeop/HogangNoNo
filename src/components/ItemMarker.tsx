@@ -1,47 +1,54 @@
 import React from 'react';
-import {Image, Platform, Text, View} from 'react-native';
-import {Marker} from 'react-native-nmap';
+import {ImageBackground, Platform, Text} from 'react-native';
+import {Align, Marker} from 'react-native-nmap';
 
 const ItemMarker = ({item}) => {
   return (
-    <Marker
-      coordinate={{
-        latitude: item.latitude,
-        longitude: item.longitude,
-      }}
-      width={64}
-      height={54}>
-      {Platform.OS === 'android' && (
-        <>
-          <Image
-            source={{
-              uri: 'https://raw.githubusercontent.com/yijunmin0/TuringNoNo/%ED%99%88%ED%99%94%EB%A9%B4%EA%B0%9C%EB%B0%9C/src/assets/images/marker.png',
-            }}
+    <>
+      {Platform.OS === 'android' ? (
+        <Marker
+          coordinate={{latitude: item.latitude, longitude: item.longitude}}
+          width={64}
+          height={54}>
+          <ImageBackground
+            source={require('../assets/images/marker.png')}
+            resizeMode="stretch"
             style={{
-              width: 64,
-              height: 54,
-              resizeMode: 'stretch',
-              position: 'absolute',
-            }}
-          />
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              bottom: 5,
-              left: 0,
-              right: 0,
+              width: '100%',
+              height: '100%',
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text style={{color: '#9AA7B8', fontSize: 12}}>{item.area}평</Text>
+            <Text style={{color: '#9aa7b8', fontSize: 12}}>{item.area}평</Text>
             <Text style={{color: 'white', fontWeight: 'bold'}}>
-              {parseInt(item.dealAmount) / 10}억
+              {item.dealAmount}억
             </Text>
-          </View>
-        </>
+          </ImageBackground>
+        </Marker>
+      ) : (
+        <Marker
+          image={require('../assets/images/marker.png')}
+          coordinate={{
+            latitude: item.latitude,
+            longitude: item.longitude,
+          }}
+          width={64}
+          height={54}
+          caption={{
+            text: `${item.area}평`,
+            textSize: 12,
+            color: '#9aa7b8',
+            align: Align.Center,
+            haloColor: 'transparent',
+          }}
+          subCaption={{
+            text: `${item.dealAmount}억`,
+            color: 'white',
+            haloColor: 'transparent',
+          }}
+        />
       )}
-    </Marker>
+    </>
   );
 };
 

@@ -25,7 +25,7 @@ export const propertyApi = async (code: string) => {
 
   let items = item.map((obj: any) => {
     return {
-      dealAmount: obj['거래금액'],
+      dealAmount: parseInt(obj['거래금액'].replace(',', '')) / 10000,
       buildYear: obj['건축년도'],
       dealYear: obj['년'],
       dealMonth: obj['월'],
