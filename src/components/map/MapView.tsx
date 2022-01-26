@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
@@ -14,10 +14,11 @@ const MapView = ({location}: Props) => {
   const dispatch = useAppDispatch();
   const propertyItems = useAppSelector(state => state.property.entities);
   const currentCodes = useAppSelector(state => state.property.ids);
+  const [regions, setRegions] = useState<Coord[]>([]);
 
   async function handleCameraChange(event: any) {
     if (event.zoom > 13) {
-      const regions = event.contentRegion.slice(0, 4);
+      setRegions(event.contentRegion.slice(0, 4));
       // 좌표 -> 주소 -> 코드
       const tempCodes = await Promise.all(
         regions.map(async (region: Coord) => {
@@ -33,10 +34,7 @@ const MapView = ({location}: Props) => {
         code => !currentCodes.includes(code),
       );
       const toRemove = currentCodes.filter(code => !newCodes.has(code));
-      if (toRemove.length > 0) {
-        dispatch(deleteRegions(toRemove));
-      }
-
+      toRemove.length && dispatch(deleteRegions(toRemove));
       // 부동산 정보 불러오기
       addedCodes.length && dispatch(fetchItems(addedCodes));
     }
@@ -53,7 +51,14 @@ const MapView = ({location}: Props) => {
         {propertyItems &&
           Object.entries(propertyItems).map(value =>
             value[1].map((item, index) => {
-              return <ItemMarker key={index} item={item} />;
+              if (
+                item.latitude > regions[0].latitude &&
+                item.latitude < regions[1].latitude &&
+                item.longitude > regions[0].longitude &&
+                item.longitude < regions[2].longitude
+              ) {
+                return <ItemMarker key={index} item={item} />;
+              }
             }),
           )}
       </NaverMapView>
