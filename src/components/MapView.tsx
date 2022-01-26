@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
-import NaverMapView, {Coord, Marker} from 'react-native-nmap';
+import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../apis/GeocodeApi';
 import {codes} from '../data/codes';
-import {propertyApi} from '../apis/PropertyApi';
-import {Image, Text, Platform, View} from 'react-native';
+import {ItemType, propertyApi} from '../apis/PropertyApi';
 import ItemMarker from './ItemMarker';
 
 type Props = {
@@ -11,7 +10,7 @@ type Props = {
 };
 
 const MapView = ({location}: Props) => {
-  const [propertyItems, setPropertyItems] = useState();
+  const [propertyItems, setPropertyItems] = useState<ItemType[]>();
 
   async function getAddress(event: any) {
     const region = event.contentRegion;
@@ -20,6 +19,7 @@ const MapView = ({location}: Props) => {
     const code = await coordToAddr(
       region[0].longitude,
       region[0].latitude,
+      // @ts-ignore
     ).then(addr => codes[addr]);
 
     propertyApi(code).then(items => setPropertyItems(items));
@@ -34,7 +34,7 @@ const MapView = ({location}: Props) => {
         center={location ? {...location, zoom: 16} : undefined}
         onCameraChange={getAddress}>
         {propertyItems &&
-          propertyItems.map((item, index) => (
+          propertyItems.map((item: ItemType, index: number) => (
             <ItemMarker key={index} item={item} />
           ))}
       </NaverMapView>

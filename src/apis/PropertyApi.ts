@@ -47,3 +47,17 @@ export const propertyApi = async (code: string) => {
 
   return items;
 };
+
+export type ItemType = {
+  dealAmount: number;
+  buildYear: number;
+  dealYear: number;
+  dealMonth: number;
+  dealDate: number;
+  dong: string;
+  apartmentName: string;
+  area: number;
+  addressNumber: number;
+  latitude: number;
+  longitude: number;
+};
