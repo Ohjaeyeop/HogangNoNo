@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {ItemType, propertyApi} from './apis/PropertyApi';
+import {ItemType, propertyApi} from '../apis/PropertyApi';
 
 type EntityType = {
   [index: string]: ItemType[];

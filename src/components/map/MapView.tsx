@@ -3,8 +3,8 @@ import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
 import ItemMarker from './ItemMarker';
-import {useAppDispatch, useAppSelector} from '../../hooks';
-import {deleteRegions, fetchItems} from '../../propertySlice';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
+import {deleteRegions, fetchItems} from '../../redux/propertySlice';
 
 type Props = {
   location: Coord | undefined;
@@ -15,13 +15,15 @@ const MapView = ({location}: Props) => {
   const propertyItems = useAppSelector(state => state.property.entities);
   const currentCodes = useAppSelector(state => state.property.ids);
   const [regions, setRegions] = useState<Coord[]>([]);
+  const regionsRef = useRef<Coord[]>([]);
 
   async function handleCameraChange(event: any) {
     if (event.zoom > 13) {
-      setRegions(event.contentRegion.slice(0, 4));
+      regionsRef.current = event.contentRegion.slice(0, 4);
+      setRegions(regionsRef.current);
       // 좌표 -> 주소 -> 코드
       const tempCodes = await Promise.all(
-        regions.map(async (region: Coord) => {
+        regionsRef.current.map(async (region: Coord) => {
           return await coordToAddr(
             region.longitude,
             region.latitude,
@@ -52,10 +54,10 @@ const MapView = ({location}: Props) => {
           Object.entries(propertyItems).map(value =>
             value[1].map((item, index) => {
               if (
-                item.latitude > regions[0].latitude &&
-                item.latitude < regions[1].latitude &&
-                item.longitude > regions[0].longitude &&
-                item.longitude < regions[2].longitude
+                item.latitude > regionsRef.current[0].latitude &&
+                item.latitude < regionsRef.current[1].latitude &&
+                item.longitude > regionsRef.current[0].longitude &&
+                item.longitude < regionsRef.current[2].longitude
               ) {
                 return <ItemMarker key={index} item={item} />;
               }
