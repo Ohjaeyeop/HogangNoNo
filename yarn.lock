@@ -1366,6 +1366,11 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.4.tgz#fcf7205c25dff795ee79af1e30da2c9790808f11"
   integrity sha512-rZ5drC/jWjrArrS8BR6SIr4cWpW09RNTYt9AMZo3Jwwif+iacXAqgVjm0B0Bv/S1jhDXKHqRVNCbACkJ89RAnQ==
 
+"@types/react-native-sqlite-storage@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/react-native-sqlite-storage/-/react-native-sqlite-storage-5.0.1.tgz#20a0862eaa52de83c9698bdd597f2114349b563a"
+  integrity sha512-M4KDSFeHVVh0qiV9WvNr5e5VonRDzYpDqBQCFPtmDAVHRoUBNWxeSQETZ+BNF8jGavxN0u/FMbOQWGo+7UwRaA==
+
 "@types/react-native-vector-icons@^6.4.10":
   version "6.4.10"
   resolved "https://registry.yarnpkg.com/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.10.tgz#9bfd6e64dd37b8119425496b5e53ff91d034efa9"
@@ -5622,6 +5627,11 @@ react-native-nmap@^0.0.66:
   version "0.0.66"
   resolved "https://registry.yarnpkg.com/react-native-nmap/-/react-native-nmap-0.0.66.tgz#caea39b1af54d4e46c4313c21130986d3adea3fc"
   integrity sha512-+XMJOqn4zZ6PWO0UH478yj0b9PjYGHQcLUd0W5gJQ3DqGeJEb3vvWVDMbkzcuHsh59hkhGPsE9Q6pZkXxKsYtQ==
+
+react-native-sqlite-storage@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-sqlite-storage/-/react-native-sqlite-storage-6.0.1.tgz#ce6a6b852f07abbea68658d5363818c8bef45dfb"
+  integrity sha512-1tDFjrint6X6qSYKf3gDyz+XB+X79jfiL6xTugKHPRtF0WvqMtVgdLuNqZunIXjNEvNtNVEbXaeZ6MsguFu00A==
 
 react-native-status-bar-height@^2.6.0:
   version "2.6.0"
