@@ -4,7 +4,7 @@ import {coordToAddr} from '../../apis/GeocodeApi';
 import {codes} from '../../data/codes';
 import ItemMarker from './ItemMarker';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {deleteRegions, fetchItems} from '../../redux/propertySlice';
+import {fetchItems, removeRegions} from '../../redux/propertySlice';
 
 type Props = {
   location: Coord | undefined;
@@ -36,7 +36,7 @@ const MapView = ({location}: Props) => {
         code => !currentCodes.includes(code),
       );
       const toRemove = currentCodes.filter(code => !newCodes.has(code));
-      toRemove.length && dispatch(deleteRegions(toRemove));
+      toRemove.length && dispatch(removeRegions(toRemove));
       // 부동산 정보 불러오기
       addedCodes.length && dispatch(fetchItems(addedCodes));
     }
@@ -53,14 +53,7 @@ const MapView = ({location}: Props) => {
         {propertyItems &&
           Object.entries(propertyItems).map(value =>
             value[1].map((item, index) => {
-              if (
-                item.latitude > regionsRef.current[0].latitude &&
-                item.latitude < regionsRef.current[1].latitude &&
-                item.longitude > regionsRef.current[0].longitude &&
-                item.longitude < regionsRef.current[2].longitude
-              ) {
-                return <ItemMarker key={index} item={item} />;
-              }
+              return <ItemMarker key={index} item={item} />;
             }),
           )}
       </NaverMapView>
