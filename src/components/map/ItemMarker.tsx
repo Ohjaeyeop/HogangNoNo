@@ -10,7 +10,8 @@ const ItemMarker = ({item}: {item: ItemType}) => {
         <Marker
           coordinate={{latitude: item.latitude, longitude: item.longitude}}
           width={64}
-          height={54}>
+          height={54}
+          anchor={{x: -1, y: 1}}>
           <ImageBackground
             source={require('../../assets/images/marker.png')}
             resizeMode="stretch"
@@ -35,6 +36,7 @@ const ItemMarker = ({item}: {item: ItemType}) => {
           }}
           width={64}
           height={54}
+          anchor={{x: -1, y: 1}}
           caption={{
             text: `${item.area}평`,
             textSize: 12,
