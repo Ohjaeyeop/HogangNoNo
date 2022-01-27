@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../../apis/GeocodeApi';
-import {codes} from '../../data/codes';
+import {regionInfos} from '../../data/regionInfos';
 import ItemMarker from './ItemMarker';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {fetchItems, removeRegions} from '../../redux/propertySlice';
@@ -28,7 +28,7 @@ const MapView = ({location}: Props) => {
             region.longitude,
             region.latitude,
             // @ts-ignore
-          ).then(addr => codes[addr]);
+          ).then(addr => regionInfos[addr]);
         }),
       );
       const newCodes = new Set(tempCodes);
