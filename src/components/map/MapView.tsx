@@ -17,7 +17,26 @@ const MapView = ({location}: Props) => {
   const [regions, setRegions] = useState<Coord[]>([]);
   const regionsRef = useRef<Coord[]>([]);
 
-  async function handleCameraChange(event: any) {
+  type CameraChangeEventType = {
+    latitude: number;
+    longitude: number;
+    zoom: number;
+    contentRegion: [Coord, Coord, Coord, Coord, Coord];
+    coveringRegion: [Coord, Coord, Coord, Coord, Coord];
+  };
+
+  async function handleCameraChange(event: CameraChangeEventType) {
+    if (event.zoom > 13) {
+      // 아파트 정보
+      setRegions(event.contentRegion.slice(0, 4));
+    } else if (event.zoom > 11) {
+      // 동 정보
+    } else if (event.zoom > 9) {
+      // 구 정보
+    } else if (event.zoom > 6) {
+      // 시 정보
+    } else {
+    }
     if (event.zoom > 13) {
       /*      regionsRef.current = event.contentRegion.slice(0, 4);
       setRegions(regionsRef.current);
@@ -49,7 +68,9 @@ const MapView = ({location}: Props) => {
         zoomControl={false}
         compass={false}
         center={{...location, zoom: 16}}
-        onCameraChange={handleCameraChange}>
+        onCameraChange={handleCameraChange}
+        maxZoomLevel={20}
+        minZoomLevel={6}>
         {propertyItems &&
           Object.entries(propertyItems).map(value =>
             value[1].map((item, index) => {
