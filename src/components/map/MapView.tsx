@@ -1,10 +1,10 @@
 import React, {useRef, useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import {coordToAddr} from '../../apis/GeocodeApi';
-import {regionInfos} from '../../data/regionInfos';
 import ItemMarker from './ItemMarker';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {fetchItems, removeRegions} from '../../redux/propertySlice';
+import {regionCodes} from '../../data/regionInfos';
 
 type Props = {
   location: Coord | undefined;
@@ -19,7 +19,7 @@ const MapView = ({location}: Props) => {
 
   async function handleCameraChange(event: any) {
     if (event.zoom > 13) {
-      regionsRef.current = event.contentRegion.slice(0, 4);
+      /*      regionsRef.current = event.contentRegion.slice(0, 4);
       setRegions(regionsRef.current);
       // 좌표 -> 주소 -> 코드
       const tempCodes = await Promise.all(
@@ -28,7 +28,7 @@ const MapView = ({location}: Props) => {
             region.longitude,
             region.latitude,
             // @ts-ignore
-          ).then(addr => regionInfos[addr]);
+          ).then(addr => regionCodes[addr]);
         }),
       );
       const newCodes = new Set(tempCodes);
@@ -38,7 +38,7 @@ const MapView = ({location}: Props) => {
       const toRemove = currentCodes.filter(code => !newCodes.has(code));
       toRemove.length && dispatch(removeRegions(toRemove));
       // 부동산 정보 불러오기
-      addedCodes.length && dispatch(fetchItems(addedCodes));
+      addedCodes.length && dispatch(fetchItems(addedCodes));*/
     }
   }
 
