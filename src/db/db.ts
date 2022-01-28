@@ -23,7 +23,7 @@ export const init = async () => {
   /* await dropTable(db);
   await createTable(db);
   await insertAddressData(db);*/
-  await insertPropertyData(db);
+  //await insertPropertyData(db).catch(err => console.log(err.message));
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -93,22 +93,34 @@ const getDate = () => {
 
 // 거래정보 삽입
 // eslint-disable-next-line @typescript-eslint/no-shadow
-export const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
+const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
 
   while (ymd <= date) {
-    const items = await propertyApi('11000', date.toString());
+    for (const code in regionCodes) {
+      await propertyApi(code, ymd.toString()).then(async items => {
+        for (const item of items) {
+          await db
+            .executeSql(
+              `INSERT OR IGNORE INTO Apartment(name, dong, latitude, longitude, buildYear) values ("${
+                item.dong + ' ' + item.apartmentName
+              }", '${
+                regionCodes[item.code].split(' ')[1] + ' ' + item.dong
+              }', ${item.latitude}, ${item.longitude}, '${item.buildYear}')`,
+            )
+            .catch(err => console.log(err.message, item.apartmentName));
 
-    for (const item of items) {
-      await db
-        .executeSql(
-          `INSERT OR IGNORE INTO Apartment(name, dong, latitude, longitude, buildYear) values ('${
-            item.dong + ' ' + item.apartmentName
-          }', '${regionCodes[item.code].split(' ')[1] + ' ' + item.dong}', ${
-            item.latitude
-          }, ${item.longitude}, '${item.buildYear}')`,
-        )
-        .catch(err => console.log(err.message));
+          await db
+            .executeSql(
+              `INSERT OR IGNORE INTO Deal(year, month, day, dealAmount, area, apartmentName) values (${
+                item.dealYear
+              }, ${item.dealMonth}, ${item.dealDate}, ${item.dealAmount}, ${
+                item.area
+              }, "${item.dong + ' ' + item.apartmentName}")`,
+            )
+            .catch(err => console.log(err.message));
+        }
+      });
     }
     ymd =
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
@@ -116,8 +128,10 @@ export const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
 };
 
 export const selectAll = async () => {
-  const all = await db.executeSql('SELECT * FROM Apartment');
-  console.log(all[0].rows.item(0));
+  const apartments = await db.executeSql('SELECT * FROM Apartment');
+  const deals = await db.executeSql('SELECT * FROM Deal');
+  console.log(apartments[0].rows.item(1));
+  console.log(deals[0].rows.item(1));
 };
 
 export type GuType = {
@@ -135,4 +149,25 @@ export type DongType = {
   count: number;
   latitude: number;
   longitude: number;
+};
+
+export type ApartmentType = {
+  name: string;
+  dong: string;
+  latitude: number;
+  longitude: number;
+  buildYear: number;
+  area: number;
+  dealAmount: number;
+  count: 0;
+};
+
+export type DealType = {
+  id: number;
+  year: number;
+  month: number;
+  day: number;
+  dealAmount: number;
+  area: number;
+  apartmentName: string;
 };

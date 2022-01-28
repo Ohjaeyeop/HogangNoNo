@@ -7,7 +7,7 @@ const App = () => {
     await db.init();
     await db.selectAll();
   }
-  /* useEffect(() => {
+  /*  useEffect(() => {
     dbInitialize();
   }, []);*/
   return <Home />;
