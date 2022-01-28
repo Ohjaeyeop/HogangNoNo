@@ -134,19 +134,22 @@ export const selectAll = async () => {
   console.log(deals[0].rows.item(1));
 };
 
-const selectApartments = async ({startX, startY, endX, endY}: CoordType) => {
+const selectData = async (
+  {startX, startY, endX, endY}: CoordType,
+  table: 'Apartment' | 'Dong' | 'Gu',
+) => {
   const res = await db
     .executeSql(
-      `SELECT * FROM Apartment WHERE latitude >= ${startX} and latitude <= ${endX} and longitude >= ${startY} and longitude <= ${endY} `,
+      `SELECT * FROM ${table} WHERE latitude >= ${startX} and latitude <= ${endX} and longitude >= ${startY} and longitude <= ${endY} `,
     )
     .catch(err => console.log(err.message));
-  let apartments: ApartmentType[] = [];
+  let items = [];
   if (res) {
     for (let i = 0; i < res[0].rows.length; i++) {
-      apartments.push(res[0].rows.item(i));
+      items.push(res[0].rows.item(i));
     }
   }
-  return apartments;
+  return items;
 };
 
 export const getData = async (
@@ -155,13 +158,13 @@ export const getData = async (
 ) => {
   if (zoom >= 14) {
     // 아파트 정보
-    return await selectApartments({startX, startY, endX, endY}).catch(err =>
-      console.log(err.message),
-    );
+    return await selectData({startX, startY, endX, endY}, 'Apartment');
   } else if (zoom >= 11) {
     // 동 정보
+    return await selectData({startX, startY, endX, endY}, 'Dong');
   } else if (zoom >= 9) {
     // 구 정보
+    return await selectData({startX, startY, endX, endY}, 'Gu');
   } else {
     // 시 정보
   }

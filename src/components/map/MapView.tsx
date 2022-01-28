@@ -8,7 +8,7 @@ type Props = {
 };
 
 const MapView = ({location}: Props) => {
-  const [apartments, setApartments] = useState<ApartmentType[] | void>([]);
+  const [apartments, setApartments] = useState<ApartmentType[] | undefined>([]);
   const [regions, setRegions] = useState<Coord[]>([]);
 
   async function handleCameraChange(event: any) {
