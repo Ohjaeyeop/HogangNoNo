@@ -13,9 +13,7 @@ export const init = async () => {
       name: 'propertyDB.db',
       location: 'default',
     },
-    () => {
-      console.log('DB connected');
-    },
+    () => {},
     error => {
       console.log(error.message);
     },
@@ -159,7 +157,7 @@ export const getData = async (
   if (zoom >= 14) {
     // 아파트 정보
     return await selectData({startX, startY, endX, endY}, 'Apartment');
-  } else if (zoom >= 11) {
+  } else if (zoom >= 12) {
     // 동 정보
     return await selectData({startX, startY, endX, endY}, 'Dong');
   } else if (zoom >= 9) {

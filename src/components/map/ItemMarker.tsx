@@ -1,9 +1,9 @@
 import React from 'react';
 import {ImageBackground, Platform, Text} from 'react-native';
 import {Align, Marker} from 'react-native-nmap';
-import {ApartmentType} from '../../db/db';
+import {ApartmentType, DongType, GuType} from '../../db/db';
 
-const ItemMarker = ({item}: {item: ApartmentType}) => {
+const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
   return (
     <>
       {Platform.OS === 'android' ? (
@@ -13,7 +13,7 @@ const ItemMarker = ({item}: {item: ApartmentType}) => {
           height={54}
           anchor={{x: -1, y: 1}}>
           <ImageBackground
-            source={require('../../assets/images/marker.png')}
+            source={require('../../../assets/images/marker.png')}
             resizeMode="stretch"
             style={{
               width: '100%',
@@ -21,7 +21,9 @@ const ItemMarker = ({item}: {item: ApartmentType}) => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text style={{color: '#9aa7b8', fontSize: 12}}>{item.area}평</Text>
+            <Text style={{color: '#9aa7b8', fontSize: 12}}>
+              {'area' in item ? `${item.area}평` : `${item.name}`}
+            </Text>
             <Text style={{color: 'white', fontWeight: 'bold'}}>
               {item.dealAmount}억
             </Text>
@@ -29,7 +31,7 @@ const ItemMarker = ({item}: {item: ApartmentType}) => {
         </Marker>
       ) : (
         <Marker
-          image={require('../../assets/images/marker.png')}
+          image={require('../../../assets/images/marker.png')}
           coordinate={{
             latitude: item.latitude,
             longitude: item.longitude,
@@ -38,7 +40,12 @@ const ItemMarker = ({item}: {item: ApartmentType}) => {
           height={54}
           anchor={{x: -1, y: 1}}
           caption={{
-            text: `${item.area}평`,
+            text:
+              'area' in item
+                ? `${item.area}평`
+                : 'gu' in item
+                ? item.name.split(' ')[1]
+                : item.name,
             textSize: 12,
             color: '#9aa7b8',
             align: Align.Center,
