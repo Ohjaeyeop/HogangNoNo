@@ -130,8 +130,48 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
 export const selectAll = async () => {
   const apartments = await db.executeSql('SELECT * FROM Apartment');
   const deals = await db.executeSql('SELECT * FROM Deal');
-  console.log(apartments[0].rows.item(1));
+  console.log(apartments[0].rows.item(270));
   console.log(deals[0].rows.item(1));
+};
+
+const selectApartments = async ({startX, startY, endX, endY}: CoordType) => {
+  const res = await db
+    .executeSql(
+      `SELECT * FROM Apartment WHERE latitude >= ${startX} and latitude <= ${endX} and longitude >= ${startY} and longitude <= ${endY} `,
+    )
+    .catch(err => console.log(err.message));
+  let apartments: ApartmentType[] = [];
+  if (res) {
+    for (let i = 0; i < res[0].rows.length; i++) {
+      apartments.push(res[0].rows.item(i));
+    }
+  }
+  return apartments;
+};
+
+export const getData = async (
+  {startX, startY, endX, endY}: CoordType,
+  zoom: number,
+) => {
+  if (zoom >= 14) {
+    // 아파트 정보
+    return await selectApartments({startX, startY, endX, endY}).catch(err =>
+      console.log(err.message),
+    );
+  } else if (zoom >= 11) {
+    // 동 정보
+  } else if (zoom >= 9) {
+    // 구 정보
+  } else {
+    // 시 정보
+  }
+};
+
+type CoordType = {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
 };
 
 export type GuType = {

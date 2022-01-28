@@ -1,9 +1,9 @@
 import React from 'react';
 import {ImageBackground, Platform, Text} from 'react-native';
 import {Align, Marker} from 'react-native-nmap';
-import {ItemType} from '../../apis/PropertyApi';
+import {ApartmentType} from '../../db/db';
 
-const ItemMarker = ({item}: {item: ItemType}) => {
+const ItemMarker = ({item}: {item: ApartmentType}) => {
   return (
     <>
       {Platform.OS === 'android' ? (
