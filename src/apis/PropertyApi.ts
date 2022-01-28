@@ -6,7 +6,7 @@ const uri =
 const SERVICE_KEY =
   'Os0BvUN73dbFsXA8O3jtA4bPKaxXGxoW7C88n6DpgNyVrssis9u3RLTGl7yxRCJimPkKY0yCD9dUeK4M8vK1BA%3D%3D';
 
-export const propertyApi = async (code: string) => {
+export const propertyApi = async (code: string, ymd: string) => {
   const {
     response: {
       body: {
@@ -14,7 +14,7 @@ export const propertyApi = async (code: string) => {
       },
     },
   } = await fetch(
-    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=202101`,
+    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=${ymd}`,
   )
     .then(res => res.text())
     .then(resText => {
