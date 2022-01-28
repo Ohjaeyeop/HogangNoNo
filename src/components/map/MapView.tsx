@@ -7,7 +7,7 @@ import {fetchItems, removeRegions} from '../../redux/propertySlice';
 import {regionCodes} from '../../data/regionInfos';
 
 type Props = {
-  location: Coord | undefined;
+  location: Coord;
 };
 
 const MapView = ({location}: Props) => {
@@ -48,7 +48,7 @@ const MapView = ({location}: Props) => {
         style={{flex: 1}}
         zoomControl={false}
         compass={false}
-        center={location ? {...location, zoom: 16} : undefined}
+        center={{...location, zoom: 16}}
         onCameraChange={handleCameraChange}>
         {propertyItems &&
           Object.entries(propertyItems).map(value =>

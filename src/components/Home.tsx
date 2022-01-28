@@ -9,7 +9,10 @@ import {Coord} from 'react-native-nmap';
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
 const Home = () => {
-  const [location, setLocation] = useState<Coord | undefined>();
+  const [location, setLocation] = useState<Coord>({
+    latitude: 37.50882651313064,
+    longitude: 127.06310347509722,
+  });
 
   async function requestPermission() {
     try {
