@@ -40,9 +40,11 @@ const MapView = ({location}: Props) => {
         maxZoomLevel={20}
         minZoomLevel={6}>
         {apartments &&
-          apartments.map((apartment, index) => (
-            <ItemMarker key={index} item={apartment} />
-          ))}
+          apartments.map((apartment, index) =>
+            apartment.dealAmount ? (
+              <ItemMarker key={index} item={apartment} />
+            ) : null,
+          )}
       </NaverMapView>
     </>
   );

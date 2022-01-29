@@ -23,6 +23,7 @@ export const init = async () => {
   await insertAddressData(db);*/
   //await insertPropertyData(db).catch(err => console.log(err.message));
   // await updateApartment();
+  //await updateDong();
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -36,13 +37,13 @@ const dropTable = async (db: SQLite.SQLiteDatabase) => {
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const createTable = async (db: SQLite.SQLiteDatabase) => {
   await db.executeSql(
-    'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, "count" INTEGER DEFAULT 0, PRIMARY KEY("name") )',
+    'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );
   await db.executeSql(
-    'CREATE TABLE "Dong" ("name" TEXT, "gu" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, "count" INTEGER DEFAULT 0, FOREIGN KEY("gu") REFERENCES "Gu"("name"), PRIMARY KEY("name") )',
+    'CREATE TABLE "Dong" ("name" TEXT, "gu" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, FOREIGN KEY("gu") REFERENCES "Gu"("name"), PRIMARY KEY("name") )',
   );
   await db.executeSql(
-    'CREATE TABLE "Apartment" ( "name" TEXT UNIQUE, "dong" TEXT, "latitude" NUMERIC, "longitude" NUMERIC, "buildYear" INTEGER, "area" NUMERIC, "dealAmount" NUMERIC DEFAULT 0, "count" INTEGER DEFAULT 0, FOREIGN KEY("dong") REFERENCES "Dong"("name"), PRIMARY KEY("name") )',
+    'CREATE TABLE "Apartment" ( "name" TEXT UNIQUE, "dong" TEXT, "latitude" NUMERIC, "longitude" NUMERIC, "buildYear" INTEGER, "area" NUMERIC, "dealAmount" NUMERIC DEFAULT 0, FOREIGN KEY("dong") REFERENCES "Dong"("name"), PRIMARY KEY("name") )',
   );
   await db.executeSql(
     'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
@@ -158,6 +159,25 @@ const updateApartment = async () => {
   }
 };
 
+const updateDong = async () => {
+  const items = await db
+    .executeSql(
+      `SELECT avg(dealAmount) as dealAmount, dong FROM Apartment group by dong`,
+    )
+    .then(res => res[0].rows);
+
+  for (let i = 0; i < items.length; i++) {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const {dealAmount, dong} = items.item(i);
+
+    await db.executeSql(
+      `UPDATE Dong SET dealAmount = ${
+        Math.round(dealAmount * 10) / 10
+      } WHERE name = "${dong}"`,
+    );
+  }
+};
+
 export const selectAll = async () => {
   const apartments = await db.executeSql('SELECT * FROM Apartment');
   console.log(apartments[0].rows.item(2433));
@@ -209,7 +229,6 @@ type CoordType = {
 export type GuType = {
   name: string;
   dealAmount: number;
-  count: number;
   latitude: number;
   longitude: number;
 };
@@ -218,7 +237,6 @@ export type DongType = {
   name: string;
   gu: string;
   dealAmount: number;
-  count: number;
   latitude: number;
   longitude: number;
 };
@@ -231,7 +249,6 @@ export type ApartmentType = {
   buildYear: number;
   area: number;
   dealAmount: number;
-  count: 0;
 };
 
 export type DealType = {
