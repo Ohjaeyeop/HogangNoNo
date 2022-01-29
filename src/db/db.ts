@@ -128,8 +128,8 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
 export const selectAll = async () => {
   const apartments = await db.executeSql('SELECT * FROM Apartment');
   const deals = await db.executeSql('SELECT * FROM Deal');
-  console.log(apartments[0].rows.item(270));
-  console.log(deals[0].rows.item(1));
+  console.log(apartments[0].rows.length);
+  console.log(deals[0].rows.item(30000));
 };
 
 const selectData = async (
