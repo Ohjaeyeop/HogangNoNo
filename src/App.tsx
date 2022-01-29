@@ -3,11 +3,8 @@ import Home from './components/Home';
 import * as db from './db/db';
 
 const App = () => {
-  async function dbInitialize() {
-    await db.init();
-  }
   useEffect(() => {
-    dbInitialize();
+    db.init();
   }, []);
   return <Home />;
 };

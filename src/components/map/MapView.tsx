@@ -9,12 +9,10 @@ type Props = {
 
 const MapView = ({location}: Props) => {
   const [apartments, setApartments] = useState<ApartmentType[] | undefined>([]);
-  const [regions, setRegions] = useState<Coord[]>([]);
 
   async function handleCameraChange(event: any) {
     if (event.zoom > 6) {
       const {zoom, contentRegion} = event;
-      setRegions(contentRegion.slice(0, 4));
       await getData(
         {
           startX: contentRegion[0].latitude,
