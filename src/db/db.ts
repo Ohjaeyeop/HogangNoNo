@@ -22,6 +22,7 @@ export const init = async () => {
   await createTable(db);
   await insertAddressData(db);*/
   //await insertPropertyData(db).catch(err => console.log(err.message));
+  // await updateApartment();
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -125,11 +126,41 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   }
 };
 
+const updateApartment = async () => {
+  const groupByApartAndArea =
+    'SELECT * FROM (SELECT apartmentName, area, count(*) as count FROM DEAL group by apartmentName, area )';
+  const apartments = await db
+    .executeSql(`SELECT name FROM Apartment`)
+    .then(res => res[0].rows);
+
+  for (let i = 0; i < apartments.length; i++) {
+    const {name} = apartments.item(i);
+    const maxCount = await db.executeSql(
+      `SELECT max(count) as count FROM (${groupByApartAndArea}) WHERE apartmentName = "${name}"`,
+    );
+    const area = await db
+      .executeSql(
+        `SELECT area FROM (${groupByApartAndArea}) WHERE apartmentName = "${name}" and count = ${
+          maxCount[0].rows.item(0).count
+        }`,
+      )
+      .then(res => res[0].rows.item(0).area);
+    const dealAmount = await db
+      .executeSql(
+        `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
+      )
+      .then(res => res[0].rows.item(0).dealAmount);
+    await db.executeSql(
+      `UPDATE Apartment SET area = ${area}, dealAmount=${
+        Math.round(dealAmount * 10) / 10
+      } WHERE name="${name}"`,
+    );
+  }
+};
+
 export const selectAll = async () => {
   const apartments = await db.executeSql('SELECT * FROM Apartment');
-  const deals = await db.executeSql('SELECT * FROM Deal');
-  console.log(apartments[0].rows.length);
-  console.log(deals[0].rows.item(30000));
+  console.log(apartments[0].rows.item(2433));
 };
 
 const selectData = async (
