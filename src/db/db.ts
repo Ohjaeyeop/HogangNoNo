@@ -22,8 +22,9 @@ export const init = async () => {
   await createTable(db);
   await insertAddressData(db);*/
   //await insertPropertyData(db).catch(err => console.log(err.message));
-  // await updateApartment();
+  //await updateApartment();
   //await updateDong();
+  //await updateGu();
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -178,9 +179,23 @@ const updateDong = async () => {
   }
 };
 
-export const selectAll = async () => {
-  const apartments = await db.executeSql('SELECT * FROM Apartment');
-  console.log(apartments[0].rows.item(2433));
+const updateGu = async () => {
+  const items = await db
+    .executeSql(
+      `SELECT avg(dealAmount) as dealAmount, gu FROM Dong group by gu`,
+    )
+    .then(res => res[0].rows);
+
+  for (let i = 0; i < items.length; i++) {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const {dealAmount, gu} = items.item(i);
+
+    await db.executeSql(
+      `UPDATE Gu SET dealAmount = ${
+        Math.round(dealAmount * 10) / 10
+      } WHERE name = "${gu}"`,
+    );
+  }
 };
 
 const selectData = async (
