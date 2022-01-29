@@ -9,12 +9,10 @@ type Props = {
 
 const MapView = ({location}: Props) => {
   const [apartments, setApartments] = useState<ApartmentType[] | undefined>([]);
-  const [regions, setRegions] = useState<Coord[]>([]);
 
   async function handleCameraChange(event: any) {
     if (event.zoom > 6) {
       const {zoom, contentRegion} = event;
-      setRegions(contentRegion.slice(0, 4));
       await getData(
         {
           startX: contentRegion[0].latitude,
@@ -40,9 +38,11 @@ const MapView = ({location}: Props) => {
         maxZoomLevel={20}
         minZoomLevel={6}>
         {apartments &&
-          apartments.map((apartment, index) => (
-            <ItemMarker key={index} item={apartment} />
-          ))}
+          apartments.map((apartment, index) =>
+            apartment.dealAmount ? (
+              <ItemMarker key={index} item={apartment} />
+            ) : null,
+          )}
       </NaverMapView>
     </>
   );
