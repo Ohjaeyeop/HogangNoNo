@@ -10,10 +10,11 @@ import Detail from './components/Detail';
 
 type StackParamList = {
   Home: undefined;
-  Detail: undefined;
+  Detail: {name: string};
 };
 
 export type HomeProps = NativeStackScreenProps<StackParamList, 'Home'>;
+export type DetailProps = NativeStackScreenProps<StackParamList, 'Detail'>;
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -29,7 +30,11 @@ const App = () => {
           component={Home}
           options={{headerShown: false}}
         />
-        <Stack.Screen name="Detail" component={Detail} />
+        <Stack.Screen
+          name="Detail"
+          component={Detail}
+          options={{headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

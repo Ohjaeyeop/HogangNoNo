@@ -14,7 +14,8 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
   const navigation = useNavigation<HomeProps['navigation']>();
 
   return (
-    <TouchableWithoutFeedback onPress={() => navigation.navigate('Detail')}>
+    <TouchableWithoutFeedback
+      onPress={() => navigation.navigate('Detail', {name: item.name})}>
       {Platform.OS === 'android' ? (
         <Marker
           coordinate={{latitude: item.latitude, longitude: item.longitude}}
