@@ -13,16 +13,19 @@ import {HomeProps} from '../../App';
 const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
   const navigation = useNavigation<HomeProps['navigation']>();
 
+  const handlePress = () => {
+    if ('buildYear' in item) {
+      navigation.navigate('Detail', {
+        name: item.name,
+        dealAmount: item.dealAmount,
+        buildYear: item.buildYear,
+        area: item.area,
+      });
+    }
+  };
+
   return (
-    <TouchableWithoutFeedback
-      onPress={() =>
-        navigation.navigate('Detail', {
-          name: item.name,
-          dealAmount: item.dealAmount,
-          buildYear: item.buildYear,
-          area: item.area,
-        })
-      }>
+    <TouchableWithoutFeedback onPress={handlePress}>
       {Platform.OS === 'android' ? (
         <Marker
           coordinate={{latitude: item.latitude, longitude: item.longitude}}

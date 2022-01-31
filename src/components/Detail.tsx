@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Platform,
   StyleSheet,
@@ -11,10 +11,15 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
 import DealInfo from './DealInfo';
 import ApartmentInfo from './ApartmentInfo';
+import {getDealInfo} from '../db/db';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
 const Detail = ({navigation, route}: DetailProps) => {
+  useEffect(() => {
+    getDealInfo(route.params.name);
+  }, [route.params.name]);
+
   return (
     <View style={{flex: 1}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}

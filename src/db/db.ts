@@ -240,6 +240,21 @@ export const getData = async (
   }
 };
 
+export const getDealInfo = async (apartmentName: string) => {
+  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}"`;
+  const dealInfoList = await db
+    .executeSql(selectQuery)
+    .then(res => res[0].rows);
+  const dealInfoGroup = await db
+    .executeSql(
+      `SELECT count(*) as count, avg(dealAmount) as avg, year, month FROM (${selectQuery}) group by year, month`,
+    )
+    .then(res => res[0].rows);
+
+  console.log(dealInfoList.item(0));
+  console.log(dealInfoGroup.item(0));
+};
+
 type CoordType = {
   startX: number;
   startY: number;
