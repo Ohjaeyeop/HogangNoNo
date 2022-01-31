@@ -9,6 +9,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
+import DealInfo from './DealInfo';
+import ApartmentInfo from './ApartmentInfo';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
@@ -26,6 +28,10 @@ const Detail = ({navigation, route}: DetailProps) => {
         </TouchableWithoutFeedback>
         <Text style={styles.title}>{route.params.name}</Text>
         <View style={{width: '25%'}} />
+      </View>
+      <View>
+        <ApartmentInfo buildYear={route.params.buildYear} />
+        <DealInfo dealAmount={route.params.dealAmount} />
       </View>
     </View>
   );

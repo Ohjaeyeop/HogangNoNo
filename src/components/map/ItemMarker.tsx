@@ -15,7 +15,14 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
 
   return (
     <TouchableWithoutFeedback
-      onPress={() => navigation.navigate('Detail', {name: item.name})}>
+      onPress={() =>
+        navigation.navigate('Detail', {
+          name: item.name,
+          dealAmount: item.dealAmount,
+          buildYear: item.buildYear,
+          area: item.area,
+        })
+      }>
       {Platform.OS === 'android' ? (
         <Marker
           coordinate={{latitude: item.latitude, longitude: item.longitude}}

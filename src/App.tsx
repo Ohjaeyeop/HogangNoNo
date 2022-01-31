@@ -10,7 +10,7 @@ import Detail from './components/Detail';
 
 type StackParamList = {
   Home: undefined;
-  Detail: {name: string};
+  Detail: {name: string; buildYear: number; area: number; dealAmount: number};
 };
 
 export type HomeProps = NativeStackScreenProps<StackParamList, 'Home'>;
