@@ -18,7 +18,7 @@ export const init = async () => {
       console.log(error.message);
     },
   );
-  /* await dropTable(db);
+  /*  await dropTable(db);
   await createTable(db);
   await insertAddressData(db);*/
   //await insertPropertyData(db).catch(err => console.log(err.message));
@@ -96,9 +96,11 @@ const getDate = () => {
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-
+  ymd = 202007;
   while (ymd <= date) {
+    console.log(ymd, date);
     for (const code in regionCodes) {
+      console.log(code);
       await propertyApi(code, ymd.toString()).then(async items => {
         for (const item of items) {
           await db
@@ -126,6 +128,7 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
     ymd =
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
   }
+  console.log(4);
 };
 
 const updateApartment = async () => {
@@ -158,6 +161,7 @@ const updateApartment = async () => {
       } WHERE name="${name}"`,
     );
   }
+  console.log(5);
 };
 
 const updateDong = async () => {
@@ -177,6 +181,7 @@ const updateDong = async () => {
       } WHERE name = "${dong}"`,
     );
   }
+  console.log(6);
 };
 
 const updateGu = async () => {
@@ -196,6 +201,7 @@ const updateGu = async () => {
       } WHERE name = "${gu}"`,
     );
   }
+  console.log(7);
 };
 
 const selectData = async (

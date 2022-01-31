@@ -22,7 +22,11 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
               alignItems: 'center',
             }}>
             <Text style={{color: '#9aa7b8', fontSize: 12}}>
-              {'area' in item ? `${item.area}평` : `${item.name}`}
+              {'area' in item
+                ? `${item.area}평`
+                : 'gu' in item
+                ? item.name.split(' ')[1]
+                : item.name}
             </Text>
             <Text style={{color: 'white', fontWeight: 'bold'}}>
               {item.dealAmount}억
