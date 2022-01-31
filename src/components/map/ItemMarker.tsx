@@ -1,11 +1,20 @@
 import React from 'react';
-import {ImageBackground, Platform, Text} from 'react-native';
+import {
+  ImageBackground,
+  Platform,
+  Text,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import {Align, Marker} from 'react-native-nmap';
 import {ApartmentType, DongType, GuType} from '../../db/db';
+import {useNavigation} from '@react-navigation/native';
+import {HomeProps} from '../../App';
 
 const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
+  const navigation = useNavigation<HomeProps['navigation']>();
+
   return (
-    <>
+    <TouchableWithoutFeedback onPress={() => navigation.navigate('Detail')}>
       {Platform.OS === 'android' ? (
         <Marker
           coordinate={{latitude: item.latitude, longitude: item.longitude}}
@@ -62,7 +71,7 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
           }}
         />
       )}
-    </>
+    </TouchableWithoutFeedback>
   );
 };
 
