@@ -1,5 +1,6 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
@@ -9,15 +10,24 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
-import DealInfo from './DealInfo';
-import ApartmentInfo from './ApartmentInfo';
+import DealInfo from './detail/DealInfo';
+import ApartmentInfo from './detail/ApartmentInfo';
 import {getDealInfo} from '../db/db';
+import {ResultSetRowList} from 'react-native-sqlite-storage';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
 const Detail = ({navigation, route}: DetailProps) => {
+  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
+  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    getDealInfo(route.params.name);
+    getDealInfo(route.params.name).then(res => {
+      setDealInfoList(res.dealInfoList);
+      setDealInfoGroup(res.dealInfoGroup);
+      setLoading(false);
+    });
   }, [route.params.name]);
 
   return (
@@ -34,10 +44,18 @@ const Detail = ({navigation, route}: DetailProps) => {
         <Text style={styles.title}>{route.params.name}</Text>
         <View style={{width: '25%'}} />
       </View>
-      <View>
-        <ApartmentInfo buildYear={route.params.buildYear} />
-        <DealInfo dealAmount={route.params.dealAmount} />
-      </View>
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <View>
+          <ApartmentInfo buildYear={route.params.buildYear} />
+          <DealInfo
+            dealAmount={route.params.dealAmount}
+            dealInfoList={dealInfoList}
+            dealInfoGroup={dealInfoGroup}
+          />
+        </View>
+      )}
     </View>
   );
 };

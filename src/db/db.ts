@@ -241,7 +241,7 @@ export const getData = async (
 };
 
 export const getDealInfo = async (apartmentName: string) => {
-  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}"`;
+  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}" order by year desc, month desc, day desc`;
   const dealInfoList = await db
     .executeSql(selectQuery)
     .then(res => res[0].rows);
@@ -251,8 +251,7 @@ export const getDealInfo = async (apartmentName: string) => {
     )
     .then(res => res[0].rows);
 
-  console.log(dealInfoList.item(0));
-  console.log(dealInfoGroup.item(0));
+  return {dealInfoList, dealInfoGroup};
 };
 
 type CoordType = {

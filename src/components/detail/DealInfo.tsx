@@ -1,7 +1,20 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {ResultSetRowList} from 'react-native-sqlite-storage';
+import DealInfoGraph from './DealInfoGraph';
+import DealList from './DealList';
 
-const DealInfo = ({dealAmount}: {dealAmount: number}) => {
+const DealInfo = ({
+  dealAmount,
+  dealInfoList,
+  dealInfoGroup,
+}: {
+  dealAmount: number;
+  dealInfoList: ResultSetRowList;
+  dealInfoGroup: ResultSetRowList;
+}) => {
+  console.log(dealInfoList.length, dealInfoGroup.length);
+
   return (
     <View>
       <View style={styles.dealInfoContainer}>
@@ -11,6 +24,8 @@ const DealInfo = ({dealAmount}: {dealAmount: number}) => {
         <Text style={{color: '#835eeb', fontSize: 20, fontWeight: 'bold'}}>
           {dealAmount}
         </Text>
+        <DealInfoGraph />
+        <DealList dealInfoList={dealInfoList} />
       </View>
     </View>
   );
