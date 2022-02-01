@@ -49,7 +49,10 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
                 : item.name}
             </Text>
             <Text style={{color: 'white', fontWeight: 'bold'}}>
-              {item.dealAmount}억
+              {'area' in item
+                ? Math.round(item.dealAmount / 1000) / 10
+                : item.dealAmount}
+              억
             </Text>
           </ImageBackground>
         </Marker>
@@ -76,7 +79,11 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
             haloColor: 'transparent',
           }}
           subCaption={{
-            text: `${item.dealAmount}억`,
+            text: `${
+              'area' in item
+                ? Math.round(item.dealAmount / 1000) / 10
+                : item.dealAmount
+            }억`,
             color: 'white',
             haloColor: 'transparent',
           }}

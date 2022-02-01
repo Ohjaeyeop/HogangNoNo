@@ -10,10 +10,18 @@ const DealInfo = ({
   dealInfoGroup,
 }: {
   dealAmount: number;
-  dealInfoList: ResultSetRowList;
-  dealInfoGroup: ResultSetRowList;
+  dealInfoList: ResultSetRowList | undefined;
+  dealInfoGroup: ResultSetRowList | undefined;
 }) => {
-  console.log(dealInfoList.length, dealInfoGroup.length);
+  const amount1 = Math.floor(dealAmount / 10000);
+  const amount2 = dealAmount % 10000;
+  const displayedAmount1 = amount1 > 0 ? `${amount1}억` : '';
+  const displayedAmount2 =
+    amount2 >= 1000
+      ? amount2.toString().slice(0, 1) + ',' + amount2.toString().slice(1)
+      : amount2 > 0
+      ? amount2.toString()
+      : '';
 
   return (
     <View>
@@ -22,7 +30,7 @@ const DealInfo = ({
           최근 실거래 기준 1개월 평균
         </Text>
         <Text style={{color: '#835eeb', fontSize: 20, fontWeight: 'bold'}}>
-          {dealAmount}
+          {displayedAmount1 + ' ' + displayedAmount2}
         </Text>
         <DealInfoGraph />
         <DealList dealInfoList={dealInfoList} />

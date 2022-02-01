@@ -19,35 +19,35 @@ export const init = async () => {
     },
   );
   /*  await dropTable(db);
-  await createTable(db);
-  await insertAddressData(db);*/
+  await createTable(db);*/
+  //await insertAddressData(db);
   //await insertPropertyData(db).catch(err => console.log(err.message));
-  //await updateApartment();
-  //await updateDong();
-  //await updateGu();
+  /*  await updateApartment();
+  await updateDong();
+  await updateGu();*/
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
-  await db.executeSql('Drop TABLE Gu');
-  await db.executeSql('Drop TABLE Dong');
+  /*  await db.executeSql('Drop TABLE Gu');
+  await db.executeSql('Drop TABLE Dong');*/
   await db.executeSql('Drop TABLE Apartment');
   await db.executeSql('Drop TABLE Deal');
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const createTable = async (db: SQLite.SQLiteDatabase) => {
-  await db.executeSql(
+  /*  await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );
   await db.executeSql(
     'CREATE TABLE "Dong" ("name" TEXT, "gu" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, FOREIGN KEY("gu") REFERENCES "Gu"("name"), PRIMARY KEY("name") )',
-  );
+  );*/
   await db.executeSql(
     'CREATE TABLE "Apartment" ( "name" TEXT UNIQUE, "dong" TEXT, "latitude" NUMERIC, "longitude" NUMERIC, "buildYear" INTEGER, "area" NUMERIC, "dealAmount" NUMERIC DEFAULT 0, FOREIGN KEY("dong") REFERENCES "Dong"("name"), PRIMARY KEY("name") )',
   );
   await db.executeSql(
-    'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
+    'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
   );
 };
 
@@ -96,7 +96,7 @@ const getDate = () => {
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 202007;
+  ymd = 202101;
   while (ymd <= date) {
     console.log(ymd, date);
     for (const code in regionCodes) {
@@ -115,11 +115,11 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
 
           await db
             .executeSql(
-              `INSERT OR IGNORE INTO Deal(year, month, day, dealAmount, area, apartmentName) values (${
+              `INSERT OR IGNORE INTO Deal(year, month, day, dealAmount, area, apartmentName, floor) values (${
                 item.dealYear
               }, ${item.dealMonth}, ${item.dealDate}, ${item.dealAmount}, ${
                 item.area
-              }, "${item.dong + ' ' + item.apartmentName}")`,
+              }, "${item.dong + ' ' + item.apartmentName}", ${item.floor})`,
             )
             .catch(err => console.log(err.message));
         }
@@ -154,11 +154,10 @@ const updateApartment = async () => {
       .executeSql(
         `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
       )
-      .then(res => res[0].rows.item(0).dealAmount);
+      .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
+    console.log(dealAmount);
     await db.executeSql(
-      `UPDATE Apartment SET area = ${area}, dealAmount=${
-        Math.round(dealAmount * 10) / 10
-      } WHERE name="${name}"`,
+      `UPDATE Apartment SET area = ${area}, dealAmount=${dealAmount} WHERE name="${name}"`,
     );
   }
   console.log(5);
@@ -177,7 +176,7 @@ const updateDong = async () => {
 
     await db.executeSql(
       `UPDATE Dong SET dealAmount = ${
-        Math.round(dealAmount * 10) / 10
+        Math.round(dealAmount / 1000) / 10
       } WHERE name = "${dong}"`,
     );
   }
@@ -194,7 +193,6 @@ const updateGu = async () => {
   for (let i = 0; i < items.length; i++) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const {dealAmount, gu} = items.item(i);
-
     await db.executeSql(
       `UPDATE Gu SET dealAmount = ${
         Math.round(dealAmount * 10) / 10
@@ -219,6 +217,7 @@ const selectData = async (
       items.push(res[0].rows.item(i));
     }
   }
+
   return items;
 };
 
@@ -240,8 +239,8 @@ export const getData = async (
   }
 };
 
-export const getDealInfo = async (apartmentName: string) => {
-  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}" order by year desc, month desc, day desc`;
+export const getDealInfo = async (apartmentName: string, area: number) => {
+  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
   const dealInfoList = await db
     .executeSql(selectQuery)
     .then(res => res[0].rows);
@@ -294,4 +293,5 @@ export type DealType = {
   dealAmount: number;
   area: number;
   apartmentName: string;
+  floor: number;
 };

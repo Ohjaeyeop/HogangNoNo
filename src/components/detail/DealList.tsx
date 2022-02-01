@@ -1,7 +1,8 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {ResultSetRowList} from 'react-native-sqlite-storage';
 
-const DealList = ({dealInfoList}) => {
+const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
   return (
     <View style={styles.table}>
       <View style={styles.tableHeader}>
@@ -16,7 +17,7 @@ const DealList = ({dealInfoList}) => {
             {dealInfoList.item(index).day}
           </Text>
           <Text>{dealInfoList.item(index).dealAmount}</Text>
-          <Text>10층</Text>
+          <Text>{dealInfoList.item(index).floor}</Text>
         </View>
       ))}
     </View>

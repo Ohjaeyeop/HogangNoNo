@@ -23,12 +23,12 @@ const Detail = ({navigation, route}: DetailProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getDealInfo(route.params.name).then(res => {
+    getDealInfo(route.params.name, route.params.area).then(res => {
       setDealInfoList(res.dealInfoList);
       setDealInfoGroup(res.dealInfoGroup);
       setLoading(false);
     });
-  }, [route.params.name]);
+  }, [route.params.name, route.params.area]);
 
   return (
     <View style={{flex: 1}}>
