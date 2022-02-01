@@ -31,7 +31,7 @@ const Detail = ({navigation, route}: DetailProps) => {
   }, [route.params.name, route.params.area]);
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, backgroundColor: 'white'}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}
       <View style={styles.header}>
         <TouchableWithoutFeedback onPress={() => navigation.pop()}>

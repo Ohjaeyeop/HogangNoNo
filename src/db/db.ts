@@ -18,37 +18,39 @@ export const init = async () => {
       console.log(error.message);
     },
   );
-  /*  await dropTable(db);
-  await createTable(db);*/
-  //await insertAddressData(db);
-  //await insertPropertyData(db).catch(err => console.log(err.message));
-  /*  await updateApartment();
+  //await dropTable(db);
+  /* await createTable(db);
+  await insertAddressData(db);*/
+  /*await insertPropertyData(db).catch(err => console.log(err.message));
+  await updateApartment();
   await updateDong();
   await updateGu();*/
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
-  /*  await db.executeSql('Drop TABLE Gu');
-  await db.executeSql('Drop TABLE Dong');*/
+  await db.executeSql('Drop TABLE Gu');
+  await db.executeSql('Drop TABLE Dong');
   await db.executeSql('Drop TABLE Apartment');
   await db.executeSql('Drop TABLE Deal');
+  console.log(1);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const createTable = async (db: SQLite.SQLiteDatabase) => {
-  /*  await db.executeSql(
+  await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );
   await db.executeSql(
     'CREATE TABLE "Dong" ("name" TEXT, "gu" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, FOREIGN KEY("gu") REFERENCES "Gu"("name"), PRIMARY KEY("name") )',
-  );*/
+  );
   await db.executeSql(
     'CREATE TABLE "Apartment" ( "name" TEXT UNIQUE, "dong" TEXT, "latitude" NUMERIC, "longitude" NUMERIC, "buildYear" INTEGER, "area" NUMERIC, "dealAmount" NUMERIC DEFAULT 0, FOREIGN KEY("dong") REFERENCES "Dong"("name"), PRIMARY KEY("name") )',
   );
   await db.executeSql(
     'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
   );
+  console.log(2);
 };
 
 // 구, 동 정보 삽입
@@ -78,6 +80,7 @@ const insertAddressData = async (db: SQLite.SQLiteDatabase) => {
         .catch(err => console.log(err.message, arr[1]));
     }
   }
+  console.log(3);
 };
 
 const getDate = () => {
@@ -96,7 +99,7 @@ const getDate = () => {
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 202101;
+  ymd = 202105;
   while (ymd <= date) {
     console.log(ymd, date);
     for (const code in regionCodes) {
