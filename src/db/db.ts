@@ -256,6 +256,10 @@ export const getDealInfo = async (apartmentName: string, area: number) => {
   return {dealInfoList, dealInfoGroup};
 };
 
+export const getAreaList = async (apartmentName: string) => {
+  const selectQuery = `SELECT DISTINCT area FROM Deal WHERE apartmentName="${apartmentName}" order by area asc`;
+};
+
 type CoordType = {
   startX: number;
   startY: number;

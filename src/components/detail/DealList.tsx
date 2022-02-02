@@ -2,7 +2,14 @@ import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 
-const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
+const DealList = ({
+  dealInfoList,
+}: {
+  dealInfoList: ResultSetRowList | undefined;
+}) => {
+  if (!dealInfoList) {
+    return null;
+  }
   return (
     <View style={styles.table}>
       <View style={styles.tableHeader}>
@@ -62,7 +69,6 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    width: '90%',
     justifyContent: 'space-between',
     padding: 10,
     backgroundColor: '#FAFAFA',
@@ -73,7 +79,6 @@ const styles = StyleSheet.create({
   },
   tableBody: {
     flexDirection: 'row',
-    width: '90%',
     justifyContent: 'space-between',
     padding: 10,
     borderBottomWidth: 0.2,

@@ -11,8 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
-import ApartmentInfo from './detail/ApartmentInfo';
-import {getDealInfo} from '../db/db';
+import {getAreaList, getDealInfo} from '../db/db';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
@@ -28,6 +27,7 @@ const Detail = ({navigation, route}: DetailProps) => {
       setDealInfoGroup(res.dealInfoGroup);
       setLoading(false);
     });
+    getAreaList(route.params.name);
   }, [route.params.name, route.params.area]);
 
   return (
@@ -48,7 +48,9 @@ const Detail = ({navigation, route}: DetailProps) => {
         <ActivityIndicator />
       ) : (
         <View>
-          <ApartmentInfo buildYear={route.params.buildYear} />
+          <View style={styles.apartmentInfo}>
+            <Text style={styles.text}>{route.params.buildYear}년</Text>
+          </View>
           <DealInfo
             dealAmount={route.params.dealAmount}
             dealInfoList={dealInfoList}
@@ -78,6 +80,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     width: '50%',
     textAlign: 'center',
+  },
+  apartmentInfo: {
+    padding: 12,
+    borderBottomWidth: 10,
+    borderColor: '#D9D9D9',
+  },
+  text: {
+    fontSize: 14,
   },
 });
 
