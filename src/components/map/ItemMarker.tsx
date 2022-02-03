@@ -6,26 +6,19 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {Align, Marker} from 'react-native-nmap';
-import {ApartmentType, DongType, GuType} from '../../db/db';
-import {useNavigation} from '@react-navigation/native';
-import {HomeProps} from '../../App';
+import {Property, PropertyType} from '../../db/db';
 
-const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
-  const navigation = useNavigation<HomeProps['navigation']>();
-
-  const handlePress = () => {
-    if ('buildYear' in item) {
-      navigation.navigate('Detail', {
-        name: item.name,
-        dealAmount: item.dealAmount,
-        buildYear: item.buildYear,
-        area: item.area,
-      });
-    }
-  };
-
+const ItemMarker = ({
+  item,
+  onPress,
+  type,
+}: {
+  item: Property<typeof type>;
+  onPress: (item: Property<typeof type>, type: PropertyType) => void;
+  type: PropertyType;
+}) => {
   return (
-    <TouchableWithoutFeedback onPress={handlePress}>
+    <TouchableWithoutFeedback onPress={() => onPress(item, type)}>
       {Platform.OS === 'android' ? (
         <Marker
           coordinate={{latitude: item.latitude, longitude: item.longitude}}

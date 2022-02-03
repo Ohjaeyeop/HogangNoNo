@@ -30,17 +30,10 @@ const DealInfo = (props: Props) => {
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(false);
 
-  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>(
-    {} as ResultSetRowList,
-  );
-  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>(
-    {} as ResultSetRowList,
-  );
-  const [areaList, setAreaList] = useState<ResultSetRowList>(
-    {} as ResultSetRowList,
-  );
+  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
+  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
+  const [areaList, setAreaList] = useState<ResultSetRowList>();
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   const changeArea = (name: string, area: number) => {
     setLoading2(true);
     getDealInfo(name, area)
@@ -54,7 +47,6 @@ const DealInfo = (props: Props) => {
     modalRef.current?.close();
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   const displayedAmount = (amount: number) => {
     const amount1 = Math.floor(amount / 10000);
     const amount2 = amount % 10000;
@@ -88,7 +80,7 @@ const DealInfo = (props: Props) => {
     }
   }, [areaList, dealInfoGroup, dealInfoList]);
 
-  return loading ? (
+  return loading || !dealInfoGroup || !dealInfoList || !areaList ? (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <ActivityIndicator size="large" />
     </View>
@@ -154,7 +146,7 @@ const DealInfo = (props: Props) => {
             />
           </View>
           <ScrollView>
-            {Array.from({length: areaList.length}, (v, i) => i).map(index => {
+            {[...new Array(areaList.length).keys()].map(index => {
               // eslint-disable-next-line @typescript-eslint/no-shadow
               const area = areaList.item(index).area;
               return (

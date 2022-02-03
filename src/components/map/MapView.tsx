@@ -1,7 +1,15 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import ItemMarker from './ItemMarker';
-import {ApartmentType, getData} from '../../db/db';
+import {
+  ApartmentType,
+  getData,
+  getPropertyTypeByZoom,
+  Property,
+  PropertyType,
+} from '../../db/db';
+import {useNavigation} from '@react-navigation/native';
+import {HomeProps} from '../../App';
 
 type Props = {
   location: Coord;
@@ -9,8 +17,12 @@ type Props = {
 
 const MapView = ({location}: Props) => {
   const [apartments, setApartments] = useState<ApartmentType[] | undefined>([]);
+  const [zoom, setZoom] = useState(0);
+  const navigation = useNavigation<HomeProps['navigation']>();
+  const mapRef = useRef<NaverMapView>(null);
 
   async function handleCameraChange(event: any) {
+    setZoom(event.zoom);
     if (event.zoom > 6) {
       const {zoom, contentRegion} = event;
       await getData(
@@ -27,9 +39,33 @@ const MapView = ({location}: Props) => {
     }
   }
 
+  const onPressApartment = (item: Property<'Apartment'>) => {
+    navigation.navigate('Detail', {
+      name: item.name,
+      dealAmount: item.dealAmount,
+      buildYear: item.buildYear,
+      area: item.area,
+    });
+  };
+
+  const onPressDong = (item: Property<'Dong'>) => {};
+
+  const onPressGu = (item: Property<'Gu'>) => {};
+
+  const onPress = (item: Property<typeof type>, type: PropertyType) => {
+    if (type === 'Apartment') {
+      onPressApartment(item);
+    } else if (type === 'Dong') {
+      onPressDong(item);
+    } else if (type === 'Gu') {
+      onPressGu(item);
+    }
+  };
+
   return (
     <>
       <NaverMapView
+        ref={mapRef}
         style={{flex: 1}}
         zoomControl={false}
         compass={false}
@@ -40,7 +76,12 @@ const MapView = ({location}: Props) => {
         {apartments &&
           apartments.map((apartment, index) =>
             apartment.dealAmount ? (
-              <ItemMarker key={index} item={apartment} />
+              <ItemMarker
+                key={index}
+                item={apartment}
+                onPress={onPress}
+                type={getPropertyTypeByZoom(zoom)}
+              />
             ) : null,
           )}
       </NaverMapView>

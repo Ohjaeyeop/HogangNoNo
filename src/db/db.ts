@@ -27,7 +27,6 @@ export const init = async () => {
   await updateGu();*/
 };
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
   await db.executeSql('Drop TABLE Gu');
   await db.executeSql('Drop TABLE Dong');
@@ -36,7 +35,6 @@ const dropTable = async (db: SQLite.SQLiteDatabase) => {
   console.log(1);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
 const createTable = async (db: SQLite.SQLiteDatabase) => {
   await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
@@ -54,7 +52,6 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
 };
 
 // 구, 동 정보 삽입
-// eslint-disable-next-line @typescript-eslint/no-shadow
 const insertAddressData = async (db: SQLite.SQLiteDatabase) => {
   for (const value of gu) {
     const res = await addrToCoord(`서울특별시 ${value}`);
@@ -96,7 +93,6 @@ const getDate = () => {
 };
 
 // 거래정보 삽입
-// eslint-disable-next-line @typescript-eslint/no-shadow
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
   ymd = 202105;
@@ -178,7 +174,6 @@ const updateDong = async () => {
     .then(res => res[0].rows);
 
   for (let i = 0; i < items.length; i++) {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     const {dealAmount, dong} = items.item(i);
 
     await db.executeSql(
@@ -198,7 +193,6 @@ const updateGu = async () => {
     .then(res => res[0].rows);
 
   for (let i = 0; i < items.length; i++) {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     const {dealAmount, gu} = items.item(i);
     await db.executeSql(
       `UPDATE Gu SET dealAmount = ${
@@ -211,14 +205,14 @@ const updateGu = async () => {
 
 const selectData = async (
   {startX, startY, endX, endY}: CoordType,
-  table: 'Apartment' | 'Dong' | 'Gu',
+  table: PropertyType,
 ) => {
   const res = await db
     .executeSql(
       `SELECT * FROM ${table} WHERE latitude >= ${startX} and latitude <= ${endX} and longitude >= ${startY} and longitude <= ${endY} `,
     )
     .catch(err => console.log(err.message));
-  let items = [];
+  let items: Property<typeof table>[] = [];
   if (res) {
     for (let i = 0; i < res[0].rows.length; i++) {
       items.push(res[0].rows.item(i));
@@ -228,22 +222,19 @@ const selectData = async (
   return items;
 };
 
+const zoomScale = {
+  gu: 9,
+  dong: 12,
+  apartment: 14,
+};
 export const getData = async (
   {startX, startY, endX, endY}: CoordType,
   zoom: number,
 ) => {
-  if (zoom >= 14) {
-    // 아파트 정보
-    return await selectData({startX, startY, endX, endY}, 'Apartment');
-  } else if (zoom >= 12) {
-    // 동 정보
-    return await selectData({startX, startY, endX, endY}, 'Dong');
-  } else if (zoom >= 9) {
-    // 구 정보
-    return await selectData({startX, startY, endX, endY}, 'Gu');
-  } else {
-    // 시 정보
-  }
+  return await selectData(
+    {startX, startY, endX, endY},
+    getPropertyTypeByZoom(zoom),
+  );
 };
 
 export const getDealInfo = async (apartmentName: string, area: number) => {
@@ -275,29 +266,18 @@ type CoordType = {
   endY: number;
 };
 
-export type GuType = {
-  name: string;
-  dealAmount: number;
-  latitude: number;
-  longitude: number;
-};
+export type PropertyType = 'Gu' | 'Dong' | 'Apartment';
 
-export type DongType = {
+export type Property<T extends PropertyType> = {
   name: string;
-  gu: string;
   dealAmount: number;
   latitude: number;
   longitude: number;
-};
 
-export type ApartmentType = {
-  name: string;
-  dong: string;
-  latitude: number;
-  longitude: number;
-  buildYear: number;
-  area: number;
-  dealAmount: number;
+  gu: T extends 'Gu' ? string : never;
+  dong: T extends 'Apartment' ? string : never;
+  buildYear: T extends 'Apartment' ? number : never;
+  area: T extends 'Apartment' ? number : never;
 };
 
 export type DealType = {
@@ -309,4 +289,14 @@ export type DealType = {
   area: number;
   apartmentName: string;
   floor: number;
+};
+
+export const getPropertyTypeByZoom = (zoom: number): PropertyType => {
+  return zoom >= zoomScale.apartment
+    ? 'Apartment'
+    : zoom >= zoomScale.dong
+    ? 'Dong'
+    : zoom >= zoomScale.gu
+    ? 'Gu'
+    : ('City' as any);
 };
