@@ -27,7 +27,8 @@ const DealInfo = (props: Props) => {
   const modalRef = useRef<Modal>(null);
   const [selectedArea, setArea] = useState(area);
   const [amount, setAmount] = useState(dealAmount);
-  const [displayedAmount, setDisplayedAmount] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(false);
 
   const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>(
     {} as ResultSetRowList,
@@ -38,8 +39,6 @@ const DealInfo = (props: Props) => {
   const [areaList, setAreaList] = useState<ResultSetRowList>(
     {} as ResultSetRowList,
   );
-  const [loading, setLoading] = useState(true);
-  const [loading2, setLoading2] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const changeArea = (name: string, area: number) => {
@@ -55,7 +54,8 @@ const DealInfo = (props: Props) => {
     modalRef.current?.close();
   };
 
-  useEffect(() => {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const displayedAmount = (amount: number) => {
     const amount1 = Math.floor(amount / 10000);
     const amount2 = amount % 10000;
     const displayedAmount1 = amount1 > 0 ? `${amount1}억` : '';
@@ -65,8 +65,8 @@ const DealInfo = (props: Props) => {
         : amount2 > 0
         ? amount2.toString()
         : '';
-    setDisplayedAmount(displayedAmount1 + ' ' + displayedAmount2);
-  }, [amount]);
+    return displayedAmount1 + ' ' + displayedAmount2;
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -124,7 +124,7 @@ const DealInfo = (props: Props) => {
           최근 실거래 기준 1개월 평균
         </Text>
         <Text style={{color: '#835eeb', fontSize: 20, fontWeight: 'bold'}}>
-          {displayedAmount}
+          {displayedAmount(amount)}
         </Text>
         <DealInfoGraph dealInfoGroup={dealInfoGroup} />
         <DealList dealInfoList={dealInfoList} />

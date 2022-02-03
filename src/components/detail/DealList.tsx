@@ -2,14 +2,7 @@ import React from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 
-const DealList = ({
-  dealInfoList,
-}: {
-  dealInfoList: ResultSetRowList | undefined;
-}) => {
-  if (!dealInfoList) {
-    return null;
-  }
+const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
   return (
     <View style={styles.table}>
       <View style={styles.tableHeader}>
