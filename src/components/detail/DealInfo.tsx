@@ -147,7 +147,6 @@ const DealInfo = (props: Props) => {
           </View>
           <ScrollView>
             {[...new Array(areaList.length).keys()].map(index => {
-              // eslint-disable-next-line @typescript-eslint/no-shadow
               const area = areaList.item(index).area;
               return (
                 <TouchableOpacity
