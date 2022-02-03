@@ -1,44 +1,56 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
-import DealInfo, {ModalRef} from './detail/DealInfo';
+import DealInfo from './detail/DealInfo';
 import {getAreaList, getDealInfo} from '../db/db';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
+import {useFocusEffect} from '@react-navigation/native';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
 const Detail = ({navigation, route}: DetailProps) => {
-  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
-  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
-  const [areaList, setAreaList] = useState<ResultSetRowList>();
+  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>(
+    {} as ResultSetRowList,
+  );
+  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>(
+    {} as ResultSetRowList,
+  );
+  const [areaList, setAreaList] = useState<ResultSetRowList>(
+    {} as ResultSetRowList,
+  );
   const [loading, setLoading] = useState(true);
-  const modalRef = useRef<ModalRef>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      getDealInfo(route.params.name, route.params.area).then(res => {
+        setDealInfoList(res.dealInfoList);
+        setDealInfoGroup(res.dealInfoGroup);
+      });
+      getAreaList(route.params.name).then(res => setAreaList(res));
+    }, [route.params.area, route.params.name]),
+  );
 
   useEffect(() => {
-    getDealInfo(route.params.name, route.params.area).then(res => {
-      setDealInfoList(res.dealInfoList);
-      setDealInfoGroup(res.dealInfoGroup);
+    if (
+      dealInfoList !== undefined &&
+      dealInfoGroup !== undefined &&
+      areaList !== undefined
+    ) {
       setLoading(false);
-    });
-    getAreaList(route.params.name).then(res => setAreaList(res));
-  }, [route.params.name, route.params.area]);
+    }
+  }, [areaList, dealInfoGroup, dealInfoList]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: modalRef.current?.isVisible ? 'black' : 'white',
-      }}>
+    <View style={{flex: 1, backgroundColor: 'white'}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}
       <View style={styles.header}>
         <TouchableWithoutFeedback onPress={() => navigation.pop()}>
@@ -52,7 +64,9 @@ const Detail = ({navigation, route}: DetailProps) => {
         <View style={{width: '25%'}} />
       </View>
       {loading ? (
-        <ActivityIndicator />
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" />
+        </View>
       ) : (
         <View>
           <View style={styles.apartmentInfo}>
@@ -64,7 +78,6 @@ const Detail = ({navigation, route}: DetailProps) => {
             areaList={areaList}
             dealInfoList={dealInfoList}
             dealInfoGroup={dealInfoGroup}
-            ref={modalRef}
           />
         </View>
       )}

@@ -1,5 +1,11 @@
-import React, {useImperativeHandle, useRef, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Modal from 'react-native-modalbox';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import DealInfoGraph from './DealInfoGraph';
@@ -9,21 +15,15 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 type Props = {
   dealAmount: number;
   area: number;
-  dealInfoList: ResultSetRowList | undefined;
-  dealInfoGroup: ResultSetRowList | undefined;
-  areaList: ResultSetRowList | undefined;
+  dealInfoList: ResultSetRowList;
+  dealInfoGroup: ResultSetRowList;
+  areaList: ResultSetRowList;
 };
 
-export type ModalRef = {
-  isVisible: () => boolean | undefined;
-  closeModal: () => void;
-};
-
-const DealInfo = (props: Props, ref: React.Ref<ModalRef>) => {
+const DealInfo = (props: Props) => {
   const {dealAmount, area, dealInfoList, dealInfoGroup, areaList} = props;
   const modalRef = useRef<Modal>(null);
   const [selectedArea, setArea] = useState(area);
-  const [modalVisible, setModalVisible] = useState(false);
   const amount1 = Math.floor(dealAmount / 10000);
   const amount2 = dealAmount % 10000;
   const displayedAmount1 = amount1 > 0 ? `${amount1}억` : '';
@@ -33,8 +33,6 @@ const DealInfo = (props: Props, ref: React.Ref<ModalRef>) => {
       : amount2 > 0
       ? amount2.toString()
       : '';
-
-  useImperativeHandle(ref, () => ({}), [modalRef]);
 
   return (
     <View style={styles.dealInfoContainer}>
@@ -67,6 +65,7 @@ const DealInfo = (props: Props, ref: React.Ref<ModalRef>) => {
         position="bottom"
         swipeToClose={false}
         coverScreen={true}
+        backdropOpacity={0.2}
         ref={modalRef}
         style={{
           height: '50%',
@@ -77,6 +76,7 @@ const DealInfo = (props: Props, ref: React.Ref<ModalRef>) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
+            marginBottom: 20,
           }}>
           <Text style={{fontSize: 18, fontWeight: 'bold'}}>평형 선택</Text>
           <Icon
@@ -85,6 +85,29 @@ const DealInfo = (props: Props, ref: React.Ref<ModalRef>) => {
             onPress={() => modalRef.current?.close()}
           />
         </View>
+        <ScrollView>
+          {Array.from({length: areaList.length}, (v, i) => i).map(index => {
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const area = areaList.item(index).area;
+            return (
+              <View
+                key={index}
+                style={{
+                  paddingVertical: 20,
+                  borderBottomWidth: 0.2,
+                  borderBottomColor: 'gray',
+                }}>
+                <Text
+                  style={[
+                    {fontWeight: 'bold', fontSize: 18},
+                    area === selectedArea ? styles.text : null,
+                  ]}>
+                  {area}평
+                </Text>
+              </View>
+            );
+          })}
+        </ScrollView>
       </Modal>
     </View>
   );
@@ -123,4 +146,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.forwardRef(DealInfo);
+export default DealInfo;
