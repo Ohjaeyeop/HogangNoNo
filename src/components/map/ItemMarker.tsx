@@ -1,11 +1,31 @@
 import React from 'react';
-import {ImageBackground, Platform, Text} from 'react-native';
+import {
+  ImageBackground,
+  Platform,
+  Text,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import {Align, Marker} from 'react-native-nmap';
 import {ApartmentType, DongType, GuType} from '../../db/db';
+import {useNavigation} from '@react-navigation/native';
+import {HomeProps} from '../../App';
 
 const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
+  const navigation = useNavigation<HomeProps['navigation']>();
+
+  const handlePress = () => {
+    if ('buildYear' in item) {
+      navigation.navigate('Detail', {
+        name: item.name,
+        dealAmount: item.dealAmount,
+        buildYear: item.buildYear,
+        area: item.area,
+      });
+    }
+  };
+
   return (
-    <>
+    <TouchableWithoutFeedback onPress={handlePress}>
       {Platform.OS === 'android' ? (
         <Marker
           coordinate={{latitude: item.latitude, longitude: item.longitude}}
@@ -29,7 +49,10 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
                 : item.name}
             </Text>
             <Text style={{color: 'white', fontWeight: 'bold'}}>
-              {item.dealAmount}억
+              {'area' in item
+                ? Math.round(item.dealAmount / 1000) / 10
+                : item.dealAmount}
+              억
             </Text>
           </ImageBackground>
         </Marker>
@@ -56,13 +79,17 @@ const ItemMarker = ({item}: {item: ApartmentType | DongType | GuType}) => {
             haloColor: 'transparent',
           }}
           subCaption={{
-            text: `${item.dealAmount}억`,
+            text: `${
+              'area' in item
+                ? Math.round(item.dealAmount / 1000) / 10
+                : item.dealAmount
+            }억`,
             color: 'white',
             haloColor: 'transparent',
           }}
         />
       )}
-    </>
+    </TouchableWithoutFeedback>
   );
 };
 

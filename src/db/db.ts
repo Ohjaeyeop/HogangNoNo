@@ -18,13 +18,13 @@ export const init = async () => {
       console.log(error.message);
     },
   );
-  /*  await dropTable(db);
-  await createTable(db);
+  //await dropTable(db);
+  /* await createTable(db);
   await insertAddressData(db);*/
-  //await insertPropertyData(db).catch(err => console.log(err.message));
-  //await updateApartment();
-  //await updateDong();
-  //await updateGu();
+  /*await insertPropertyData(db).catch(err => console.log(err.message));
+  await updateApartment();
+  await updateDong();
+  await updateGu();*/
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -33,6 +33,7 @@ const dropTable = async (db: SQLite.SQLiteDatabase) => {
   await db.executeSql('Drop TABLE Dong');
   await db.executeSql('Drop TABLE Apartment');
   await db.executeSql('Drop TABLE Deal');
+  console.log(1);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -47,8 +48,9 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
     'CREATE TABLE "Apartment" ( "name" TEXT UNIQUE, "dong" TEXT, "latitude" NUMERIC, "longitude" NUMERIC, "buildYear" INTEGER, "area" NUMERIC, "dealAmount" NUMERIC DEFAULT 0, FOREIGN KEY("dong") REFERENCES "Dong"("name"), PRIMARY KEY("name") )',
   );
   await db.executeSql(
-    'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
+    'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
   );
+  console.log(2);
 };
 
 // 구, 동 정보 삽입
@@ -78,6 +80,7 @@ const insertAddressData = async (db: SQLite.SQLiteDatabase) => {
         .catch(err => console.log(err.message, arr[1]));
     }
   }
+  console.log(3);
 };
 
 const getDate = () => {
@@ -96,7 +99,7 @@ const getDate = () => {
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 202007;
+  ymd = 202105;
   while (ymd <= date) {
     console.log(ymd, date);
     for (const code in regionCodes) {
@@ -115,11 +118,11 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
 
           await db
             .executeSql(
-              `INSERT OR IGNORE INTO Deal(year, month, day, dealAmount, area, apartmentName) values (${
+              `INSERT OR IGNORE INTO Deal(year, month, day, dealAmount, area, apartmentName, floor) values (${
                 item.dealYear
               }, ${item.dealMonth}, ${item.dealDate}, ${item.dealAmount}, ${
                 item.area
-              }, "${item.dong + ' ' + item.apartmentName}")`,
+              }, "${item.dong + ' ' + item.apartmentName}", ${item.floor})`,
             )
             .catch(err => console.log(err.message));
         }
@@ -129,6 +132,14 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
   }
   console.log(4);
+};
+
+export const getRecentDealAmount = async (name: string, area: number) => {
+  return await db
+    .executeSql(
+      `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
+    )
+    .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
 };
 
 const updateApartment = async () => {
@@ -150,15 +161,10 @@ const updateApartment = async () => {
         }`,
       )
       .then(res => res[0].rows.item(0).area);
-    const dealAmount = await db
-      .executeSql(
-        `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
-      )
-      .then(res => res[0].rows.item(0).dealAmount);
+    const dealAmount = getRecentDealAmount(name, area);
+
     await db.executeSql(
-      `UPDATE Apartment SET area = ${area}, dealAmount=${
-        Math.round(dealAmount * 10) / 10
-      } WHERE name="${name}"`,
+      `UPDATE Apartment SET area = ${area}, dealAmount=${dealAmount} WHERE name="${name}"`,
     );
   }
   console.log(5);
@@ -177,7 +183,7 @@ const updateDong = async () => {
 
     await db.executeSql(
       `UPDATE Dong SET dealAmount = ${
-        Math.round(dealAmount * 10) / 10
+        Math.round(dealAmount / 1000) / 10
       } WHERE name = "${dong}"`,
     );
   }
@@ -194,7 +200,6 @@ const updateGu = async () => {
   for (let i = 0; i < items.length; i++) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const {dealAmount, gu} = items.item(i);
-
     await db.executeSql(
       `UPDATE Gu SET dealAmount = ${
         Math.round(dealAmount * 10) / 10
@@ -219,6 +224,7 @@ const selectData = async (
       items.push(res[0].rows.item(i));
     }
   }
+
   return items;
 };
 
@@ -238,6 +244,28 @@ export const getData = async (
   } else {
     // 시 정보
   }
+};
+
+export const getDealInfo = async (apartmentName: string, area: number) => {
+  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
+  const dealInfoList = await db
+    .executeSql(selectQuery)
+    .then(res => res[0].rows);
+  const dealInfoGroup = await db
+    .executeSql(
+      `SELECT count(*) as count, avg(dealAmount) as avg, year, month FROM (${selectQuery}) group by year, month`,
+    )
+    .then(res => res[0].rows);
+
+  return {dealInfoList, dealInfoGroup};
+};
+
+export const getAreaList = async (apartmentName: string) => {
+  return await db
+    .executeSql(
+      `SELECT DISTINCT area FROM Deal WHERE apartmentName="${apartmentName}" order by area asc`,
+    )
+    .then(res => res[0].rows);
 };
 
 type CoordType = {
@@ -280,4 +308,5 @@ export type DealType = {
   dealAmount: number;
   area: number;
   apartmentName: string;
+  floor: number;
 };

@@ -25,8 +25,7 @@ export const propertyApi = async (code: string, ymd: string) => {
 
   let items = item.map((obj: any) => {
     return {
-      dealAmount:
-        Math.round(parseInt(obj['거래금액'].replace(',', '')) / 1000) / 10,
+      dealAmount: parseInt(obj['거래금액'].replace(',', '')),
       buildYear: obj['건축년도'],
       dealYear: obj['년'],
       dealMonth: obj['월'],
@@ -36,6 +35,7 @@ export const propertyApi = async (code: string, ymd: string) => {
       area: Math.round(obj['전용면적'] / 3.3058),
       addressNumber: obj['지번'],
       code: obj['지역코드'],
+      floor: obj['층'],
     };
   });
 
@@ -68,4 +68,5 @@ export type ItemType = {
   latitude: number;
   longitude: number;
   code: number;
+  floor: number;
 };
