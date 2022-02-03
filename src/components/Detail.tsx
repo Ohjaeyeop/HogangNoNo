@@ -1,6 +1,5 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React from 'react';
 import {
-  ActivityIndicator,
   Platform,
   StyleSheet,
   Text,
@@ -11,43 +10,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
-import {getAreaList, getDealInfo} from '../db/db';
-import {ResultSetRowList} from 'react-native-sqlite-storage';
-import {useFocusEffect} from '@react-navigation/native';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
 const Detail = ({navigation, route}: DetailProps) => {
-  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>(
-    {} as ResultSetRowList,
-  );
-  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>(
-    {} as ResultSetRowList,
-  );
-  const [areaList, setAreaList] = useState<ResultSetRowList>(
-    {} as ResultSetRowList,
-  );
-  const [loading, setLoading] = useState(true);
-
-  useFocusEffect(
-    useCallback(() => {
-      getDealInfo(route.params.name, route.params.area).then(res => {
-        setDealInfoList(res.dealInfoList);
-        setDealInfoGroup(res.dealInfoGroup);
-      });
-      getAreaList(route.params.name).then(res => setAreaList(res));
-    }, [route.params.area, route.params.name]),
-  );
-
-  useEffect(() => {
-    if (
-      dealInfoList !== undefined &&
-      dealInfoGroup !== undefined &&
-      areaList !== undefined
-    ) {
-      setLoading(false);
-    }
-  }, [areaList, dealInfoGroup, dealInfoList]);
+  const {dealAmount, buildYear, name, area} = route.params;
 
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -60,27 +27,15 @@ const Detail = ({navigation, route}: DetailProps) => {
             name="arrow-back"
           />
         </TouchableWithoutFeedback>
-        <Text style={styles.title}>{route.params.name}</Text>
+        <Text style={styles.title}>{name}</Text>
         <View style={{width: '25%'}} />
       </View>
-      {loading ? (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <ActivityIndicator size="large" />
-        </View>
-      ) : (
-        <View>
-          <View style={styles.apartmentInfo}>
-            <Text style={styles.text}>{route.params.buildYear}년</Text>
-          </View>
-          <DealInfo
-            dealAmount={route.params.dealAmount}
-            area={route.params.area}
-            areaList={areaList}
-            dealInfoList={dealInfoList}
-            dealInfoGroup={dealInfoGroup}
-          />
-        </View>
-      )}
+      <DealInfo
+        dealAmount={dealAmount}
+        area={area}
+        buildYear={buildYear}
+        name={name}
+      />
     </View>
   );
 };

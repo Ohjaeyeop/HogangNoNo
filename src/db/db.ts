@@ -134,6 +134,14 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   console.log(4);
 };
 
+export const getRecentDealAmount = async (name: string, area: number) => {
+  return await db
+    .executeSql(
+      `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
+    )
+    .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
+};
+
 const updateApartment = async () => {
   const groupByApartAndArea =
     'SELECT * FROM (SELECT apartmentName, area, count(*) as count FROM DEAL group by apartmentName, area )';
@@ -153,12 +161,8 @@ const updateApartment = async () => {
         }`,
       )
       .then(res => res[0].rows.item(0).area);
-    const dealAmount = await db
-      .executeSql(
-        `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
-      )
-      .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
-    console.log(dealAmount);
+    const dealAmount = getRecentDealAmount(name, area);
+
     await db.executeSql(
       `UPDATE Apartment SET area = ${area}, dealAmount=${dealAmount} WHERE name="${name}"`,
     );
