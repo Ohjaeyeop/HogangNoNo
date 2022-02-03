@@ -11,10 +11,6 @@ const DealInfoGraph = ({
     return null;
   }
 
-  for (let i = 0; i < dealInfoGroup.length; i++) {
-    console.log(dealInfoGroup.item(i));
-  }
-
   return <View></View>;
 };
 

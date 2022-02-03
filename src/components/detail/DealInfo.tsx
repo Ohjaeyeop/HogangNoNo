@@ -1,19 +1,29 @@
-import React from 'react';
+import React, {useImperativeHandle, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import Modal from 'react-native-modalbox';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import DealInfoGraph from './DealInfoGraph';
 import DealList from './DealList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const DealInfo = ({
-  dealAmount,
-  dealInfoList,
-  dealInfoGroup,
-}: {
+type Props = {
   dealAmount: number;
+  area: number;
   dealInfoList: ResultSetRowList | undefined;
   dealInfoGroup: ResultSetRowList | undefined;
-}) => {
+  areaList: ResultSetRowList | undefined;
+};
+
+export type ModalRef = {
+  isVisible: () => boolean | undefined;
+  closeModal: () => void;
+};
+
+const DealInfo = (props: Props, ref: React.Ref<ModalRef>) => {
+  const {dealAmount, area, dealInfoList, dealInfoGroup, areaList} = props;
+  const modalRef = useRef<Modal>(null);
+  const [selectedArea, setArea] = useState(area);
+  const [modalVisible, setModalVisible] = useState(false);
   const amount1 = Math.floor(dealAmount / 10000);
   const amount2 = dealAmount % 10000;
   const displayedAmount1 = amount1 > 0 ? `${amount1}억` : '';
@@ -23,6 +33,8 @@ const DealInfo = ({
       : amount2 > 0
       ? amount2.toString()
       : '';
+
+  useImperativeHandle(ref, () => ({}), [modalRef]);
 
   return (
     <View style={styles.dealInfoContainer}>
@@ -35,8 +47,10 @@ const DealInfo = ({
             <Text>전월세</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.selectBox}>
-          <Text style={styles.text}>24평</Text>
+        <TouchableOpacity
+          style={styles.selectBox}
+          onPress={() => modalRef.current?.open()}>
+          <Text style={[styles.text, {marginRight: 10}]}>{selectedArea}평</Text>
           <Icon name={'arrow-drop-down'} size={20} color={'#835eeb'} />
         </TouchableOpacity>
       </View>
@@ -48,6 +62,30 @@ const DealInfo = ({
       </Text>
       <DealInfoGraph dealInfoGroup={dealInfoGroup} />
       <DealList dealInfoList={dealInfoList} />
+      <Modal
+        entry="bottom"
+        position="bottom"
+        swipeToClose={false}
+        coverScreen={true}
+        ref={modalRef}
+        style={{
+          height: '50%',
+          backgroundColor: 'white',
+          padding: 20,
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <Text style={{fontSize: 18, fontWeight: 'bold'}}>평형 선택</Text>
+          <Icon
+            name={'close'}
+            size={20}
+            onPress={() => modalRef.current?.close()}
+          />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -74,15 +112,15 @@ const styles = StyleSheet.create({
   selectBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-end',
     borderWidth: 2,
     borderColor: '#835eeb',
     paddingVertical: 5,
-    width: 70,
+    width: 75,
   },
   text: {
     color: '#835eeb',
   },
 });
 
-export default DealInfo;
+export default React.forwardRef(DealInfo);

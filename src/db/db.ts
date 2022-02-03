@@ -257,7 +257,11 @@ export const getDealInfo = async (apartmentName: string, area: number) => {
 };
 
 export const getAreaList = async (apartmentName: string) => {
-  const selectQuery = `SELECT DISTINCT area FROM Deal WHERE apartmentName="${apartmentName}" order by area asc`;
+  return await db
+    .executeSql(
+      `SELECT DISTINCT area FROM Deal WHERE apartmentName="${apartmentName}" order by area asc`,
+    )
+    .then(res => res[0].rows);
 };
 
 type CoordType = {
