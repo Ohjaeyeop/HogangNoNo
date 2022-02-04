@@ -101,12 +101,14 @@ const DealInfo = (props: Props) => {
             <Icon name={'arrow-drop-down'} size={20} color={color.main} />
           </TouchableOpacity>
         </View>
-        <Text style={{color: color.main, fontWeight: 'bold'}}>
-          최근 실거래 기준 1개월 평균
-        </Text>
-        <Text style={{color: color.main, fontSize: 20, fontWeight: 'bold'}}>
-          {displayedAmount(amount)}
-        </Text>
+        <View style={{marginBottom: 30}}>
+          <Text style={{color: color.main, fontWeight: 'bold'}}>
+            최근 실거래 기준 1개월 평균
+          </Text>
+          <Text style={{color: color.main, fontSize: 20, fontWeight: 'bold'}}>
+            {displayedAmount(amount)}
+          </Text>
+        </View>
         <DealInfoGraph dealInfoGroup={dealInfoGroup} />
         <DealList dealInfoList={dealInfoList} />
         <Modal

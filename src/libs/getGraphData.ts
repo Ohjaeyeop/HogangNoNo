@@ -31,7 +31,7 @@ export const getGraphData = (dealInfoGroup: ResultSetRowList) => {
       j++;
     } else {
       arr.push({
-        amount: 0,
+        amount: i > 1 ? arr[i - 1].amount : 0,
         count: 0,
         month: ymd % 100,
         year: Math.floor(ymd / 100),

@@ -2,12 +2,11 @@ import {DealInfoGroupType} from './getGraphData';
 
 export const getGraphPath = (
   maxValue: number,
-  minValue: number,
+  diff: number,
   gap: number,
   graphHeight: number,
   graphData: DealInfoGroupType[],
 ) => {
-  const diff = maxValue !== minValue ? maxValue - minValue : 1;
   let y = graphHeight;
   let x = 0;
   let prevX = 0;
