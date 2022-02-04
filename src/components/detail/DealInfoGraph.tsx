@@ -22,6 +22,7 @@ const radius = 5;
 
 const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
   const [tooltipText, setTooltipText] = useState('');
+  const [tooltipWidth, setTooltipWidth] = useState(0);
   const graphData = getGraphData(dealInfoGroup);
   const maxValue = Math.ceil(
     Math.max(...graphData.map(value => value.amount)) / 10000,
@@ -84,7 +85,16 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
 
   const tooltipAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: x.value - 160}],
+      transform: [
+        {
+          translateX:
+            graphWidth - x.value >= tooltipWidth / 3
+              ? x.value - tooltipWidth / 3 > graphPadding
+                ? x.value - tooltipWidth / 3
+                : 0
+              : graphWidth - tooltipWidth + graphPadding * 2,
+        },
+      ],
     };
   });
 
@@ -101,7 +111,6 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         Math.max(ctx.startX + event.translationX, -radius),
         graphWidth - radius,
       );
-      console.log('x', x.value);
     },
   });
 
@@ -115,7 +124,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         <Animated.View style={[styles.circle, circleAnimatedStyle]} />
         <Animated.View
           style={[styles.tooltip, tooltipAnimatedStyle]}
-          onLayout={event => console.log(event.nativeEvent.layout.width)}>
+          onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
           <Text style={{color: 'white', fontWeight: '500'}}>{tooltipText}</Text>
         </Animated.View>
       </Animated.View>
