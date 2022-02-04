@@ -1,14 +1,20 @@
 import React from 'react';
-import {Dimensions, StyleSheet, View} from 'react-native';
+import {Dimensions, StyleSheet, Text} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
 import {PanGestureHandler} from 'react-native-gesture-handler';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
+import {getGraphPath} from '../../libs/getGraphPath';
 
-const graphWidth = Dimensions.get('window').width - 40 - 20;
+const graphWidth = Dimensions.get('window').width - 40 - 40;
 const graphHeight = graphWidth * 0.4;
+const radius = 5;
 
 const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
   const arr = getGraphData(dealInfoGroup);
@@ -19,44 +25,65 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
     Math.min(...arr.map(value => value.amount).filter(value => value !== 0)) /
       10000,
   );
-  const gap = graphWidth / 36;
-  const diff = maxValue !== minValue ? maxValue - minValue : 1;
-  let y = graphHeight;
-  let x = 0;
-  let prevX = 0;
-  let path = `M0 ${y} `;
+  const path = getGraphPath(maxValue, minValue, graphWidth, graphHeight, arr);
+  const x = useSharedValue(graphWidth);
+  const y = useSharedValue(0);
 
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].amount !== 0) {
-      y = ((maxValue - arr[i].amount / 10000) / diff) * graphHeight;
-    }
-    x += gap;
-    path += `S${prevX + gap / 2} ${y}, ${x} ${y} `;
-    prevX = x;
-  }
+  const circleAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{translateX: x.value}],
+    };
+  });
+
+  const gestureHandler = useAnimatedGestureHandler({
+    onStart: (event, ctx: any) => {
+      x.value = event.x - 20;
+    },
+    onActive: (event, ctx: any) => {
+      x.value = Math.min(
+        Math.max(x.value + event.translationX, -radius),
+        graphWidth + radius,
+      );
+    },
+  });
 
   return (
-    <View style={styles.graphContainer}>
-      <Svg height={graphHeight} width={graphWidth}>
-        <Path d={path} fill="none" stroke="#835eeb" strokeWidth={3} />
-      </Svg>
-      <PanGestureHandler>
-        <Animated.View style={styles.circle}></Animated.View>
-      </PanGestureHandler>
-    </View>
+    <PanGestureHandler onGestureEvent={gestureHandler}>
+      <Animated.View style={styles.graphContainer}>
+        <Svg height={graphHeight} width={graphWidth}>
+          <Path d={path} fill="none" stroke="#835eeb" strokeWidth={3} />
+        </Svg>
+        <Animated.View style={[styles.circle, circleAnimatedStyle]} />
+        <Animated.View style={styles.tooltip}>
+          <Text style={{color: 'white', fontWeight: '500'}}>
+            2021.10 평균 55억 (0건)
+          </Text>
+        </Animated.View>
+      </Animated.View>
+    </PanGestureHandler>
   );
 };
 
 const styles = StyleSheet.create({
   graphContainer: {
-    marginVertical: 20,
-    alignItems: 'center',
+    marginVertical: 40,
+    paddingHorizontal: 20,
   },
   circle: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: radius * 2,
+    height: radius * 2,
+    borderRadius: radius,
     backgroundColor: color.main,
+  },
+  tooltip: {
+    position: 'absolute',
+    right: 0,
+    top: -30,
+    backgroundColor: color.main,
+    paddingHorizontal: 12,
+    height: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

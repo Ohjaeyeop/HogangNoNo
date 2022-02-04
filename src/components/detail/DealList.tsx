@@ -17,7 +17,7 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
           <Text>층</Text>
         </View>
       </View>
-      <ScrollView style={{width: '100%', height: '50%'}}>
+      <ScrollView style={{width: '100%', height: 180}}>
         {Array.from({length: dealInfoList.length}, (v, i) => i).map(index => {
           return (
             <View style={styles.tableBody} key={index}>
@@ -52,7 +52,6 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
 const styles = StyleSheet.create({
   table: {
     alignItems: 'center',
-    marginTop: 15,
   },
   tableHeader: {
     flexDirection: 'row',

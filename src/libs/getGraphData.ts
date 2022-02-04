@@ -1,7 +1,7 @@
 import {getDate} from '../db/db';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 
-type DealInfoGroupType = {
+export type DealInfoGroupType = {
   amount: number;
   count: number;
   month: number;
