@@ -80,7 +80,7 @@ const insertAddressData = async (db: SQLite.SQLiteDatabase) => {
   console.log(3);
 };
 
-const getDate = () => {
+export const getDate = () => {
   let today = new Date();
   let year = today.getFullYear();
   let month = today.getMonth() + 1;
@@ -95,7 +95,7 @@ const getDate = () => {
 // 거래정보 삽입
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 202105;
+
   while (ymd <= date) {
     console.log(ymd, date);
     for (const code in regionCodes) {

@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
+import {color} from '../theme/color';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
@@ -23,7 +24,12 @@ const Detail = ({navigation, route}: DetailProps) => {
         <TouchableWithoutFeedback onPress={() => navigation.pop()}>
           <Icon
             size={25}
-            style={{color: 'white', width: '25%', textAlign: 'center'}}
+            style={{
+              color: 'white',
+              width: '25%',
+              textAlign: 'center',
+              paddingHorizontal: 20,
+            }}
             name="arrow-back"
           />
         </TouchableWithoutFeedback>
@@ -43,10 +49,10 @@ const Detail = ({navigation, route}: DetailProps) => {
 const styles = StyleSheet.create({
   statusBar: {
     height: statusBarHeight,
-    backgroundColor: '#835eeb',
+    backgroundColor: color.main,
   },
   header: {
-    backgroundColor: '#835eeb',
+    backgroundColor: color.main,
     height: 40,
     flexDirection: 'row',
     alignItems: 'center',
@@ -62,7 +68,7 @@ const styles = StyleSheet.create({
   apartmentInfo: {
     padding: 12,
     borderBottomWidth: 10,
-    borderColor: '#D9D9D9',
+    borderColor: color.gray,
   },
   text: {
     fontSize: 14,

@@ -1,6 +1,7 @@
 import React from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
+import {displayedAmount} from '../../libs/displayedAmount';
 
 const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
   return (
@@ -18,19 +19,6 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
       </View>
       <ScrollView style={{width: '100%', height: '50%'}}>
         {Array.from({length: dealInfoList.length}, (v, i) => i).map(index => {
-          const amount1 = Math.floor(
-            dealInfoList.item(index).dealAmount / 10000,
-          );
-          const amount2 = dealInfoList.item(index).dealAmount % 10000;
-          const displayedAmount1 = amount1 > 0 ? `${amount1}억` : '';
-          const displayedAmount2 =
-            amount2 >= 1000
-              ? amount2.toString().slice(0, 1) +
-                ',' +
-                amount2.toString().slice(1)
-              : amount2 > 0
-              ? amount2.toString()
-              : '';
           return (
             <View style={styles.tableBody} key={index}>
               <View style={styles.column}>
@@ -47,7 +35,7 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
               </View>
               <View style={styles.column}>
                 <Text style={{fontWeight: 'bold'}}>
-                  {displayedAmount1 + ' ' + displayedAmount2}
+                  {displayedAmount(dealInfoList.item(index).dealAmount)}
                 </Text>
               </View>
               <View style={styles.column}>
