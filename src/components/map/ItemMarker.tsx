@@ -41,7 +41,7 @@ const ItemMarker = ({
                 ? item.name.split(' ')[1]
                 : item.name}
             </Text>
-            <Text style={{color: 'white', fontWeight: 'bold'}}>
+            <Text style={{color: 'white', fontSize: 13}}>
               {'area' in item
                 ? Math.round(item.dealAmount / 1000) / 10
                 : item.dealAmount}
@@ -66,7 +66,6 @@ const ItemMarker = ({
                 : 'gu' in item
                 ? item.name.split(' ')[1]
                 : item.name,
-            textSize: 12,
             color: '#9aa7b8',
             align: Align.Center,
             haloColor: 'transparent',

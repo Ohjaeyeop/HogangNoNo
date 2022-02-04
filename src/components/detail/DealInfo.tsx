@@ -14,6 +14,8 @@ import DealList from './DealList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useFocusEffect} from '@react-navigation/native';
 import {getAreaList, getDealInfo, getRecentDealAmount} from '../../db/db';
+import {displayedAmount} from '../../libs/displayedAmount';
+import {color} from '../../theme/color';
 
 type Props = {
   dealAmount: number;
@@ -45,19 +47,6 @@ const DealInfo = (props: Props) => {
     getRecentDealAmount(name, area).then(res => setAmount(res));
     setArea(area);
     modalRef.current?.close();
-  };
-
-  const displayedAmount = (amount: number) => {
-    const amount1 = Math.floor(amount / 10000);
-    const amount2 = amount % 10000;
-    const displayedAmount1 = amount1 > 0 ? `${amount1}억` : '';
-    const displayedAmount2 =
-      amount2 >= 1000
-        ? amount2.toString().slice(0, 1) + ',' + amount2.toString().slice(1)
-        : amount2 > 0
-        ? amount2.toString()
-        : '';
-    return displayedAmount1 + ' ' + displayedAmount2;
   };
 
   useFocusEffect(
@@ -109,13 +98,13 @@ const DealInfo = (props: Props) => {
                 {selectedArea}평
               </Text>
             )}
-            <Icon name={'arrow-drop-down'} size={20} color={'#835eeb'} />
+            <Icon name={'arrow-drop-down'} size={20} color={color.main} />
           </TouchableOpacity>
         </View>
-        <Text style={{color: '#835eeb', fontWeight: 'bold'}}>
+        <Text style={{color: color.main, fontWeight: 'bold'}}>
           최근 실거래 기준 1개월 평균
         </Text>
-        <Text style={{color: '#835eeb', fontSize: 20, fontWeight: 'bold'}}>
+        <Text style={{color: color.main, fontSize: 20, fontWeight: 'bold'}}>
           {displayedAmount(amount)}
         </Text>
         <DealInfoGraph dealInfoGroup={dealInfoGroup} />
@@ -193,24 +182,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 5,
     width: 60,
-    backgroundColor: '#D9D9D9',
+    backgroundColor: color.gray,
   },
   selectBox: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
     borderWidth: 2,
-    borderColor: '#835eeb',
+    borderColor: color.main,
     paddingVertical: 5,
     width: 75,
   },
   text: {
-    color: '#835eeb',
+    color: color.main,
   },
   apartmentInfo: {
     padding: 12,
     borderBottomWidth: 10,
-    borderColor: '#D9D9D9',
+    borderColor: color.gray,
   },
 });
 

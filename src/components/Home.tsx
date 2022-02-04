@@ -5,6 +5,7 @@ import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MapView from './map/MapView';
 import {Coord} from 'react-native-nmap';
+import {color} from '../theme/color';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
@@ -69,10 +70,10 @@ const Home = () => {
 const styles = StyleSheet.create({
   statusBar: {
     height: statusBarHeight,
-    backgroundColor: '#835eeb',
+    backgroundColor: color.main,
   },
   header: {
-    backgroundColor: '#835eeb',
+    backgroundColor: color.main,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
@@ -82,10 +83,10 @@ const styles = StyleSheet.create({
     right: 15,
     top: statusBarHeight + 60,
     borderWidth: 1,
-    borderColor: '#835eeb',
+    borderColor: color.main,
     backgroundColor: 'white',
     padding: 4,
-    color: '#835eeb',
+    color: color.main,
   },
 });
 
