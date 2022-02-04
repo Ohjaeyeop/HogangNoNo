@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React, {useEffect} from 'react';
 import Home from './components/Home';
 import * as db from './db/db';

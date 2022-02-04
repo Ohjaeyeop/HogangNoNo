@@ -4,6 +4,8 @@ import {ResultSetRowList} from 'react-native-sqlite-storage';
 import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
+import {PanGestureHandler} from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 
 const graphWidth = Dimensions.get('window').width - 40 - 20;
 const graphHeight = graphWidth * 0.4;
@@ -38,6 +40,9 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
       <Svg height={graphHeight} width={graphWidth}>
         <Path d={path} fill="none" stroke="#835eeb" strokeWidth={3} />
       </Svg>
+      <PanGestureHandler>
+        <Animated.View style={styles.circle}></Animated.View>
+      </PanGestureHandler>
     </View>
   );
 };
@@ -48,9 +53,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   circle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: color.main,
   },
 });
