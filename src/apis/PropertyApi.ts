@@ -1,12 +1,12 @@
 import {XMLParser} from 'fast-xml-parser';
 import {getCoord} from '../libs/getCoord';
 
-const uri =
-  'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTrade';
-const SERVICE_KEY =
-  'Os0BvUN73dbFsXA8O3jtA4bPKaxXGxoW7C88n6DpgNyVrssis9u3RLTGl7yxRCJimPkKY0yCD9dUeK4M8vK1BA%3D%3D';
-
 export const propertyApi = async (code: string, ymd: string) => {
+  const uri =
+    'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTrade';
+  const SERVICE_KEY =
+    'Os0BvUN73dbFsXA8O3jtA4bPKaxXGxoW7C88n6DpgNyVrssis9u3RLTGl7yxRCJimPkKY0yCD9dUeK4M8vK1BA%3D%3D';
+
   const {
     response: {
       body: {
@@ -39,8 +39,8 @@ export const propertyApi = async (code: string, ymd: string) => {
     };
   });
 
-  let res = [];
-  // eslint-disable-next-line @typescript-eslint/no-shadow
+  let res: PropertyItem[] = [];
+
   for (const item of items) {
     const coord = await getCoord(`${item.dong} ${item.addressNumber}`);
     if (coord) {
@@ -55,18 +55,70 @@ export const propertyApi = async (code: string, ymd: string) => {
   return res;
 };
 
-export type ItemType = {
-  dealAmount: number;
-  buildYear: number;
+export const leasePropertyApi = async (
+  code: string,
+  ymd: string,
+): Promise<LeasePropertyItem[]> => {
+  const uri =
+    'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptRent';
+  const SERVICE_KEY =
+    'Os0BvUN73dbFsXA8O3jtA4bPKaxXGxoW7C88n6DpgNyVrssis9u3RLTGl7yxRCJimPkKY0yCD9dUeK4M8vK1BA%3D%3D';
+
+  const {
+    response: {
+      body: {
+        items: {item},
+      },
+    },
+  } = await fetch(
+    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=${ymd}`,
+  )
+    .then(res => res.text())
+    .then(resText => {
+      const parser = new XMLParser();
+      return parser.parse(resText);
+    })
+    .catch(err => console.log(err.message));
+
+  return item.map((obj: any) => {
+    console.log(obj['보증금액']);
+    return {
+      deposit:
+        typeof obj['보증금액'] === 'string'
+          ? parseInt(obj['보증금액'].replace(',', ''))
+          : obj['보증금액'],
+      monthlyRent: obj['월세'],
+      dealYear: obj['년'],
+      dealMonth: obj['월'],
+      dealDate: obj['일'],
+      apartmentName: obj['아파트'],
+      area: Math.round(obj['전용면적'] / 3.3058),
+      dong: obj['법정동'],
+      floor: obj['층'],
+    };
+  });
+};
+
+type Base = {
   dealYear: number;
   dealMonth: number;
   dealDate: number;
-  dong: string;
   apartmentName: string;
   area: number;
+  floor: number;
+  dong: string;
+};
+
+type LeasePropertyItem = Base & {
+  deposit: number;
+  monthlyRent: number;
+};
+
+type PropertyItem = Base & {
+  dealAmount: number;
+  buildYear: number;
   addressNumber: number;
   latitude: number;
   longitude: number;
   code: number;
-  floor: number;
 };

@@ -1,5 +1,5 @@
 import SQLite from 'react-native-sqlite-storage';
-import {propertyApi} from '../apis/PropertyApi';
+import {propertyApi, leasePropertyApi} from '../apis/PropertyApi';
 import {dong, gu, regionCodes} from '../data/regionInfos';
 import {addrToCoord} from '../apis/GeocodeApi';
 
@@ -19,24 +19,27 @@ export const init = async () => {
     },
   );
   //await dropTable(db);
-  /* await createTable(db);
-  await insertAddressData(db);*/
-  /*await insertPropertyData(db).catch(err => console.log(err.message));
+  //await createTable(db);
+  // await insertAddressData(db);
+  /*await insertPropertyData(db);
   await updateApartment();
   await updateDong();
   await updateGu();*/
+  await insertLeasePropertyData(db);
 };
 
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
-  await db.executeSql('Drop TABLE Gu');
+  /*  await db.executeSql('Drop TABLE Gu');
   await db.executeSql('Drop TABLE Dong');
   await db.executeSql('Drop TABLE Apartment');
-  await db.executeSql('Drop TABLE Deal');
+  await db.executeSql('Drop TABLE Deal');*/
+  await db.executeSql('Drop TABLE Lease');
   console.log(1);
 };
 
 const createTable = async (db: SQLite.SQLiteDatabase) => {
-  await db.executeSql(
+  console.log(11);
+  /*  await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );
   await db.executeSql(
@@ -47,7 +50,12 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
   );
   await db.executeSql(
     'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
-  );
+  );*/
+  await db
+    .executeSql(
+      'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "deposit" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
+    )
+    .catch(err => console.log(err.message));
   console.log(2);
 };
 
@@ -123,6 +131,35 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
             .catch(err => console.log(err.message));
         }
       });
+    }
+    ymd =
+      (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
+  }
+  console.log(4);
+};
+
+const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
+  let {date, ymd} = getDate();
+  ymd = 201902;
+  while (ymd <= date) {
+    console.log(ymd, date);
+    for (const code in regionCodes) {
+      console.log(code);
+      await leasePropertyApi(code, ymd.toString())
+        .then(async items => {
+          for (const item of items) {
+            await db
+              .executeSql(
+                `INSERT OR IGNORE INTO Lease(apartmentName, year, month, day, deposit, monthlyRent, floor, area) values ("${
+                  item.dong + ' ' + item.apartmentName
+                }", ${item.dealYear}, ${item.dealMonth}, ${item.dealDate}, ${
+                  item.deposit
+                }, ${item.monthlyRent}, ${item.floor}, ${item.area})`,
+              )
+              .catch(err => console.log(err.message, item.apartmentName));
+          }
+        })
+        .catch(err => console.log(err.message));
     }
     ymd =
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
