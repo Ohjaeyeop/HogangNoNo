@@ -3,6 +3,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -36,6 +37,20 @@ const Detail = ({navigation, route}: DetailProps) => {
         <Text style={styles.title}>{name}</Text>
         <View style={{width: '25%'}} />
       </View>
+      <View style={styles.subHeader}>
+        <TouchableOpacity
+          style={[
+            styles.selectBox,
+            {borderRightWidth: 0.2, borderRightColor: 'lightgray'},
+          ]}>
+          <Text style={styles.text}>매매</Text>
+          <Icon name="keyboard-arrow-down" size={20} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.selectBox}>
+          <Text style={styles.text}>{area}평</Text>
+          <Icon name="keyboard-arrow-down" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
       <DealInfo
         dealAmount={dealAmount}
         area={area}
@@ -57,6 +72,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
+    borderBottomWidth: 0.2,
+    borderBottomColor: 'lightgray',
+  },
+  subHeader: {
+    backgroundColor: color.main,
+    height: 40,
+    flexDirection: 'row',
+  },
+  selectBox: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     color: 'white',
@@ -71,7 +99,10 @@ const styles = StyleSheet.create({
     borderColor: color.gray,
   },
   text: {
-    fontSize: 14,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginRight: 10,
   },
 });
 
