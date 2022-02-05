@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  ActivityIndicator,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,13 +14,68 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
 import {color} from '../theme/color';
+import Modal from 'react-native-modalbox';
+import {getAreaList, getDealInfo, getRecentDealAmount} from '../db/db';
+import {ResultSetRowList} from 'react-native-sqlite-storage';
+import {useFocusEffect} from '@react-navigation/native';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 
 const Detail = ({navigation, route}: DetailProps) => {
   const {dealAmount, buildYear, name, area} = route.params;
+  const [selectedArea, setArea] = useState(area);
+  const [amount, setAmount] = useState(dealAmount);
+  const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(false);
 
-  return (
+  const [areaList, setAreaList] = useState<ResultSetRowList>();
+  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
+  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
+
+  const modalRef = useRef<Modal>(null);
+
+  const changeArea = (name: string, area: number) => {
+    setLoading2(true);
+    getDealInfo('Deal', name, area)
+      .then(res => {
+        setDealInfoList(res.dealInfoList);
+        setDealInfoGroup(res.dealInfoGroup);
+      })
+      .then(() => setLoading2(false));
+    getRecentDealAmount(name, area).then(res => setAmount(res));
+    setArea(area);
+    modalRef.current?.close();
+  };
+
+  const modalOpen = () => {
+    modalRef.current?.open();
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getDealInfo('Deal', name, area).then(res => {
+        setDealInfoList(res.dealInfoList);
+        setDealInfoGroup(res.dealInfoGroup);
+      });
+      getAreaList(name).then(res => setAreaList(res));
+    }, [area, name]),
+  );
+
+  useEffect(() => {
+    if (
+      dealInfoList !== undefined &&
+      dealInfoGroup !== undefined &&
+      areaList !== undefined
+    ) {
+      setLoading(false);
+    }
+  }, [areaList, dealInfoGroup, dealInfoList]);
+
+  return loading || !dealInfoGroup || !dealInfoList || !areaList ? (
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <ActivityIndicator size="large" />
+    </View>
+  ) : (
     <View style={{flex: 1, backgroundColor: 'white'}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}
       <View style={styles.header}>
@@ -46,17 +103,71 @@ const Detail = ({navigation, route}: DetailProps) => {
           <Text style={styles.text}>매매</Text>
           <Icon name="keyboard-arrow-down" size={20} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.selectBox}>
-          <Text style={styles.text}>{area}평</Text>
+        <TouchableOpacity style={styles.selectBox} onPress={modalOpen}>
+          <Text style={styles.text}>{selectedArea}평</Text>
           <Icon name="keyboard-arrow-down" size={20} color="white" />
         </TouchableOpacity>
       </View>
       <DealInfo
-        dealAmount={dealAmount}
-        area={area}
+        amount={amount}
+        area={selectedArea}
         buildYear={buildYear}
-        name={name}
+        dealInfoList={dealInfoList}
+        dealInfoGroup={dealInfoGroup}
+        modalOpen={modalOpen}
+        loading={loading2}
       />
+      <Modal
+        entry="bottom"
+        position="bottom"
+        swipeToClose={false}
+        coverScreen={true}
+        backdropOpacity={0.2}
+        ref={modalRef}
+        style={{
+          height: '50%',
+          backgroundColor: 'white',
+          padding: 20,
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 20,
+          }}>
+          <Text style={{fontSize: 18, fontWeight: 'bold'}}>평형 선택</Text>
+          <Icon
+            name={'close'}
+            size={20}
+            onPress={() => modalRef.current?.close()}
+          />
+        </View>
+        <ScrollView>
+          {[...new Array(areaList.length).keys()].map(index => {
+            const area = areaList.item(index).area;
+            return (
+              <TouchableOpacity
+                key={index}
+                style={{
+                  paddingVertical: 20,
+                  borderBottomWidth: 0.2,
+                  borderBottomColor: 'gray',
+                }}
+                onPress={() => {
+                  changeArea(name, area);
+                }}>
+                <Text
+                  style={[
+                    {fontWeight: 'bold', fontSize: 18},
+                    area === selectedArea ? {color: color.main} : null,
+                  ]}>
+                  {area}평
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </Modal>
     </View>
   );
 };
