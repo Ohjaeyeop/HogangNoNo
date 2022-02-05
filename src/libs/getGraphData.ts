@@ -22,7 +22,7 @@ export const getGraphData = (dealInfoGroup: ResultSetRowList) => {
       ymd === dealInfoGroup.item(j).year * 100 + dealInfoGroup.item(j).month
     ) {
       arr.push({
-        amount: dealInfoGroup.item(j).avg,
+        amount: Math.floor(dealInfoGroup.item(j).avg),
         count: dealInfoGroup.item(j).count,
         month: dealInfoGroup.item(j).month,
         year: dealInfoGroup.item(j).year,

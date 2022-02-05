@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {Dimensions, StyleSheet, Text} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
-import Svg, {Path} from 'react-native-svg';
+import Svg, {Line, Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
 import {PanGestureHandler} from 'react-native-gesture-handler';
@@ -14,6 +14,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import {getGraphPath} from '../../libs/getGraphPath';
+import GraphBackground from './GraphBackground';
 
 const graphWidth = Dimensions.get('window').width - 40 - 40;
 const graphHeight = graphWidth * 0.4;
@@ -23,6 +24,7 @@ const radius = 5;
 const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
+  const arr = useMemo(() => [0, 1, 2, 3], []);
   const graphData = getGraphData(dealInfoGroup);
   const maxValue = Math.ceil(
     Math.max(...graphData.map(value => value.amount)) / 10000,
@@ -89,8 +91,8 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         {
           translateX:
             graphWidth - x.value >= tooltipWidth / 3
-              ? x.value - tooltipWidth / 3 > graphPadding
-                ? x.value - tooltipWidth / 3
+              ? x.value - tooltipWidth / 3 - graphPadding * 2 > graphPadding
+                ? x.value - tooltipWidth / 3 - graphPadding * 2
                 : 0
               : graphWidth - tooltipWidth + graphPadding * 2,
         },
@@ -118,6 +120,11 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
     <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={styles.graphContainer}>
         <Svg height={graphHeight} width={graphWidth}>
+          <GraphBackground
+            graphHeight={graphHeight}
+            graphWidth={graphWidth}
+            arr={arr}
+          />
           <Path d={path} fill="none" stroke="#835eeb" strokeWidth={3} />
         </Svg>
         <Animated.View style={[styles.line, lineAnimatedStyle]} />
@@ -146,7 +153,8 @@ const styles = StyleSheet.create({
   line: {
     position: 'absolute',
     width: 0.5,
-    height: graphHeight + 10,
+    top: -30,
+    height: graphHeight + 50,
     backgroundColor: 'black',
   },
   tooltip: {
