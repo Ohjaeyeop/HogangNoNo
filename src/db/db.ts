@@ -25,20 +25,19 @@ export const init = async () => {
   await updateApartment();
   await updateDong();
   await updateGu();*/
-  //await insertLeasePropertyData(db);
+  await insertLeasePropertyData(db);
 };
 
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
-  /*  await db.executeSql('Drop TABLE Gu');
+  await db.executeSql('Drop TABLE Gu');
   await db.executeSql('Drop TABLE Dong');
   await db.executeSql('Drop TABLE Apartment');
-  await db.executeSql('Drop TABLE Deal');*/
+  await db.executeSql('Drop TABLE Deal');
   await db.executeSql('Drop TABLE Lease');
   console.log(1);
 };
 
 const createTable = async (db: SQLite.SQLiteDatabase) => {
-  console.log(11);
   /*  await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );

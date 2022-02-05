@@ -81,7 +81,6 @@ export const leasePropertyApi = async (
     .catch(err => console.log(err.message));
 
   return item.map((obj: any) => {
-    console.log(obj['보증금액']);
     return {
       deposit:
         typeof obj['보증금액'] === 'string'
