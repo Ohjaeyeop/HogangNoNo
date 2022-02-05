@@ -1,6 +1,6 @@
 export const displayedAmount = (amount: number) => {
   const amount1 = Math.floor(amount / 10000);
-  const amount2 = amount % 10000;
+  const amount2 = Math.round((amount % 10000) / 100) * 100;
   const displayedAmount1 = amount1 > 0 ? `${amount1}억` : '';
   const displayedAmount2 =
     amount2 >= 1000

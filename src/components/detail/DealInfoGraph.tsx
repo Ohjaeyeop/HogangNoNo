@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import {Dimensions, StyleSheet, Text} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
-import Svg, {Line, Path} from 'react-native-svg';
+import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
 import {PanGestureHandler} from 'react-native-gesture-handler';
