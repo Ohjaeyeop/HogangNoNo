@@ -21,6 +21,8 @@ type Props = {
   dealInfoGroup: ResultSetRowList;
   modalOpen: () => void;
   loading: boolean;
+  type: string;
+  setType: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const DealInfo = ({
@@ -31,9 +33,9 @@ const DealInfo = ({
   dealInfoGroup,
   modalOpen,
   loading,
+  type,
+  setType,
 }: Props) => {
-  const [type, setType] = useState('Deal');
-
   return (
     <View>
       <View style={styles.apartmentInfo}>

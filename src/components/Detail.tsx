@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,12 +28,14 @@ const Detail = ({navigation, route}: DetailProps) => {
   const [amount, setAmount] = useState(dealAmount);
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(false);
+  const [type, setType] = useState('Deal');
 
   const [areaList, setAreaList] = useState<ResultSetRowList>();
   const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
   const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
 
-  const modalRef = useRef<Modal>(null);
+  const typeModalRef = useRef<Modal>(null);
+  const areaModalRef = useRef<Modal>(null);
 
   const changeArea = (name: string, area: number) => {
     setLoading2(true);
@@ -44,11 +47,11 @@ const Detail = ({navigation, route}: DetailProps) => {
       .then(() => setLoading2(false));
     getRecentDealAmount(name, area).then(res => setAmount(res));
     setArea(area);
-    modalRef.current?.close();
+    areaModalRef.current?.close();
   };
 
   const modalOpen = () => {
-    modalRef.current?.open();
+    areaModalRef.current?.open();
   };
 
   useFocusEffect(
@@ -99,8 +102,9 @@ const Detail = ({navigation, route}: DetailProps) => {
           style={[
             styles.selectBox,
             {borderRightWidth: 0.2, borderRightColor: 'lightgray'},
-          ]}>
-          <Text style={styles.text}>매매</Text>
+          ]}
+          onPress={() => typeModalRef.current?.open()}>
+          <Text style={styles.text}>{type === 'Deal' ? '매매' : '전월세'}</Text>
           <Icon name="keyboard-arrow-down" size={20} color="white" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.selectBox} onPress={modalOpen}>
@@ -116,14 +120,48 @@ const Detail = ({navigation, route}: DetailProps) => {
         dealInfoGroup={dealInfoGroup}
         modalOpen={modalOpen}
         loading={loading2}
+        type={type}
+        setType={setType}
       />
+      <Modal
+        animationDuration={0}
+        position="center"
+        swipeToClose={false}
+        coverScreen={true}
+        backdropOpacity={0.6}
+        ref={typeModalRef}
+        style={{
+          width: 150,
+          height: 100,
+          backgroundColor: 'transparent',
+          justifyContent: 'space-between',
+        }}>
+        <Pressable style={styles.typeModal} onPress={() => setType('Deal')}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: type === 'Deal' ? color.main : 'gray',
+            }}>
+            매매
+          </Text>
+        </Pressable>
+        <Pressable style={styles.typeModal} onPress={() => setType('Lease')}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: type === 'Lease' ? color.main : 'gray',
+            }}>
+            전월세
+          </Text>
+        </Pressable>
+      </Modal>
       <Modal
         entry="bottom"
         position="bottom"
         swipeToClose={false}
         coverScreen={true}
         backdropOpacity={0.2}
-        ref={modalRef}
+        ref={areaModalRef}
         style={{
           height: '50%',
           backgroundColor: 'white',
@@ -139,7 +177,7 @@ const Detail = ({navigation, route}: DetailProps) => {
           <Icon
             name={'close'}
             size={20}
-            onPress={() => modalRef.current?.close()}
+            onPress={() => areaModalRef.current?.close()}
           />
         </View>
         <ScrollView>
@@ -214,6 +252,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginRight: 10,
+  },
+  typeModal: {
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+    borderRadius: 5,
   },
 });
 
