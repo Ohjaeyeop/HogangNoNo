@@ -25,7 +25,7 @@ export const init = async () => {
   await updateApartment();
   await updateDong();
   await updateGu();*/
-  await insertLeasePropertyData(db);
+  //await insertLeasePropertyData(db);
 };
 
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
@@ -53,7 +53,7 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
   );*/
   await db
     .executeSql(
-      'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "deposit" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
+      'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
     )
     .catch(err => console.log(err.message));
   console.log(2);
@@ -150,7 +150,7 @@ const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
           for (const item of items) {
             await db
               .executeSql(
-                `INSERT OR IGNORE INTO Lease(apartmentName, year, month, day, deposit, monthlyRent, floor, area) values ("${
+                `INSERT OR IGNORE INTO Lease(apartmentName, year, month, day, dealAmount, monthlyRent, floor, area) values ("${
                   item.dong + ' ' + item.apartmentName
                 }", ${item.dealYear}, ${item.dealMonth}, ${item.dealDate}, ${
                   item.deposit
@@ -274,8 +274,12 @@ export const getData = async (
   );
 };
 
-export const getDealInfo = async (apartmentName: string, area: number) => {
-  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
+export const getDealInfo = async (
+  table: string,
+  apartmentName: string,
+  area: number,
+) => {
+  const selectQuery = `SELECT * FROM ${table} WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
   const dealInfoList = await db
     .executeSql(selectQuery)
     .then(res => res[0].rows);
@@ -326,6 +330,10 @@ export type DealType = {
   area: number;
   apartmentName: string;
   floor: number;
+};
+
+export type LeaseType = DealType & {
+  monthlyRent: number;
 };
 
 export const getPropertyTypeByZoom = (zoom: number): PropertyType => {

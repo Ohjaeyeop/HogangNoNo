@@ -31,6 +31,7 @@ const DealInfo = (props: Props) => {
   const [amount, setAmount] = useState(dealAmount);
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(false);
+  const [type, setType] = useState('Deal');
 
   const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
   const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
@@ -38,7 +39,7 @@ const DealInfo = (props: Props) => {
 
   const changeArea = (name: string, area: number) => {
     setLoading2(true);
-    getDealInfo(name, area)
+    getDealInfo('Deal', name, area)
       .then(res => {
         setDealInfoList(res.dealInfoList);
         setDealInfoGroup(res.dealInfoGroup);
@@ -51,7 +52,7 @@ const DealInfo = (props: Props) => {
 
   useFocusEffect(
     useCallback(() => {
-      getDealInfo(name, area).then(res => {
+      getDealInfo('Deal', name, area).then(res => {
         setDealInfoList(res.dealInfoList);
         setDealInfoGroup(res.dealInfoGroup);
       });
@@ -80,14 +81,28 @@ const DealInfo = (props: Props) => {
       </View>
       <View style={styles.dealInfoContainer}>
         <View style={styles.selectorView}>
-          <TouchableOpacity style={styles.typeSelector}>
-            <View style={styles.typeBox}>
-              <Text>매매</Text>
-            </View>
-            <View style={styles.typeBox}>
-              <Text>전월세</Text>
-            </View>
-          </TouchableOpacity>
+          <View style={styles.typeSelector}>
+            <TouchableOpacity
+              style={[
+                styles.typeBox,
+                {backgroundColor: type === 'Deal' ? color.main : undefined},
+              ]}
+              onPress={() => setType('Deal')}>
+              <Text style={{color: type === 'Deal' ? 'white' : color.main}}>
+                매매
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.typeBox,
+                {backgroundColor: type === 'Lease' ? color.main : undefined},
+              ]}
+              onPress={() => setType('Lease')}>
+              <Text style={{color: type === 'Lease' ? 'white' : color.main}}>
+                전월세
+              </Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             style={styles.selectBox}
             onPress={() => modalRef.current?.open()}>
@@ -178,13 +193,12 @@ const styles = StyleSheet.create({
   },
   typeSelector: {
     flexDirection: 'row',
+    backgroundColor: color.gray,
   },
   typeBox: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 5,
     width: 60,
-    backgroundColor: color.gray,
   },
   selectBox: {
     flexDirection: 'row',
