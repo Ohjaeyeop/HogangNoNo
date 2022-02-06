@@ -36,7 +36,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
       ) / 10000,
     ) - 1;
 
-  const gap = graphWidth / 36;
+  const gap = graphWidth / 37;
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
   const path = getGraphPath(maxValue, diff, gap, graphHeight, graphData);
 

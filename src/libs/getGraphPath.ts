@@ -7,7 +7,10 @@ export const getGraphPath = (
   graphHeight: number,
   graphData: DealInfoGroupType[],
 ) => {
-  let y = graphHeight;
+  let y =
+    graphData[0].amount === 0
+      ? graphHeight
+      : ((maxValue - graphData[0].amount / 10000) / diff) * graphHeight;
   let x = 0;
   let prevX = 0;
   let path = `M0 ${y} `;

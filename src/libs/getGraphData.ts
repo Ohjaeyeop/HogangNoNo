@@ -16,6 +16,7 @@ export const getGraphData = (dealInfoGroup: ResultSetRowList) => {
   let {date, ymd} = getDate();
   const arr: DealInfoGroupType[] = [];
   ymd = 201902;
+
   while (ymd <= date) {
     if (
       j < dealInfoGroup.length &&
