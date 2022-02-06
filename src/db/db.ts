@@ -18,21 +18,21 @@ export const init = async () => {
       console.log(error.message);
     },
   );
-  //await dropTable(db);
-  //await createTable(db);
+  /*  await dropTable(db);
+  await createTable(db);*/
   // await insertAddressData(db);
   /*await insertPropertyData(db);
   await updateApartment();
   await updateDong();
   await updateGu();*/
-  await insertLeasePropertyData(db);
+  //await insertLeasePropertyData(db);
 };
 
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
-  await db.executeSql('Drop TABLE Gu');
+  /*  await db.executeSql('Drop TABLE Gu');
   await db.executeSql('Drop TABLE Dong');
   await db.executeSql('Drop TABLE Apartment');
-  await db.executeSql('Drop TABLE Deal');
+  await db.executeSql('Drop TABLE Deal');*/
   await db.executeSql('Drop TABLE Lease');
   console.log(1);
 };
@@ -52,7 +52,7 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
   );*/
   await db
     .executeSql(
-      'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
+      'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, PRIMARY KEY("id" AUTOINCREMENT) )',
     )
     .catch(err => console.log(err.message));
   console.log(2);
@@ -155,7 +155,7 @@ const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
                   item.deposit
                 }, ${item.monthlyRent}, ${item.floor}, ${item.area})`,
               )
-              .catch(err => console.log(err.message, item.apartmentName));
+              .catch(err => console.log(err.message));
           }
         })
         .catch(err => console.log(err.message));

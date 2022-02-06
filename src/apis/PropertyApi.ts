@@ -75,6 +75,7 @@ export const leasePropertyApi = async (
   )
     .then(res => res.text())
     .then(resText => {
+      console.log(resText);
       const parser = new XMLParser();
       return parser.parse(resText);
     })
