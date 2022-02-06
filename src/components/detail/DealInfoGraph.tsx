@@ -91,10 +91,10 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         {
           translateX:
             graphWidth - x.value >= tooltipWidth / 3
-              ? x.value - tooltipWidth / 3 - graphPadding * 2 > graphPadding
-                ? x.value - tooltipWidth / 3 - graphPadding * 2
-                : 0
-              : graphWidth - tooltipWidth + graphPadding * 2,
+              ? x.value - tooltipWidth / 3 > graphPadding
+                ? x.value - graphWidth + tooltipWidth / 3
+                : -(graphWidth - tooltipWidth + graphPadding * 2)
+              : 0,
         },
       ],
     };
@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
   tooltip: {
     position: 'absolute',
     top: -50,
+    right: 0,
     backgroundColor: color.main,
     paddingHorizontal: 12,
     height: 25,
