@@ -82,7 +82,13 @@ const Detail = ({navigation, route}: DetailProps) => {
     <View style={{flex: 1, backgroundColor: 'white'}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}
       <View style={styles.header}>
-        <View style={{width: '60%', alignItems: 'center'}}>
+        <View
+          style={{
+            width: '60%',
+            height: 25,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
           <Text style={styles.title}>{name}</Text>
         </View>
         <TouchableOpacity
