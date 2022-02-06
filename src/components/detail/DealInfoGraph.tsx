@@ -36,14 +36,14 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
       ) / 10000,
     ) - 1;
 
-  const gap = graphWidth / 37;
+  const gap = graphWidth / 36;
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
   const path = getGraphPath(maxValue, diff, gap, graphHeight, graphData);
 
   const x = useSharedValue(graphWidth - radius);
   const dataIndex = useDerivedValue(() => {
     return Math.min(
-      Math.max(Math.floor(x.value / gap), 0),
+      Math.max(Math.floor(x.value / gap) + 1, 0),
       graphData.length - 1,
     );
   });
@@ -92,10 +92,10 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
       transform: [
         {
           translateX:
-            graphWidth - x.value >= tooltipWidth / 3
-              ? x.value - tooltipWidth / 3 > graphPadding
-                ? x.value - graphWidth + tooltipWidth / 3
-                : -(graphWidth - (tooltipWidth / 3) * 2 - graphPadding)
+            graphWidth - x.value + graphPadding >= tooltipWidth / 2
+              ? x.value - tooltipWidth / 2 > -graphPadding
+                ? x.value - graphWidth - graphPadding + tooltipWidth / 2
+                : -graphWidth - graphPadding * 2 + tooltipWidth
               : 0,
         },
       ],

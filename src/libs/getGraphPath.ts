@@ -15,7 +15,7 @@ export const getGraphPath = (
   let prevX = 0;
   let path = `M0 ${y} `;
 
-  for (let i = 0; i < graphData.length; i++) {
+  for (let i = 1; i < graphData.length; i++) {
     if (graphData[i].amount !== 0) {
       y = ((maxValue - graphData[i].amount / 10000) / diff) * graphHeight;
     }
