@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -21,6 +20,7 @@ import {ResultSetRowList} from 'react-native-sqlite-storage';
 import {useFocusEffect} from '@react-navigation/native';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
+const rowHeight = 70;
 
 const Detail = ({navigation, route}: DetailProps) => {
   const {dealAmount, buildYear, name, area} = route.params;
@@ -164,30 +164,36 @@ const Detail = ({navigation, route}: DetailProps) => {
         backdropOpacity={0.2}
         ref={areaModalRef}
         style={{
-          height: '50%',
+          height:
+            areaList.length >= 5 ? '50%' : rowHeight * (areaList.length + 1),
           backgroundColor: 'white',
           padding: 20,
         }}>
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
             marginBottom: 20,
           }}>
           <Text style={{fontSize: 18, fontWeight: 'bold'}}>평형 선택</Text>
-          <Icon
-            name={'close'}
-            size={20}
-            onPress={() => areaModalRef.current?.close()}
-          />
+          <TouchableOpacity
+            style={{
+              width: 44,
+              alignItems: 'center',
+              position: 'absolute',
+              right: -10,
+            }}
+            onPress={() => areaModalRef.current?.close()}>
+            <Icon name={'close'} size={20} />
+          </TouchableOpacity>
         </View>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {[...new Array(areaList.length).keys()].map(index => {
             const area = areaList.item(index).area;
             return (
               <TouchableOpacity
                 key={index}
                 style={{
+                  height: rowHeight,
                   paddingVertical: 20,
                   borderBottomWidth: 0.2,
                   borderBottomColor: 'gray',
