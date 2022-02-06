@@ -70,7 +70,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         {
           translateY:
             graphData[dataIndex.value].amount === 0
-              ? -radius
+              ? -radius - 2
               : ((maxValue - graphData[dataIndex.value].amount / 10000) / diff -
                   1) *
                   graphHeight -
