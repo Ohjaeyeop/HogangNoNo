@@ -56,12 +56,12 @@ const Detail = ({navigation, route}: DetailProps) => {
 
   useFocusEffect(
     useCallback(() => {
-      getDealInfo('Deal', name, area).then(res => {
+      getDealInfo(type, name, area).then(res => {
         setDealInfoList(res.dealInfoList);
         setDealInfoGroup(res.dealInfoGroup);
       });
       getAreaList(name).then(res => setAreaList(res));
-    }, [area, name]),
+    }, [area, name, type]),
   );
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const Detail = ({navigation, route}: DetailProps) => {
     <View style={{flex: 1, backgroundColor: 'white'}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}
       <View style={styles.header}>
-        <View style={{width: '100%', alignItems: 'center'}}>
+        <View style={{width: '60%', alignItems: 'center'}}>
           <Text style={styles.title}>{name}</Text>
         </View>
         <TouchableOpacity
