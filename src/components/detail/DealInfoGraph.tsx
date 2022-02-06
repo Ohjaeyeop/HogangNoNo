@@ -104,7 +104,6 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
 
   const gestureHandler = useAnimatedGestureHandler({
     onStart: (event, ctx: any) => {
-      console.log(event.x - graphPadding);
       x.value = Math.min(Math.max(event.x - graphPadding, 0), graphWidth);
       x.value = Math.round(x.value / gap) * gap;
       ctx.startX = x.value;
@@ -124,7 +123,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         <Svg
           height={graphHeight + 4}
           width={graphWidth}
-          viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
+          viewBox={`-2 0 ${graphWidth + 2} ${graphHeight}`}>
           <GraphBackground
             graphHeight={graphHeight}
             graphWidth={graphWidth}

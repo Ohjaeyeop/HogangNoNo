@@ -139,7 +139,7 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
 
 const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 201902;
+  ymd = 202103;
   while (ymd <= date) {
     console.log(ymd, date);
     for (const code in regionCodes) {
@@ -166,10 +166,14 @@ const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
   console.log(4);
 };
 
-export const getRecentDealAmount = async (name: string, area: number) => {
+export const getRecentDealAmount = async (
+  table: string,
+  name: string,
+  area: number,
+) => {
   return await db
     .executeSql(
-      `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
+      `SELECT avg(dealAmount) as dealAmount FROM ${table} WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
     )
     .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
 };
@@ -193,7 +197,7 @@ const updateApartment = async () => {
         }`,
       )
       .then(res => res[0].rows.item(0).area);
-    const dealAmount = getRecentDealAmount(name, area);
+    const dealAmount = getRecentDealAmount('Deal', name, area);
 
     await db.executeSql(
       `UPDATE Apartment SET area = ${area}, dealAmount=${dealAmount} WHERE name="${name}"`,

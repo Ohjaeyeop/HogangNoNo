@@ -45,7 +45,7 @@ const Detail = ({navigation, route}: DetailProps) => {
         setDealInfoGroup(res.dealInfoGroup);
       })
       .then(() => setLoading2(false));
-    getRecentDealAmount(name, area).then(res => setAmount(res));
+    getRecentDealAmount(type, name, area).then(res => setAmount(res));
     setArea(area);
     areaModalRef.current?.close();
   };
@@ -60,6 +60,7 @@ const Detail = ({navigation, route}: DetailProps) => {
         setDealInfoList(res.dealInfoList);
         setDealInfoGroup(res.dealInfoGroup);
       });
+      getRecentDealAmount(type, name, area).then(res => setAmount(res));
       getAreaList(name).then(res => setAreaList(res));
     }, [area, name, type]),
   );

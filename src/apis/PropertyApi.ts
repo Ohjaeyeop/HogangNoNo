@@ -75,7 +75,6 @@ export const leasePropertyApi = async (
   )
     .then(res => res.text())
     .then(resText => {
-      console.log(resText);
       const parser = new XMLParser();
       return parser.parse(resText);
     })
@@ -87,7 +86,7 @@ export const leasePropertyApi = async (
         typeof obj['보증금액'] === 'string'
           ? parseInt(obj['보증금액'].replace(',', ''))
           : obj['보증금액'],
-      monthlyRent: obj['월세'],
+      monthlyRent: obj['월세금액'],
       dealYear: obj['년'],
       dealMonth: obj['월'],
       dealDate: obj['일'],
