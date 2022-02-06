@@ -82,20 +82,21 @@ const Detail = ({navigation, route}: DetailProps) => {
     <View style={{flex: 1, backgroundColor: 'white'}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}
       <View style={styles.header}>
-        <TouchableWithoutFeedback onPress={() => navigation.pop()}>
+        <View style={{width: '100%', alignItems: 'center'}}>
+          <Text style={styles.title}>{name}</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => navigation.pop()}
+          style={{position: 'absolute', left: 20, width: 44}}>
           <Icon
             size={25}
             style={{
               color: 'white',
-              width: '25%',
               textAlign: 'center',
-              paddingHorizontal: 20,
             }}
             name="arrow-back"
           />
-        </TouchableWithoutFeedback>
-        <Text style={styles.title}>{name}</Text>
-        <View style={{width: '25%'}} />
+        </TouchableOpacity>
       </View>
       <View style={styles.subHeader}>
         <TouchableOpacity
@@ -239,7 +240,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 18,
-    width: '50%',
     textAlign: 'center',
   },
   apartmentInfo: {
