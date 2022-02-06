@@ -119,7 +119,10 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={styles.graphContainer}>
-        <Svg height={graphHeight} width={graphWidth}>
+        <Svg
+          height={graphHeight + 4}
+          width={graphWidth}
+          viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
           <GraphBackground
             graphHeight={graphHeight}
             graphWidth={graphWidth}
