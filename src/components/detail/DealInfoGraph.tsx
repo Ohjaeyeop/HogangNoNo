@@ -95,7 +95,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
             graphWidth - x.value >= tooltipWidth / 3
               ? x.value - tooltipWidth / 3 > graphPadding
                 ? x.value - graphWidth + tooltipWidth / 3
-                : -(graphWidth - tooltipWidth + graphPadding * 2)
+                : -(graphWidth - (tooltipWidth / 3) * 2 - graphPadding)
               : 0,
         },
       ],
