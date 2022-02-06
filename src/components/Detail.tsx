@@ -39,7 +39,7 @@ const Detail = ({navigation, route}: DetailProps) => {
 
   const changeArea = (name: string, area: number) => {
     setLoading2(true);
-    getDealInfo('Deal', name, area)
+    getDealInfo(type, name, area)
       .then(res => {
         setDealInfoList(res.dealInfoList);
         setDealInfoGroup(res.dealInfoGroup);
@@ -143,7 +143,12 @@ const Detail = ({navigation, route}: DetailProps) => {
           backgroundColor: 'transparent',
           justifyContent: 'space-between',
         }}>
-        <Pressable style={styles.typeModal} onPress={() => setType('Deal')}>
+        <Pressable
+          style={styles.typeModal}
+          onPress={() => {
+            setType('Deal');
+            typeModalRef.current?.close();
+          }}>
           <Text
             style={{
               fontSize: 16,
@@ -152,7 +157,12 @@ const Detail = ({navigation, route}: DetailProps) => {
             매매
           </Text>
         </Pressable>
-        <Pressable style={styles.typeModal} onPress={() => setType('Lease')}>
+        <Pressable
+          style={styles.typeModal}
+          onPress={() => {
+            setType('Lease');
+            typeModalRef.current?.close();
+          }}>
           <Text
             style={{
               fontSize: 16,
