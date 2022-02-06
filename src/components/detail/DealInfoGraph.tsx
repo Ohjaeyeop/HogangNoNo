@@ -40,10 +40,10 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
   const path = getGraphPath(maxValue, diff, gap, graphHeight, graphData);
 
-  const x = useSharedValue(graphWidth - radius);
+  const x = useSharedValue(graphWidth);
   const dataIndex = useDerivedValue(() => {
     return Math.min(
-      Math.max(Math.floor(x.value / gap) + 1, 0),
+      Math.max(Math.round(x.value / gap), 0),
       graphData.length - 1,
     );
   });
@@ -66,7 +66,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
   const circleAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        {translateX: x.value},
+        {translateX: x.value - radius},
         {
           translateY:
             graphData[dataIndex.value].amount === 0
@@ -83,7 +83,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
 
   const lineAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: x.value + graphPadding + radius}],
+      transform: [{translateX: x.value + graphPadding}],
     };
   });
 
@@ -104,17 +104,17 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
 
   const gestureHandler = useAnimatedGestureHandler({
     onStart: (event, ctx: any) => {
-      x.value = Math.min(
-        Math.max(event.x - graphPadding, -radius),
-        graphWidth - radius,
-      );
+      console.log(event.x - graphPadding);
+      x.value = Math.min(Math.max(event.x - graphPadding, 0), graphWidth);
+      x.value = Math.round(x.value / gap) * gap;
       ctx.startX = x.value;
     },
     onActive: (event, ctx: any) => {
       x.value = Math.min(
-        Math.max(ctx.startX + event.translationX, -radius),
-        graphWidth - radius,
+        Math.max(ctx.startX + event.translationX, 0),
+        graphWidth,
       );
+      x.value = Math.round(x.value / gap) * gap;
     },
   });
 
