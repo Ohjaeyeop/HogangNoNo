@@ -73,7 +73,8 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
               : ((maxValue - graphData[dataIndex.value].amount / 10000) / diff -
                   1) *
                   graphHeight -
-                radius,
+                radius -
+                2,
         },
       ],
     };
