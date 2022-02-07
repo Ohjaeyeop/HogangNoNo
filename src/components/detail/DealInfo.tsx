@@ -22,7 +22,7 @@ type Props = {
   modalOpen: () => void;
   loading: boolean;
   type: 'Deal' | 'Lease';
-  setType: React.Dispatch<React.SetStateAction<'Deal' | 'Lease'>>;
+  changeType: (type: 'Deal' | 'Lease') => void;
 };
 
 const DealInfo = ({
@@ -34,7 +34,7 @@ const DealInfo = ({
   modalOpen,
   loading,
   type,
-  setType,
+  changeType,
 }: Props) => {
   return (
     <View>
@@ -49,7 +49,7 @@ const DealInfo = ({
                 styles.typeBox,
                 {backgroundColor: type === 'Deal' ? color.main : undefined},
               ]}
-              onPress={() => setType('Deal')}>
+              onPress={() => changeType('Deal')}>
               <Text style={{color: type === 'Deal' ? 'white' : color.main}}>
                 매매
               </Text>
@@ -59,7 +59,7 @@ const DealInfo = ({
                 styles.typeBox,
                 {backgroundColor: type === 'Lease' ? color.main : undefined},
               ]}
-              onPress={() => setType('Lease')}>
+              onPress={() => changeType('Lease')}>
               <Text style={{color: type === 'Lease' ? 'white' : color.main}}>
                 전월세
               </Text>

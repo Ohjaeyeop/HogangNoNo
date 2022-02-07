@@ -30,27 +30,40 @@ const Detail = ({navigation, route}: DetailProps) => {
   const [loading2, setLoading2] = useState(false);
   const [type, setType] = useState<'Deal' | 'Lease'>('Deal');
 
-  const [areaList, setAreaList] = useState<ResultSetRowList>();
+  const [areaList, setAreaList] = useState<number[]>([]);
   const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
   const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
 
   const typeModalRef = useRef<Modal>(null);
   const areaModalRef = useRef<Modal>(null);
 
-  const changeArea = (name: string, area: number) => {
-    setLoading2(true);
-    getDealInfo(type, name, area)
-      .then(res => {
-        setDealInfoList(res.dealInfoList);
-        setDealInfoGroup(res.dealInfoGroup);
-      })
-      .then(() => setLoading2(false))
-      .catch(err => console.log(err));
-    getRecentDealAmount(type, name, area)
+  const getData = async (
+    type: 'Deal' | 'Lease',
+    name: string,
+    selectedArea: number,
+  ) => {
+    await getDealInfo(type, name, selectedArea).then(res => {
+      setDealInfoList(res.dealInfoList);
+      setDealInfoGroup(res.dealInfoGroup);
+    });
+    await getRecentDealAmount(type, name, selectedArea)
       .then(res => setAmount(res))
       .catch(() => setAmount(0));
-    setArea(area);
+  };
+
+  const changeArea = (area: number) => {
+    setLoading2(true);
+    getData(type, name, area)
+      .then(() => setArea(area))
+      .then(() => setLoading2(false));
+
     areaModalRef.current?.close();
+  };
+
+  const changeType = (type: 'Deal' | 'Lease') => {
+    getData(type, name, selectedArea);
+    setType(type);
+    typeModalRef.current?.close();
   };
 
   const modalOpen = () => {
@@ -59,15 +72,16 @@ const Detail = ({navigation, route}: DetailProps) => {
 
   useFocusEffect(
     useCallback(() => {
-      getDealInfo(type, name, area).then(res => {
-        setDealInfoList(res.dealInfoList);
-        setDealInfoGroup(res.dealInfoGroup);
+      getData('Deal', name, area);
+      getAreaList(name).then(res => {
+        const arr: number[] = [];
+        [...new Array(res.length).keys()].map(index => {
+          const area = res.item(index).area;
+          arr.push(area);
+        });
+        setAreaList(arr);
       });
-      getRecentDealAmount(type, name, area)
-        .then(res => setAmount(res))
-        .catch(() => setAmount(0));
-      getAreaList(name).then(res => setAreaList(res));
-    }, [area, name, type]),
+    }, [name, area]),
   );
 
   useEffect(() => {
@@ -134,7 +148,7 @@ const Detail = ({navigation, route}: DetailProps) => {
         modalOpen={modalOpen}
         loading={loading2}
         type={type}
-        setType={setType}
+        changeType={changeType}
       />
       <Modal
         animationDuration={0}
@@ -149,12 +163,7 @@ const Detail = ({navigation, route}: DetailProps) => {
           backgroundColor: 'transparent',
           justifyContent: 'space-between',
         }}>
-        <Pressable
-          style={styles.typeModal}
-          onPress={() => {
-            setType('Deal');
-            typeModalRef.current?.close();
-          }}>
+        <Pressable style={styles.typeModal} onPress={() => changeType('Deal')}>
           <Text
             style={{
               fontSize: 16,
@@ -163,12 +172,7 @@ const Detail = ({navigation, route}: DetailProps) => {
             매매
           </Text>
         </Pressable>
-        <Pressable
-          style={styles.typeModal}
-          onPress={() => {
-            setType('Lease');
-            typeModalRef.current?.close();
-          }}>
+        <Pressable style={styles.typeModal} onPress={() => changeType('Lease')}>
           <Text
             style={{
               fontSize: 16,
@@ -208,9 +212,10 @@ const Detail = ({navigation, route}: DetailProps) => {
             <Icon name={'close'} size={20} />
           </TouchableOpacity>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {[...new Array(areaList.length).keys()].map(index => {
-            const area = areaList.item(index).area;
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentOffset={{x: 0, y: areaList.indexOf(selectedArea) * rowHeight}}>
+          {areaList.map((area, index) => {
             return (
               <TouchableOpacity
                 key={index}
@@ -221,7 +226,7 @@ const Detail = ({navigation, route}: DetailProps) => {
                   borderBottomColor: 'gray',
                 }}
                 onPress={() => {
-                  changeArea(name, area);
+                  changeArea(area);
                 }}>
                 <Text
                   style={[

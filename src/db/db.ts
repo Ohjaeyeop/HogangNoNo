@@ -271,7 +271,7 @@ const zoomScale = {
   dong: 12,
   apartment: 14,
 };
-export const getData = async (
+export const getDisplayedData = async (
   {startX, startY, endX, endY}: CoordType,
   zoom: number,
 ) => {

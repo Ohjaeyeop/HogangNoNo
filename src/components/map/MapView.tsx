@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import ItemMarker from './ItemMarker';
 import {
-  getData,
+  getDisplayedData,
   getPropertyTypeByZoom,
   Property,
   PropertyType,
@@ -33,7 +33,7 @@ const MapView = ({location, handlePress}: Props) => {
     setZoom(event.zoom);
     if (event.zoom > 6) {
       const {zoom, contentRegion} = event;
-      await getData(
+      await getDisplayedData(
         {
           startX: contentRegion[0].latitude,
           startY: contentRegion[0].longitude,

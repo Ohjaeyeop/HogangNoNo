@@ -19,7 +19,6 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
       </View>
       <ScrollView style={{width: '100%', height: 180}}>
         {Array.from({length: dealInfoList.length}, (v, i) => i).map(index => {
-          console.log(dealInfoList.item(index).monthlyRent);
           return (
             <View style={styles.tableBody} key={index}>
               <View style={styles.column}>
