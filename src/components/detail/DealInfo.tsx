@@ -1,6 +1,8 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Alert,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -38,10 +40,27 @@ const DealInfo = ({
   type,
   changeType,
 }: Props) => {
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Test',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+        } else {
+        }
+      } else if (result.action === Share.dismissedAction) {
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <View>
       <View style={styles.apartmentInfo}>
         <Text style={{fontSize: 14, color: 'black'}}>{buildYear}년</Text>
+        <Icon name={'share'} size={20} color={color.main} onPress={onShare} />
       </View>
       <View style={styles.dealInfoContainer}>
         <View style={styles.selectorView}>
@@ -127,8 +146,12 @@ const styles = StyleSheet.create({
   },
   apartmentInfo: {
     padding: 12,
+    paddingHorizontal: 20,
     borderBottomWidth: 10,
     borderColor: color.gray,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 });
 

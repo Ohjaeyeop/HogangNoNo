@@ -4,7 +4,10 @@ import {ResultSetRowList} from 'react-native-sqlite-storage';
 import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
-import {PanGestureHandler} from 'react-native-gesture-handler';
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedGestureHandler,
@@ -124,41 +127,45 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   });
 
   return (
-    <PanGestureHandler onGestureEvent={gestureHandler}>
-      <Animated.View style={styles.graphContainer}>
-        <Svg
-          height={graphHeight + 4}
-          width={graphWidth}
-          viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
-          <GraphBackground
-            graphHeight={graphHeight}
-            graphWidth={graphWidth}
-            arr={arr}
-          />
-          {!loading && (
-            <Path
-              d={path}
-              fill="none"
-              stroke={type === 'Deal' ? color.main : '#3D9752'}
-              strokeWidth={3}
+    <GestureHandlerRootView>
+      <PanGestureHandler onGestureEvent={gestureHandler}>
+        <Animated.View style={styles.graphContainer}>
+          <Svg
+            height={graphHeight + 4}
+            width={graphWidth}
+            viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
+            <GraphBackground
+              graphHeight={graphHeight}
+              graphWidth={graphWidth}
+              arr={arr}
             />
-          )}
-        </Svg>
-        <Animated.View style={[styles.line, lineAnimatedStyle]} />
-        <Animated.View
-          style={[
-            styles.circle,
-            circleAnimatedStyle,
-            {backgroundColor: type === 'Deal' ? color.main : '#3D9752'},
-          ]}
-        />
-        <Animated.View
-          style={[styles.tooltip, tooltipAnimatedStyle]}
-          onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
-          <Text style={{color: 'white', fontWeight: '500'}}>{tooltipText}</Text>
+            {!loading && (
+              <Path
+                d={path}
+                fill="none"
+                stroke={type === 'Deal' ? color.main : '#3D9752'}
+                strokeWidth={3}
+              />
+            )}
+          </Svg>
+          <Animated.View style={[styles.line, lineAnimatedStyle]} />
+          <Animated.View
+            style={[
+              styles.circle,
+              circleAnimatedStyle,
+              {backgroundColor: type === 'Deal' ? color.main : '#3D9752'},
+            ]}
+          />
+          <Animated.View
+            style={[styles.tooltip, tooltipAnimatedStyle]}
+            onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
+            <Text style={{color: 'white', fontWeight: '500'}}>
+              {tooltipText}
+            </Text>
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
-    </PanGestureHandler>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
   );
 };
 
