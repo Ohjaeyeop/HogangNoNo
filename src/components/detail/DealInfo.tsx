@@ -41,7 +41,7 @@ const DealInfo = ({
   return (
     <View>
       <View style={styles.apartmentInfo}>
-        <Text style={{fontSize: 14}}>{buildYear}년</Text>
+        <Text style={{fontSize: 14, color: 'black'}}>{buildYear}년</Text>
       </View>
       <View style={styles.dealInfoContainer}>
         <View style={styles.selectorView}>

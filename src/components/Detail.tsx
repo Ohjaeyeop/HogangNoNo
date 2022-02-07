@@ -203,7 +203,7 @@ const Detail = ({navigation, route}: DetailProps) => {
             flexDirection: 'row',
             marginBottom: 20,
           }}>
-          <Text style={{fontSize: 18, fontWeight: 'bold'}}>평형 선택</Text>
+          <Text style={styles.modalText}>평형 선택</Text>
           <TouchableOpacity
             style={{
               width: 44,
@@ -233,7 +233,7 @@ const Detail = ({navigation, route}: DetailProps) => {
                 }}>
                 <Text
                   style={[
-                    {fontWeight: 'bold', fontSize: 18},
+                    styles.modalText,
                     area === selectedArea ? {color: color.main} : null,
                   ]}>
                   {area}평
@@ -295,6 +295,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 40,
     borderRadius: 5,
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
   },
 });
 

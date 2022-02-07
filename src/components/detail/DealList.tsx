@@ -8,13 +8,13 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
     <View style={styles.table}>
       <View style={styles.tableHeader}>
         <View style={styles.column}>
-          <Text>계약일</Text>
+          <Text style={styles.text}>계약일</Text>
         </View>
         <View style={styles.column}>
-          <Text>가격</Text>
+          <Text style={styles.text}>가격</Text>
         </View>
         <View style={styles.column}>
-          <Text>층</Text>
+          <Text style={styles.text}>층</Text>
         </View>
       </View>
       <ScrollView style={{width: '100%', height: 180}}>
@@ -22,7 +22,7 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
           return (
             <View style={styles.tableBody} key={index}>
               <View style={styles.column}>
-                <Text>
+                <Text style={styles.text}>
                   {dealInfoList.item(index).year}.
                   {dealInfoList.item(index).month < 10
                     ? `0${dealInfoList.item(index).month}`
@@ -34,7 +34,7 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
                 </Text>
               </View>
               <View style={styles.column}>
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={[styles.text, {fontWeight: 'bold'}]}>
                   {displayedAmount(dealInfoList.item(index).dealAmount)}
                   {dealInfoList.item(index).monthlyRent > 0
                     ? `/${dealInfoList.item(index).monthlyRent}`
@@ -42,7 +42,9 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
                 </Text>
               </View>
               <View style={styles.column}>
-                <Text>{dealInfoList.item(index).floor}층</Text>
+                <Text style={styles.text}>
+                  {dealInfoList.item(index).floor}층
+                </Text>
               </View>
             </View>
           );
@@ -63,8 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
     borderTopWidth: 0.5,
     borderBottomWidth: 0.5,
-    borderTopColor: 'gray',
-    borderBottomColor: 'gray',
+    borderColor: 'gray',
   },
   tableBody: {
     flexDirection: 'row',
@@ -75,6 +76,9 @@ const styles = StyleSheet.create({
   column: {
     flex: 1 / 3,
     alignItems: 'center',
+  },
+  text: {
+    color: 'black',
   },
 });
 
