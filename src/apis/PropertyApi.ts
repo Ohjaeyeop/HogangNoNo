@@ -1,11 +1,10 @@
 import {XMLParser} from 'fast-xml-parser';
 import {getCoord} from '../libs/getCoord';
+import Config from 'react-native-config';
 
 export const propertyApi = async (code: string, ymd: string) => {
   const uri =
     'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTrade';
-  const SERVICE_KEY =
-    'Os0BvUN73dbFsXA8O3jtA4bPKaxXGxoW7C88n6DpgNyVrssis9u3RLTGl7yxRCJimPkKY0yCD9dUeK4M8vK1BA%3D%3D';
 
   const {
     response: {
@@ -14,7 +13,7 @@ export const propertyApi = async (code: string, ymd: string) => {
       },
     },
   } = await fetch(
-    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=${ymd}`,
+    `${uri}?serviceKey=${Config.SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=${ymd}`,
   )
     .then(res => res.text())
     .then(resText => {
@@ -61,8 +60,6 @@ export const leasePropertyApi = async (
 ): Promise<LeasePropertyItem[]> => {
   const uri =
     'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptRent';
-  const SERVICE_KEY =
-    'Os0BvUN73dbFsXA8O3jtA4bPKaxXGxoW7C88n6DpgNyVrssis9u3RLTGl7yxRCJimPkKY0yCD9dUeK4M8vK1BA%3D%3D';
 
   const {
     response: {
@@ -71,7 +68,7 @@ export const leasePropertyApi = async (
       },
     },
   } = await fetch(
-    `${uri}?serviceKey=${SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=${ymd}`,
+    `${uri}?serviceKey=${Config.SERVICE_KEY}&LAWD_CD=${code}&DEAL_YMD=${ymd}`,
   )
     .then(res => res.text())
     .then(resText => {
