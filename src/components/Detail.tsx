@@ -28,7 +28,7 @@ const Detail = ({navigation, route}: DetailProps) => {
   const [amount, setAmount] = useState(dealAmount);
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(false);
-  const [type, setType] = useState('Deal');
+  const [type, setType] = useState<'Deal' | 'Lease'>('Deal');
 
   const [areaList, setAreaList] = useState<ResultSetRowList>();
   const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
@@ -44,8 +44,11 @@ const Detail = ({navigation, route}: DetailProps) => {
         setDealInfoList(res.dealInfoList);
         setDealInfoGroup(res.dealInfoGroup);
       })
-      .then(() => setLoading2(false));
-    getRecentDealAmount(type, name, area).then(res => setAmount(res));
+      .then(() => setLoading2(false))
+      .catch(err => console.log(err));
+    getRecentDealAmount(type, name, area)
+      .then(res => setAmount(res))
+      .catch(() => setAmount(0));
     setArea(area);
     areaModalRef.current?.close();
   };
@@ -60,7 +63,9 @@ const Detail = ({navigation, route}: DetailProps) => {
         setDealInfoList(res.dealInfoList);
         setDealInfoGroup(res.dealInfoGroup);
       });
-      getRecentDealAmount(type, name, area).then(res => setAmount(res));
+      getRecentDealAmount(type, name, area)
+        .then(res => setAmount(res))
+        .catch(() => setAmount(0));
       getAreaList(name).then(res => setAreaList(res));
     }, [area, name, type]),
   );

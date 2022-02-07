@@ -32,11 +32,11 @@ export const getGraphData = (dealInfoGroup: ResultSetRowList) => {
       j++;
     } else {
       arr.push({
-        amount: i > 1 ? arr[i - 1].amount : 0,
+        amount: i > 0 ? arr[i - 1].amount : 0,
         count: 0,
         month: ymd % 100,
         year: Math.floor(ymd / 100),
-        displayedAmount: i > 1 ? arr[i - 1].displayedAmount : '0원',
+        displayedAmount: i > 0 ? arr[i - 1].displayedAmount : '0원',
       });
     }
     i++;

@@ -21,8 +21,8 @@ type Props = {
   dealInfoGroup: ResultSetRowList;
   modalOpen: () => void;
   loading: boolean;
-  type: string;
-  setType: React.Dispatch<React.SetStateAction<string>>;
+  type: 'Deal' | 'Lease';
+  setType: React.Dispatch<React.SetStateAction<'Deal' | 'Lease'>>;
 };
 
 const DealInfo = ({
@@ -82,7 +82,7 @@ const DealInfo = ({
             {displayedAmount(amount)}
           </Text>
         </View>
-        <DealInfoGraph dealInfoGroup={dealInfoGroup} />
+        <DealInfoGraph dealInfoGroup={dealInfoGroup} type={type} />
         <DealList dealInfoList={dealInfoList} />
       </View>
     </View>

@@ -21,7 +21,13 @@ const graphHeight = graphWidth * 0.4;
 const graphPadding = 20;
 const radius = 5;
 
-const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
+const DealInfoGraph = ({
+  dealInfoGroup,
+  type,
+}: {
+  dealInfoGroup: ResultSetRowList;
+  type: 'Deal' | 'Lease';
+}) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
   const arr = useMemo(() => [0, 1, 2, 3], []);
@@ -123,16 +129,27 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         <Svg
           height={graphHeight + 4}
           width={graphWidth}
-          viewBox={`-2 0 ${graphWidth + 2} ${graphHeight}`}>
+          viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
           <GraphBackground
             graphHeight={graphHeight}
             graphWidth={graphWidth}
             arr={arr}
           />
-          <Path d={path} fill="none" stroke="#835eeb" strokeWidth={3} />
+          <Path
+            d={path}
+            fill="none"
+            stroke={type === 'Deal' ? color.main : '#3D9752'}
+            strokeWidth={3}
+          />
         </Svg>
         <Animated.View style={[styles.line, lineAnimatedStyle]} />
-        <Animated.View style={[styles.circle, circleAnimatedStyle]} />
+        <Animated.View
+          style={[
+            styles.circle,
+            circleAnimatedStyle,
+            {backgroundColor: type === 'Deal' ? color.main : '#3D9752'},
+          ]}
+        />
         <Animated.View
           style={[styles.tooltip, tooltipAnimatedStyle]}
           onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
@@ -152,7 +169,6 @@ const styles = StyleSheet.create({
     width: radius * 2,
     height: radius * 2,
     borderRadius: radius,
-    backgroundColor: color.main,
   },
   line: {
     position: 'absolute',

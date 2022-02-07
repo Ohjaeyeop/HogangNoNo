@@ -171,11 +171,15 @@ export const getRecentDealAmount = async (
   name: string,
   area: number,
 ) => {
-  return await db
-    .executeSql(
-      `SELECT avg(dealAmount) as dealAmount FROM ${table} WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
-    )
-    .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
+  try {
+    return await db
+      .executeSql(
+        `SELECT avg(dealAmount) as dealAmount FROM ${table} WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
+      )
+      .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const updateApartment = async () => {
@@ -283,16 +287,20 @@ export const getDealInfo = async (
   area: number,
 ) => {
   const selectQuery = `SELECT * FROM ${table} WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
-  const dealInfoList = await db
-    .executeSql(selectQuery)
-    .then(res => res[0].rows);
-  const dealInfoGroup = await db
-    .executeSql(
-      `SELECT count(*) as count, avg(dealAmount) as avg, year, month FROM (${selectQuery}) group by year, month`,
-    )
-    .then(res => res[0].rows);
+  try {
+    const dealInfoList = await db
+      .executeSql(selectQuery)
+      .then(res => res[0].rows);
+    const dealInfoGroup = await db
+      .executeSql(
+        `SELECT count(*) as count, avg(dealAmount) as avg, year, month FROM (${selectQuery}) group by year, month`,
+      )
+      .then(res => res[0].rows);
 
-  return {dealInfoList, dealInfoGroup};
+    return {dealInfoList, dealInfoGroup};
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getAreaList = async (apartmentName: string) => {
