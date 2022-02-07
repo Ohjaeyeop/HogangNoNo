@@ -86,6 +86,7 @@ const MapView = ({location, handlePress}: Props) => {
       onCameraChange={handleCameraChange}
       maxZoomLevel={20}
       minZoomLevel={6}
+      rotateGesturesEnabled={false}
       onMapClick={() => handlePress()}>
       {apartments &&
         apartments.map((apartment, index) =>
