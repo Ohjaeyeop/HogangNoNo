@@ -1,5 +1,12 @@
-import React, {useState} from 'react';
-import {PermissionsAndroid, Platform, StyleSheet, View} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {
+  PermissionsAndroid,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -8,12 +15,19 @@ import {Coord} from 'react-native-nmap';
 import {color} from '../theme/color';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
+const AnimatableTouchableOpacity =
+  Animatable.createAnimatableComponent(TouchableOpacity);
 
 const Home = () => {
   const [location, setLocation] = useState<Coord>({
     latitude: 37.50882651313064,
     longitude: 127.06310347509722,
   });
+  const [visible, setVisible] = useState(true);
+  const headerRef = useRef<Animatable.View & View>(null);
+  const myLocationRef = useRef<
+    typeof AnimatableTouchableOpacity & TouchableOpacity
+  >(null);
 
   async function requestPermission() {
     try {
@@ -26,7 +40,7 @@ const Home = () => {
         );
       }
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   }
 
@@ -50,19 +64,30 @@ const Home = () => {
     });
   }
 
+  const handlePress = () => {
+    if (visible) {
+      headerRef.current?.fadeOutUp?.(500);
+      myLocationRef.current?.fadeOutRight?.(500);
+    } else {
+      headerRef.current?.fadeInDown?.(500);
+      myLocationRef.current?.fadeInRight?.(500);
+    }
+    setVisible(!visible);
+  };
+
   return (
     <View style={{flex: 1}}>
       {Platform.OS === 'ios' && <View style={styles.statusBar} />}
-      <View style={styles.header}>
+      <MapView location={location} handlePress={handlePress} />
+      <Animatable.View style={styles.header} ref={headerRef}>
         <Icon name={'home-filled'} size={20} style={{color: 'white'}} />
-      </View>
-      <MapView location={location} />
-      <Icon
-        name={'my-location'}
-        size={20}
+      </Animatable.View>
+      <AnimatableTouchableOpacity
         style={styles.myLocation}
         onPress={() => getMyLocation()}
-      />
+        ref={myLocationRef}>
+        <Icon name={'my-location'} size={18} style={styles.locationIcon} />
+      </AnimatableTouchableOpacity>
     </View>
   );
 };
@@ -73,20 +98,43 @@ const styles = StyleSheet.create({
     backgroundColor: color.main,
   },
   header: {
+    position: 'absolute',
+    top: statusBarHeight,
     backgroundColor: color.main,
+    width: '100%',
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  locationIcon: {
+    color: color.main,
   },
   myLocation: {
     position: 'absolute',
     right: 15,
     top: statusBarHeight + 60,
-    borderWidth: 1,
-    borderColor: color.main,
+    width: 32,
+    height: 32,
     backgroundColor: 'white',
-    padding: 4,
-    color: color.main,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0.5,
+    borderColor: 'gray',
+    borderRadius: 5,
+    ...Platform.select({
+      ios: {
+        shadowColor: 'gray',
+        shadowOpacity: 0.5,
+        shadowRadius: 5,
+        shadowOffset: {
+          height: -1,
+          width: 0,
+        },
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
 });
 

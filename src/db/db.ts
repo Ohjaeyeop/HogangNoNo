@@ -18,14 +18,14 @@ export const init = async () => {
       console.log(error.message);
     },
   );
-  //await dropTable(db);
-  //await createTable(db);
+  /*  await dropTable(db);
+  await createTable(db);*/
   // await insertAddressData(db);
   /*await insertPropertyData(db);
   await updateApartment();
   await updateDong();
   await updateGu();*/
-  await insertLeasePropertyData(db);
+  //await insertLeasePropertyData(db);
 };
 
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
@@ -38,7 +38,6 @@ const dropTable = async (db: SQLite.SQLiteDatabase) => {
 };
 
 const createTable = async (db: SQLite.SQLiteDatabase) => {
-  console.log(11);
   /*  await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );
@@ -53,7 +52,7 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
   );*/
   await db
     .executeSql(
-      'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "deposit" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
+      'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, PRIMARY KEY("id" AUTOINCREMENT) )',
     )
     .catch(err => console.log(err.message));
   console.log(2);
@@ -140,7 +139,7 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
 
 const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 201902;
+  ymd = 202103;
   while (ymd <= date) {
     console.log(ymd, date);
     for (const code in regionCodes) {
@@ -150,13 +149,13 @@ const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
           for (const item of items) {
             await db
               .executeSql(
-                `INSERT OR IGNORE INTO Lease(apartmentName, year, month, day, deposit, monthlyRent, floor, area) values ("${
+                `INSERT OR IGNORE INTO Lease(apartmentName, year, month, day, dealAmount, monthlyRent, floor, area) values ("${
                   item.dong + ' ' + item.apartmentName
                 }", ${item.dealYear}, ${item.dealMonth}, ${item.dealDate}, ${
                   item.deposit
                 }, ${item.monthlyRent}, ${item.floor}, ${item.area})`,
               )
-              .catch(err => console.log(err.message, item.apartmentName));
+              .catch(err => console.log(err.message));
           }
         })
         .catch(err => console.log(err.message));
@@ -167,12 +166,20 @@ const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
   console.log(4);
 };
 
-export const getRecentDealAmount = async (name: string, area: number) => {
-  return await db
-    .executeSql(
-      `SELECT avg(dealAmount) as dealAmount FROM DEAL WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
-    )
-    .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
+export const getRecentDealAmount = async (
+  table: string,
+  name: string,
+  area: number,
+) => {
+  try {
+    return await db
+      .executeSql(
+        `SELECT avg(dealAmount) as dealAmount FROM ${table} WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
+      )
+      .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const updateApartment = async () => {
@@ -194,7 +201,7 @@ const updateApartment = async () => {
         }`,
       )
       .then(res => res[0].rows.item(0).area);
-    const dealAmount = getRecentDealAmount(name, area);
+    const dealAmount = getRecentDealAmount('Deal', name, area);
 
     await db.executeSql(
       `UPDATE Apartment SET area = ${area}, dealAmount=${dealAmount} WHERE name="${name}"`,
@@ -244,19 +251,21 @@ const selectData = async (
   {startX, startY, endX, endY}: CoordType,
   table: PropertyType,
 ) => {
-  const res = await db
-    .executeSql(
+  try {
+    const res = await db.executeSql(
       `SELECT * FROM ${table} WHERE latitude >= ${startX} and latitude <= ${endX} and longitude >= ${startY} and longitude <= ${endY} `,
-    )
-    .catch(err => console.log(err.message));
-  let items: Property<typeof table>[] = [];
-  if (res) {
-    for (let i = 0; i < res[0].rows.length; i++) {
-      items.push(res[0].rows.item(i));
+    );
+    let items: Property<typeof table>[] = [];
+    if (res) {
+      for (let i = 0; i < res[0].rows.length; i++) {
+        items.push(res[0].rows.item(i));
+      }
     }
-  }
 
-  return items;
+    return items;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const zoomScale = {
@@ -264,7 +273,7 @@ const zoomScale = {
   dong: 12,
   apartment: 14,
 };
-export const getData = async (
+export const getDisplayedData = async (
   {startX, startY, endX, endY}: CoordType,
   zoom: number,
 ) => {
@@ -274,18 +283,26 @@ export const getData = async (
   );
 };
 
-export const getDealInfo = async (apartmentName: string, area: number) => {
-  const selectQuery = `SELECT * FROM Deal WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
-  const dealInfoList = await db
-    .executeSql(selectQuery)
-    .then(res => res[0].rows);
-  const dealInfoGroup = await db
-    .executeSql(
-      `SELECT count(*) as count, avg(dealAmount) as avg, year, month FROM (${selectQuery}) group by year, month`,
-    )
-    .then(res => res[0].rows);
+export const getDealInfo = async (
+  table: string,
+  apartmentName: string,
+  area: number,
+) => {
+  const selectQuery = `SELECT * FROM ${table} WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
+  try {
+    const dealInfoList = await db
+      .executeSql(selectQuery)
+      .then(res => res[0].rows);
+    const dealInfoGroup = await db
+      .executeSql(
+        `SELECT count(*) as count, avg(dealAmount) as avg, year, month FROM (${selectQuery}) group by year, month`,
+      )
+      .then(res => res[0].rows);
 
-  return {dealInfoList, dealInfoGroup};
+    return {dealInfoList, dealInfoGroup};
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getAreaList = async (apartmentName: string) => {
@@ -326,6 +343,10 @@ export type DealType = {
   area: number;
   apartmentName: string;
   floor: number;
+};
+
+export type LeaseType = DealType & {
+  monthlyRent: number;
 };
 
 export const getPropertyTypeByZoom = (zoom: number): PropertyType => {

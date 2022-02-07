@@ -81,13 +81,12 @@ export const leasePropertyApi = async (
     .catch(err => console.log(err.message));
 
   return item.map((obj: any) => {
-    console.log(obj['보증금액']);
     return {
       deposit:
         typeof obj['보증금액'] === 'string'
           ? parseInt(obj['보증금액'].replace(',', ''))
           : obj['보증금액'],
-      monthlyRent: obj['월세'],
+      monthlyRent: obj['월세금액'],
       dealYear: obj['년'],
       dealMonth: obj['월'],
       dealDate: obj['일'],

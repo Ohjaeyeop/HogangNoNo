@@ -1,8 +1,8 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import NaverMapView, {Coord} from 'react-native-nmap';
 import ItemMarker from './ItemMarker';
 import {
-  getData,
+  getDisplayedData,
   getPropertyTypeByZoom,
   Property,
   PropertyType,
@@ -12,9 +12,10 @@ import {HomeProps} from '../../App';
 
 type Props = {
   location: Coord;
+  handlePress: () => void;
 };
 
-const MapView = ({location}: Props) => {
+const MapView = ({location, handlePress}: Props) => {
   const [apartments, setApartments] = useState<
     Property<'Apartment'>[] | undefined
   >([]);
@@ -24,11 +25,15 @@ const MapView = ({location}: Props) => {
   const [center, setCenter] = useState<Coord>(location);
   const [centerZoom, setCenterZoom] = useState(14);
 
+  useEffect(() => {
+    setCenter(location);
+  }, [location]);
+
   async function handleCameraChange(event: any) {
     setZoom(event.zoom);
     if (event.zoom > 6) {
       const {zoom, contentRegion} = event;
-      await getData(
+      await getDisplayedData(
         {
           startX: contentRegion[0].latitude,
           startY: contentRegion[0].longitude,
@@ -80,7 +85,9 @@ const MapView = ({location}: Props) => {
       center={{...center, zoom: centerZoom}}
       onCameraChange={handleCameraChange}
       maxZoomLevel={20}
-      minZoomLevel={6}>
+      minZoomLevel={6}
+      rotateGesturesEnabled={false}
+      onMapClick={() => handlePress()}>
       {apartments &&
         apartments.map((apartment, index) =>
           apartment.dealAmount ? (

@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import {Dimensions, StyleSheet, Text} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
-import Svg, {Line, Path} from 'react-native-svg';
+import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
 import {PanGestureHandler} from 'react-native-gesture-handler';
@@ -21,7 +21,13 @@ const graphHeight = graphWidth * 0.4;
 const graphPadding = 20;
 const radius = 5;
 
-const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
+type Props = {
+  dealInfoGroup: ResultSetRowList;
+  type: 'Deal' | 'Lease';
+  loading: boolean;
+};
+
+const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
   const arr = useMemo(() => [0, 1, 2, 3], []);
@@ -35,14 +41,15 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
         ...graphData.map(value => value.amount).filter(value => value !== 0),
       ) / 10000,
     ) - 1;
+
   const gap = graphWidth / 36;
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
   const path = getGraphPath(maxValue, diff, gap, graphHeight, graphData);
 
-  const x = useSharedValue(graphWidth - radius);
+  const x = useSharedValue(graphWidth);
   const dataIndex = useDerivedValue(() => {
     return Math.min(
-      Math.max(Math.floor(x.value / gap), 0),
+      Math.max(Math.round(x.value / gap), 0),
       graphData.length - 1,
     );
   });
@@ -65,15 +72,16 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
   const circleAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        {translateX: x.value},
+        {translateX: x.value - radius},
         {
           translateY:
             graphData[dataIndex.value].amount === 0
-              ? -radius
+              ? -radius - 2
               : ((maxValue - graphData[dataIndex.value].amount / 10000) / diff -
                   1) *
                   graphHeight -
-                radius,
+                radius -
+                2,
         },
       ],
     };
@@ -81,7 +89,7 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
 
   const lineAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: x.value + graphPadding + radius}],
+      transform: [{translateX: x.value + graphPadding}],
     };
   });
 
@@ -90,11 +98,11 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
       transform: [
         {
           translateX:
-            graphWidth - x.value >= tooltipWidth / 3
-              ? x.value - tooltipWidth / 3 - graphPadding * 2 > graphPadding
-                ? x.value - tooltipWidth / 3 - graphPadding * 2
-                : 0
-              : graphWidth - tooltipWidth + graphPadding * 2,
+            graphWidth - x.value + graphPadding >= tooltipWidth / 2
+              ? x.value - tooltipWidth / 2 > -graphPadding
+                ? x.value - graphWidth - graphPadding + tooltipWidth / 2
+                : -graphWidth - graphPadding * 2 + tooltipWidth
+              : 0,
         },
       ],
     };
@@ -102,33 +110,48 @@ const DealInfoGraph = ({dealInfoGroup}: {dealInfoGroup: ResultSetRowList}) => {
 
   const gestureHandler = useAnimatedGestureHandler({
     onStart: (event, ctx: any) => {
-      x.value = Math.min(
-        Math.max(event.x - graphPadding, -radius),
-        graphWidth - radius,
-      );
+      x.value = Math.min(Math.max(event.x - graphPadding, 0), graphWidth);
+      x.value = Math.round(x.value / gap) * gap;
       ctx.startX = x.value;
     },
     onActive: (event, ctx: any) => {
       x.value = Math.min(
-        Math.max(ctx.startX + event.translationX, -radius),
-        graphWidth - radius,
+        Math.max(ctx.startX + event.translationX, 0),
+        graphWidth,
       );
+      x.value = Math.round(x.value / gap) * gap;
     },
   });
 
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
       <Animated.View style={styles.graphContainer}>
-        <Svg height={graphHeight} width={graphWidth}>
+        <Svg
+          height={graphHeight + 4}
+          width={graphWidth}
+          viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
           <GraphBackground
             graphHeight={graphHeight}
             graphWidth={graphWidth}
             arr={arr}
           />
-          <Path d={path} fill="none" stroke="#835eeb" strokeWidth={3} />
+          {!loading && (
+            <Path
+              d={path}
+              fill="none"
+              stroke={type === 'Deal' ? color.main : '#3D9752'}
+              strokeWidth={3}
+            />
+          )}
         </Svg>
         <Animated.View style={[styles.line, lineAnimatedStyle]} />
-        <Animated.View style={[styles.circle, circleAnimatedStyle]} />
+        <Animated.View
+          style={[
+            styles.circle,
+            circleAnimatedStyle,
+            {backgroundColor: type === 'Deal' ? color.main : '#3D9752'},
+          ]}
+        />
         <Animated.View
           style={[styles.tooltip, tooltipAnimatedStyle]}
           onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
@@ -148,7 +171,6 @@ const styles = StyleSheet.create({
     width: radius * 2,
     height: radius * 2,
     borderRadius: radius,
-    backgroundColor: color.main,
   },
   line: {
     position: 'absolute',
@@ -160,6 +182,7 @@ const styles = StyleSheet.create({
   tooltip: {
     position: 'absolute',
     top: -50,
+    right: 0,
     backgroundColor: color.main,
     paddingHorizontal: 12,
     height: 25,

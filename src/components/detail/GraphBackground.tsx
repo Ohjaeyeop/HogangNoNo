@@ -18,7 +18,7 @@ const GraphBackground = React.memo<Props>(({graphHeight, graphWidth, arr}) => {
           x2={graphWidth}
           y2={(index * graphHeight) / 3}
           stroke={color.gray}
-          strokeWidth="2"
+          strokeWidth={1}
           key={index}
         />
       ))}

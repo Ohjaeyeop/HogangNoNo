@@ -36,6 +36,9 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
               <View style={styles.column}>
                 <Text style={{fontWeight: 'bold'}}>
                   {displayedAmount(dealInfoList.item(index).dealAmount)}
+                  {dealInfoList.item(index).monthlyRent > 0
+                    ? `/${dealInfoList.item(index).monthlyRent}`
+                    : undefined}
                 </Text>
               </View>
               <View style={styles.column}>
