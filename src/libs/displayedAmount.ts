@@ -8,5 +8,5 @@ export const displayedAmount = (amount: number) => {
       : amount2 > 0
       ? amount2.toString()
       : '';
-  return displayedAmount1 + ' ' + displayedAmount2;
+  return (displayedAmount1 + ' ' + displayedAmount2).trim();
 };
