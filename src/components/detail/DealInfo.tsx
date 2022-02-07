@@ -20,7 +20,8 @@ type Props = {
   dealInfoList: ResultSetRowList;
   dealInfoGroup: ResultSetRowList;
   modalOpen: () => void;
-  loading: boolean;
+  loading1: boolean;
+  loading2: boolean;
   type: 'Deal' | 'Lease';
   changeType: (type: 'Deal' | 'Lease') => void;
 };
@@ -32,7 +33,8 @@ const DealInfo = ({
   dealInfoList,
   dealInfoGroup,
   modalOpen,
-  loading,
+  loading1,
+  loading2,
   type,
   changeType,
 }: Props) => {
@@ -66,7 +68,7 @@ const DealInfo = ({
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.selectBox} onPress={modalOpen}>
-            {loading ? (
+            {loading1 ? (
               <ActivityIndicator />
             ) : (
               <Text style={[styles.text, {marginRight: 10}]}>{area}평</Text>
@@ -82,7 +84,11 @@ const DealInfo = ({
             {displayedAmount(amount)}
           </Text>
         </View>
-        <DealInfoGraph dealInfoGroup={dealInfoGroup} type={type} />
+        <DealInfoGraph
+          dealInfoGroup={dealInfoGroup}
+          type={type}
+          loading={loading2}
+        />
         <DealList dealInfoList={dealInfoList} />
       </View>
     </View>

@@ -21,13 +21,13 @@ const graphHeight = graphWidth * 0.4;
 const graphPadding = 20;
 const radius = 5;
 
-const DealInfoGraph = ({
-  dealInfoGroup,
-  type,
-}: {
+type Props = {
   dealInfoGroup: ResultSetRowList;
   type: 'Deal' | 'Lease';
-}) => {
+  loading: boolean;
+};
+
+const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
   const arr = useMemo(() => [0, 1, 2, 3], []);
@@ -135,12 +135,14 @@ const DealInfoGraph = ({
             graphWidth={graphWidth}
             arr={arr}
           />
-          <Path
-            d={path}
-            fill="none"
-            stroke={type === 'Deal' ? color.main : '#3D9752'}
-            strokeWidth={3}
-          />
+          {!loading && (
+            <Path
+              d={path}
+              fill="none"
+              stroke={type === 'Deal' ? color.main : '#3D9752'}
+              strokeWidth={3}
+            />
+          )}
         </Svg>
         <Animated.View style={[styles.line, lineAnimatedStyle]} />
         <Animated.View

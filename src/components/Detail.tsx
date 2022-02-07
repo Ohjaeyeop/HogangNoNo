@@ -27,7 +27,8 @@ const Detail = ({navigation, route}: DetailProps) => {
   const [selectedArea, setArea] = useState(area);
   const [amount, setAmount] = useState(dealAmount);
   const [loading, setLoading] = useState(true);
-  const [loading2, setLoading2] = useState(false);
+  const [areaChangingLoading, setAreaChangingLoading] = useState(false);
+  const [typeChangingLoading, setTypeChangingLoading] = useState(false);
   const [type, setType] = useState<'Deal' | 'Lease'>('Deal');
 
   const [areaList, setAreaList] = useState<number[]>([]);
@@ -52,16 +53,17 @@ const Detail = ({navigation, route}: DetailProps) => {
   };
 
   const changeArea = (area: number) => {
-    setLoading2(true);
+    setAreaChangingLoading(true);
     getData(type, name, area)
       .then(() => setArea(area))
-      .then(() => setLoading2(false));
+      .then(() => setAreaChangingLoading(false));
 
     areaModalRef.current?.close();
   };
 
   const changeType = (type: 'Deal' | 'Lease') => {
-    getData(type, name, selectedArea);
+    setTypeChangingLoading(true);
+    getData(type, name, selectedArea).then(() => setTypeChangingLoading(false));
     setType(type);
     typeModalRef.current?.close();
   };
@@ -146,7 +148,8 @@ const Detail = ({navigation, route}: DetailProps) => {
         dealInfoList={dealInfoList}
         dealInfoGroup={dealInfoGroup}
         modalOpen={modalOpen}
-        loading={loading2}
+        loading1={areaChangingLoading}
+        loading2={typeChangingLoading}
         type={type}
         changeType={changeType}
       />
