@@ -2,7 +2,6 @@ import React, {useRef, useState} from 'react';
 import {
   PermissionsAndroid,
   Platform,
-  Pressable,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -41,7 +40,7 @@ const Home = () => {
         );
       }
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   }
 

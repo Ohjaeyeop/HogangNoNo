@@ -251,19 +251,21 @@ const selectData = async (
   {startX, startY, endX, endY}: CoordType,
   table: PropertyType,
 ) => {
-  const res = await db
-    .executeSql(
+  try {
+    const res = await db.executeSql(
       `SELECT * FROM ${table} WHERE latitude >= ${startX} and latitude <= ${endX} and longitude >= ${startY} and longitude <= ${endY} `,
-    )
-    .catch(err => console.log(err.message));
-  let items: Property<typeof table>[] = [];
-  if (res) {
-    for (let i = 0; i < res[0].rows.length; i++) {
-      items.push(res[0].rows.item(i));
+    );
+    let items: Property<typeof table>[] = [];
+    if (res) {
+      for (let i = 0; i < res[0].rows.length; i++) {
+        items.push(res[0].rows.item(i));
+      }
     }
-  }
 
-  return items;
+    return items;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const zoomScale = {
