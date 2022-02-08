@@ -18,6 +18,7 @@ import Modal from 'react-native-modalbox';
 import {getAreaList, getDealInfo, getRecentDealAmount} from '../db/db';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import {useFocusEffect} from '@react-navigation/native';
+import TaxInfo from './detail/TaxInfo';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 const rowHeight = 70;
@@ -141,18 +142,21 @@ const Detail = ({navigation, route}: DetailProps) => {
           <Icon name="keyboard-arrow-down" size={20} color="white" />
         </TouchableOpacity>
       </View>
-      <DealInfo
-        amount={amount}
-        area={selectedArea}
-        buildYear={buildYear}
-        dealInfoList={dealInfoList}
-        dealInfoGroup={dealInfoGroup}
-        modalOpen={modalOpen}
-        loading1={areaChangingLoading}
-        loading2={typeChangingLoading}
-        type={type}
-        changeType={changeType}
-      />
+      <ScrollView>
+        <DealInfo
+          amount={amount}
+          area={selectedArea}
+          buildYear={buildYear}
+          dealInfoList={dealInfoList}
+          dealInfoGroup={dealInfoGroup}
+          modalOpen={modalOpen}
+          loading1={areaChangingLoading}
+          loading2={typeChangingLoading}
+          type={type}
+          changeType={changeType}
+        />
+        <TaxInfo amount={amount} />
+      </ScrollView>
       <Modal
         animationDuration={0}
         position="center"

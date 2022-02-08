@@ -206,7 +206,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
 
 const styles = StyleSheet.create({
   graphContainer: {
-    marginVertical: 40,
+    marginVertical: 50,
     paddingHorizontal: graphPadding,
   },
   chartContainer: {
