@@ -113,7 +113,7 @@ const DealInfo = ({
         <DealInfoGraph
           dealInfoGroup={dealInfoGroup}
           type={type}
-          loading={loading2}
+          loading={loading1 || loading2}
         />
         <DealList dealInfoList={dealInfoList} />
       </View>
