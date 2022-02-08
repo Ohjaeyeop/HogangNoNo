@@ -13,7 +13,7 @@ const Table = ({columnNames, tableData, boldColumns, column}: Props) => {
     <View style={styles.table}>
       <View style={styles.tableHeader}>
         {columnNames.map(name => (
-          <View style={[styles.column, {flex: 1 / column}]}>
+          <View style={[styles.column, {flex: 1 / column}]} key={name}>
             <Text style={styles.text}>{name}</Text>
           </View>
         ))}
