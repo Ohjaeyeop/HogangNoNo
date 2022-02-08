@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Share,
   StyleSheet,
   Text,
@@ -71,9 +70,13 @@ const DealInfo = ({
                 {backgroundColor: type === 'Deal' ? color.main : undefined},
               ]}
               onPress={() => changeType('Deal')}>
-              <Text style={{color: type === 'Deal' ? 'white' : color.main}}>
-                매매
-              </Text>
+              {type === 'Deal' && loading2 ? (
+                <ActivityIndicator />
+              ) : (
+                <Text style={{color: type === 'Deal' ? 'white' : color.main}}>
+                  매매
+                </Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -81,9 +84,13 @@ const DealInfo = ({
                 {backgroundColor: type === 'Lease' ? color.main : undefined},
               ]}
               onPress={() => changeType('Lease')}>
-              <Text style={{color: type === 'Lease' ? 'white' : color.main}}>
-                전월세
-              </Text>
+              {type === 'Lease' && loading2 ? (
+                <ActivityIndicator />
+              ) : (
+                <Text style={{color: type === 'Lease' ? 'white' : color.main}}>
+                  전월세
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.selectBox} onPress={modalOpen}>
@@ -106,7 +113,7 @@ const DealInfo = ({
         <DealInfoGraph
           dealInfoGroup={dealInfoGroup}
           type={type}
-          loading={loading2}
+          loading={loading1 || loading2}
         />
         <DealList dealInfoList={dealInfoList} />
       </View>
