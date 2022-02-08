@@ -34,7 +34,6 @@ type Props = {
 const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
-  const arr = useMemo(() => [0, 1, 2, 3], []);
   const graphData = getGraphData(dealInfoGroup);
 
   const maxValue = Math.ceil(
@@ -140,7 +139,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
             <GraphBackground
               graphHeight={graphHeight}
               graphWidth={graphWidth}
-              arr={arr}
+              line={4}
             />
             {!loading && (
               <Path
