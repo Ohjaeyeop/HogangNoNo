@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import Animated, {
+  runOnJS,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -11,13 +12,21 @@ import {color} from '../theme/color';
 type Props = {
   height: number;
   width: number;
+  maxValue: number;
+  startValue: number;
+  setIncreaseRate: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const radius = 10;
 
-const Slider = (props: Props) => {
-  const {height, width} = props;
-  const offset = useSharedValue(0);
+const Slider = ({
+  height,
+  width,
+  startValue,
+  maxValue,
+  setIncreaseRate,
+}: Props) => {
+  const offset = useSharedValue((width * startValue) / maxValue - radius);
 
   const animatedCircleStyles = useAnimatedStyle(() => {
     return {
@@ -30,12 +39,15 @@ const Slider = (props: Props) => {
     };
   });
 
-  const start = useSharedValue(0);
+  const start = useSharedValue((width * startValue) / maxValue - radius);
   const panGesture = useAnimatedGestureHandler({
     onActive: event => {
       offset.value = Math.min(
         width - radius,
         Math.max(0, event.translationX + start.value),
+      );
+      runOnJS(setIncreaseRate)(
+        Math.round((maxValue * offset.value) / (width - radius)),
       );
     },
     onFinish: () => {

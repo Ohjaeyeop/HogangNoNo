@@ -138,12 +138,20 @@ const TaxInfo = ({amount}: {amount: number}) => {
       <View style={styles.taxInfo}>
         <View>
           <Text style={styles.text}>2022년 예상 세금</Text>
-          <Text style={styles.boldText}>1048만원</Text>
+          <Text style={styles.boldText}>
+            {tableData.length > 1 && tableData[1][4]}
+          </Text>
         </View>
         <View>
           <Text style={styles.text}>공시가격 예상 상승율</Text>
           <Text style={styles.boldText}>{`${increaseRate}%`}</Text>
-          <Slider height={7} width={140} />
+          <Slider
+            height={7}
+            width={140}
+            maxValue={50}
+            startValue={22}
+            setIncreaseRate={setIncreaseRate}
+          />
         </View>
       </View>
       <Table
