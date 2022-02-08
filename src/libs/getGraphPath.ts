@@ -1,26 +1,27 @@
-import {DealInfoGroupType} from './getGraphData';
-
 export const getGraphPath = (
   maxValue: number,
   diff: number,
   gap: number,
   graphHeight: number,
-  graphData: DealInfoGroupType[],
+  graphData: number[],
+  startPoint: number,
+  lineType: string,
 ) => {
   let y =
-    graphData[0].amount === 0
+    graphData[0] === 0
       ? graphHeight
-      : ((maxValue - graphData[0].amount / 10000) / diff) * graphHeight;
-  let x = 0;
+      : ((maxValue - graphData[0]) / diff) * graphHeight;
+  let x = startPoint;
   let prevX = 0;
-  let path = `M0 ${y} `;
+  let path = `M${startPoint} ${y} `;
 
   for (let i = 1; i < graphData.length; i++) {
-    if (graphData[i].amount !== 0) {
-      y = ((maxValue - graphData[i].amount / 10000) / diff) * graphHeight;
+    if (graphData[i] !== 0) {
+      y = ((maxValue - graphData[i]) / diff) * graphHeight;
     }
     x += gap;
-    path += `S${prevX + gap / 2} ${y}, ${x} ${y} `;
+    path +=
+      lineType === 'S' ? `S${prevX + gap / 2} ${y}, ${x} ${y} ` : `L${x} ${y} `;
     prevX = x;
   }
 

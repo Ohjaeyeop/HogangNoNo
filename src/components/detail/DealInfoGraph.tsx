@@ -49,7 +49,15 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
 
   const gap = graphWidth / 36;
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
-  const path = getGraphPath(maxValue, diff, gap, graphHeight, graphData);
+  const path = getGraphPath(
+    maxValue,
+    diff,
+    gap,
+    graphHeight,
+    graphData.map(data => data.amount / 10000),
+    0,
+    'S',
+  );
 
   const x = useSharedValue(graphWidth);
   const dataIndex = useDerivedValue(() => {

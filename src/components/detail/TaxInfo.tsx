@@ -3,9 +3,10 @@ import {View, Text, StyleSheet, Dimensions} from 'react-native';
 import {getDefaultTax, getTax, getWealthTax} from '../../libs/tax';
 import Table from '../../share/Table';
 import {displayedAmount} from '../../libs/displayedAmount';
-import Svg from 'react-native-svg';
+import Svg, {Path} from 'react-native-svg';
 import {color} from '../../theme/color';
 import GraphBackground from './GraphBackground';
+import {getGraphPath} from '../../libs/getGraphPath';
 
 type Tax = {
   year: number;
@@ -29,6 +30,8 @@ const TaxInfo = ({amount}: {amount: number}) => {
   const [expectedTaxList, setExpectedTaxList] = useState<Tax[]>([]);
   const [tableData, setTableData] = useState<string[][]>([[]]);
   const maximum = useRef(0);
+  const defaultPath = useRef('');
+  const wealthPath = useRef('');
 
   const getTaxList = (amount: number, increaseRate: number) => {
     const taxList: Tax[] = [];
@@ -51,6 +54,24 @@ const TaxInfo = ({amount}: {amount: number}) => {
     const taxList = getTaxList(amount, increaseRate);
     maximum.current =
       Math.ceil(Math.max(...taxList.map(value => value.tax)) / 10) * 10;
+    defaultPath.current = getGraphPath(
+      maximum.current,
+      maximum.current,
+      gap,
+      chartHeight,
+      taxList.map(tax => tax.tax),
+      barWidth * 2,
+      'L',
+    );
+    wealthPath.current = getGraphPath(
+      maximum.current,
+      maximum.current,
+      gap,
+      chartHeight,
+      taxList.map(tax => tax.wealthTax),
+      barWidth * 2,
+      'L',
+    );
     setExpectedTaxList(taxList);
     setTableData(
       taxList.map(data => {
@@ -66,16 +87,27 @@ const TaxInfo = ({amount}: {amount: number}) => {
 
   return (
     <View style={{marginHorizontal: 20}}>
-      <Text style={{fontSize: 16, marginBottom: 40}}>보유세</Text>
+      <Text style={{fontSize: 16, marginBottom: 20}}>보유세</Text>
+      <View
+        style={{
+          width: chartWidth,
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          marginBottom: 15,
+        }}>
+        <Text style={{fontSize: 12, color: color.main}}>종부세 </Text>
+        <Text style={{fontSize: 12, color: '#FA6400'}}> 재산세</Text>
+      </View>
       <Svg height={chartHeight} width={graphWidth} style={{marginBottom: 40}}>
         <GraphBackground
           graphHeight={chartHeight}
           graphWidth={chartWidth}
           line={4}
         />
+        <Path d={defaultPath.current} fill="none" stroke={'#FA6400'} />
+        <Path d={wealthPath.current} fill="none" stroke={color.main} />
         <View style={styles.chartContainer}>
           {expectedTaxList.map((taxObj, index) => {
-            console.log(taxObj.wealthTax);
             return (
               <View
                 key={index}
