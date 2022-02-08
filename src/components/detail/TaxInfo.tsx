@@ -7,6 +7,7 @@ import Svg, {Path} from 'react-native-svg';
 import {color} from '../../theme/color';
 import GraphBackground from './GraphBackground';
 import {getGraphPath} from '../../libs/getGraphPath';
+import Slider from '../../share/Slider';
 
 type Tax = {
   year: number;
@@ -98,7 +99,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
         <Text style={{fontSize: 12, color: color.main}}>종부세 </Text>
         <Text style={{fontSize: 12, color: '#FA6400'}}> 재산세</Text>
       </View>
-      <Svg height={chartHeight} width={graphWidth} style={{marginBottom: 40}}>
+      <Svg height={chartHeight} width={graphWidth} style={{marginBottom: 30}}>
         <GraphBackground
           graphHeight={chartHeight}
           graphWidth={chartWidth}
@@ -134,6 +135,17 @@ const TaxInfo = ({amount}: {amount: number}) => {
           })}
         </View>
       </Svg>
+      <View style={styles.taxInfo}>
+        <View>
+          <Text style={styles.text}>2022년 예상 세금</Text>
+          <Text style={styles.boldText}>1048만원</Text>
+        </View>
+        <View>
+          <Text style={styles.text}>공시가격 예상 상승율</Text>
+          <Text style={styles.boldText}>{`${increaseRate}%`}</Text>
+          <Slider height={7} width={140} />
+        </View>
+      </View>
       <Table
         columnNames={columnNames}
         boldColumns={boldColumns}
@@ -150,6 +162,20 @@ const styles = StyleSheet.create({
     height: chartHeight,
     borderBottomWidth: 1,
     borderColor: 'gray',
+  },
+  taxInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  text: {
+    color: 'black',
+  },
+  boldText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 18,
+    paddingVertical: 7,
   },
 });
 
