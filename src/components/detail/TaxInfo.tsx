@@ -86,7 +86,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
   }, [amount, increaseRate]);
 
   return (
-    <View style={{marginHorizontal: 20}}>
+    <View style={{padding: 20}}>
       <Text style={{fontSize: 16, marginBottom: 20}}>보유세</Text>
       <View
         style={{
