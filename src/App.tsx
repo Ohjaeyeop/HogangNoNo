@@ -8,6 +8,7 @@ import {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import Detail from './components/Detail';
+import {Linking} from 'react-native';
 
 type StackParamList = {
   Home: undefined;
@@ -20,11 +21,32 @@ export type DetailProps = NativeStackScreenProps<StackParamList, 'Detail'>;
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const App = () => {
+  const linking = {
+    prefixes: ['hohoho://'],
+    config: {
+      screens: {
+        Home: 'home',
+        Detail: 'detail',
+      },
+    },
+    async getInitialURL() {
+      return await Linking.getInitialURL();
+    },
+    subscribe(listener: any) {
+      const onReceiveURL = ({url}: {url: string}) => listener(url);
+      Linking.addEventListener('url', onReceiveURL);
+
+      return () => {
+        Linking.removeEventListener('url', onReceiveURL);
+      };
+    },
+  };
+
   useEffect(() => {
     db.init();
   }, []);
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator>
         <Stack.Screen
           name="Home"

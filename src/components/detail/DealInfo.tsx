@@ -42,7 +42,7 @@ const DealInfo = ({
   const onShare = async () => {
     try {
       const result = await Share.share({
-        message: 'Test',
+        message: 'hohoho://home',
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
