@@ -8,6 +8,7 @@ import {color} from '../../theme/color';
 import GraphBackground from './GraphBackground';
 import {getGraphPath} from '../../libs/getGraphPath';
 import Slider from '../../share/Slider';
+import {calculateGraphAxisInfo} from '../../libs/calculateGraphAxisInfo';
 
 type Tax = {
   year: number;
@@ -29,6 +30,8 @@ const TaxInfo = ({amount}: {amount: number}) => {
   const [increaseRate, setIncreaseRate] = useState(22);
   const [expectedTaxList, setExpectedTaxList] = useState<Tax[]>([]);
   const [tableData, setTableData] = useState<string[][]>([[]]);
+  const [line, setLine] = useState(0);
+  const [axisGap, setAxisGap] = useState(0);
   const maximum = useRef(0);
   const defaultPath = useRef('');
   const wealthPath = useRef('');
@@ -52,8 +55,9 @@ const TaxInfo = ({amount}: {amount: number}) => {
 
   useEffect(() => {
     const taxList = getTaxList(amount, increaseRate);
-    maximum.current =
-      Math.ceil(Math.max(...taxList.map(value => value.tax)) / 10) * 10;
+    maximum.current = calculateGraphAxisInfo(taxList[2].tax).maxValue;
+    setLine(calculateGraphAxisInfo(taxList[2].tax).line);
+    setAxisGap(calculateGraphAxisInfo(taxList[2].tax).gap);
     defaultPath.current = getGraphPath(
       maximum.current,
       maximum.current,
@@ -102,7 +106,9 @@ const TaxInfo = ({amount}: {amount: number}) => {
         <GraphBackground
           graphHeight={chartHeight}
           graphWidth={chartWidth}
-          line={4}
+          line={line}
+          maxValue={maximum.current}
+          gap={axisGap}
         />
         <Path d={defaultPath.current} fill="none" stroke={'#FA6400'} />
         <Path d={wealthPath.current} fill="none" stroke={color.main} />

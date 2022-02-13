@@ -148,6 +148,8 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
               graphHeight={graphHeight}
               graphWidth={graphWidth}
               line={4}
+              maxValue={graphHeight}
+              gap={graphHeight / 4}
             />
             {!loading && (
               <Path
