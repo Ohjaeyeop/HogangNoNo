@@ -102,44 +102,48 @@ const TaxInfo = ({amount}: {amount: number}) => {
         <Text style={{fontSize: 12, color: color.main}}>종부세 </Text>
         <Text style={{fontSize: 12, color: '#FA6400'}}> 재산세</Text>
       </View>
-      <Svg height={chartHeight} width={graphWidth} style={{marginBottom: 30}}>
-        <GraphBackground
-          graphHeight={chartHeight}
-          graphWidth={chartWidth}
-          line={line}
-          maxValue={maximum.current}
-          gap={axisGap}
-        />
-        <Path d={defaultPath.current} fill="none" stroke={'#FA6400'} />
-        <Path d={wealthPath.current} fill="none" stroke={color.main} />
-        <View style={styles.chartContainer}>
-          {expectedTaxList.map((taxObj, index) => {
-            return (
-              <View
-                key={index}
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: barWidth * 1.5 + gap * index,
-                  width: barWidth,
-                }}>
+      <View style={{alignItems: 'center'}}>
+        <Svg height={chartHeight} width={graphWidth} style={{marginBottom: 30}}>
+          <GraphBackground
+            graphHeight={chartHeight}
+            graphWidth={chartWidth}
+            line={line}
+            maxValue={maximum.current}
+            gap={axisGap}
+          />
+          <Path d={defaultPath.current} fill="none" stroke={'#FA6400'} />
+          <Path d={wealthPath.current} fill="none" stroke={color.main} />
+          <View style={styles.chartContainer}>
+            {expectedTaxList.map((taxObj, index) => {
+              return (
                 <View
+                  key={index}
                   style={{
-                    height: (chartHeight * taxObj.defaultTax) / maximum.current,
-                    backgroundColor: '#FA6400',
-                  }}
-                />
-                <View
-                  style={{
-                    height: (chartHeight * taxObj.wealthTax) / maximum.current,
-                    backgroundColor: color.main,
-                  }}
-                />
-              </View>
-            );
-          })}
-        </View>
-      </Svg>
+                    position: 'absolute',
+                    bottom: 0,
+                    left: barWidth * 1.5 + gap * index,
+                    width: barWidth,
+                  }}>
+                  <View
+                    style={{
+                      height:
+                        (chartHeight * taxObj.defaultTax) / maximum.current,
+                      backgroundColor: '#FA6400',
+                    }}
+                  />
+                  <View
+                    style={{
+                      height:
+                        (chartHeight * taxObj.wealthTax) / maximum.current,
+                      backgroundColor: color.main,
+                    }}
+                  />
+                </View>
+              );
+            })}
+          </View>
+        </Svg>
+      </View>
       <View style={styles.taxInfo}>
         <View>
           <Text style={styles.text}>2022년 예상 세금</Text>

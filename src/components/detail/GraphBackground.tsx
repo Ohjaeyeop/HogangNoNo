@@ -1,5 +1,5 @@
 import React from 'react';
-import {Line} from 'react-native-svg';
+import {Line, Text} from 'react-native-svg';
 import {color} from '../../theme/color';
 
 type Props = {

@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import Svg, {Path} from 'react-native-svg';
@@ -149,7 +149,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
               graphWidth={graphWidth}
               line={4}
               maxValue={graphHeight}
-              gap={graphHeight / 4}
+              gap={graphHeight / 3}
             />
             {!loading && (
               <Path
