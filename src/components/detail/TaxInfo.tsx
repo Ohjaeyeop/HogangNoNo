@@ -26,7 +26,6 @@ const gap = (chartWidth - barWidth * 4) / 2;
 const TaxInfo = ({amount}: {amount: number}) => {
   const columnNames = ['년도', '공시가', '재산세', '종부세', '합계'];
   const boldColumns = [1, 4];
-  const column = 5;
   const [increaseRate, setIncreaseRate] = useState(22);
   const [expectedTaxList, setExpectedTaxList] = useState<Tax[]>([]);
   const [tableData, setTableData] = useState<string[][]>([[]]);
@@ -158,7 +157,6 @@ const TaxInfo = ({amount}: {amount: number}) => {
         columnNames={columnNames}
         boldColumns={boldColumns}
         tableData={tableData}
-        column={column}
       />
     </View>
   );

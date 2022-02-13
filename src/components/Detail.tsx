@@ -21,6 +21,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import TaxInfo from './detail/TaxInfo';
 
 const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
+console.log(statusBarHeight);
 const rowHeight = 70;
 
 const Detail = ({navigation, route}: DetailProps) => {
@@ -155,7 +156,7 @@ const Detail = ({navigation, route}: DetailProps) => {
           type={type}
           changeType={changeType}
         />
-        <TaxInfo amount={amount} />
+        <TaxInfo amount={dealAmount} />
       </ScrollView>
       <Modal
         animationDuration={0}

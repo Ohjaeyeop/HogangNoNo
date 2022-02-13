@@ -6,7 +6,6 @@ import Table from '../../share/Table';
 const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
   const columnNames = ['계약일', '가격', '층'];
   const boldColumns = [1];
-  const column = 3;
   const tableData = Array.from({length: dealInfoList.length}, (v, i) => i).map(
     index => {
       const {year, month, day, dealAmount, monthlyRent, floor} =
@@ -26,7 +25,6 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
       columnNames={columnNames}
       tableData={tableData}
       boldColumns={boldColumns}
-      column={column}
     />
   );
 };
