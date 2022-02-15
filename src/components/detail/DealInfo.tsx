@@ -124,6 +124,8 @@ const DealInfo = ({
 const styles = StyleSheet.create({
   dealInfoContainer: {
     padding: 20,
+    borderBottomWidth: 10,
+    borderColor: color.gray,
   },
   selectorView: {
     flexDirection: 'row',

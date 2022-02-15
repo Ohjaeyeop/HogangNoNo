@@ -1,85 +1,32 @@
 import React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import {displayedAmount} from '../../libs/displayedAmount';
+import Table from '../../share/Table';
 
 const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
+  const columnNames = ['계약일', '가격', '층'];
+  const boldColumns = [1];
+  const tableData = Array.from({length: dealInfoList.length}, (v, i) => i).map(
+    index => {
+      const {year, month, day, dealAmount, monthlyRent, floor} =
+        dealInfoList.item(index);
+      const dealDate = `${year}.${month < 10 ? `0${month}` : month}.${
+        day < 10 ? `0${day}` : day
+      }`;
+      const amount = `${displayedAmount(dealAmount)}${
+        monthlyRent > 0 ? `/${monthlyRent}` : ''
+      }`;
+      return [dealDate, amount, `${floor}층`];
+    },
+  );
+
   return (
-    <View style={styles.table}>
-      <View style={styles.tableHeader}>
-        <View style={styles.column}>
-          <Text style={styles.text}>계약일</Text>
-        </View>
-        <View style={styles.column}>
-          <Text style={styles.text}>가격</Text>
-        </View>
-        <View style={styles.column}>
-          <Text style={styles.text}>층</Text>
-        </View>
-      </View>
-      <ScrollView style={{width: '100%', height: 180}}>
-        {Array.from({length: dealInfoList.length}, (v, i) => i).map(index => {
-          return (
-            <View style={styles.tableBody} key={index}>
-              <View style={styles.column}>
-                <Text style={styles.text}>
-                  {dealInfoList.item(index).year}.
-                  {dealInfoList.item(index).month < 10
-                    ? `0${dealInfoList.item(index).month}`
-                    : dealInfoList.item(index).month}
-                  .
-                  {dealInfoList.item(index).day < 10
-                    ? `0${dealInfoList.item(index).day}`
-                    : dealInfoList.item(index).day}
-                </Text>
-              </View>
-              <View style={styles.column}>
-                <Text style={[styles.text, {fontWeight: 'bold'}]}>
-                  {displayedAmount(dealInfoList.item(index).dealAmount)}
-                  {dealInfoList.item(index).monthlyRent > 0
-                    ? `/${dealInfoList.item(index).monthlyRent}`
-                    : undefined}
-                </Text>
-              </View>
-              <View style={styles.column}>
-                <Text style={styles.text}>
-                  {dealInfoList.item(index).floor}층
-                </Text>
-              </View>
-            </View>
-          );
-        })}
-      </ScrollView>
-    </View>
+    <Table
+      columnNames={columnNames}
+      tableData={tableData}
+      boldColumns={boldColumns}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  table: {
-    alignItems: 'center',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: '#FAFAFA',
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    borderColor: 'gray',
-  },
-  tableBody: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    borderBottomWidth: 0.2,
-  },
-  column: {
-    flex: 1 / 3,
-    alignItems: 'center',
-  },
-  text: {
-    color: 'black',
-  },
-});
 
 export default DealList;

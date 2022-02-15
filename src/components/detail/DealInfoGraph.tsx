@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import Svg, {Path} from 'react-native-svg';
@@ -34,7 +34,6 @@ type Props = {
 const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
-  const arr = useMemo(() => [0, 1, 2, 3], []);
   const graphData = getGraphData(dealInfoGroup);
 
   const maxValue = Math.ceil(
@@ -50,7 +49,15 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
 
   const gap = graphWidth / 36;
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
-  const path = getGraphPath(maxValue, diff, gap, graphHeight, graphData);
+  const path = getGraphPath(
+    maxValue,
+    diff,
+    gap,
+    graphHeight,
+    graphData.map(data => data.amount / 10000),
+    0,
+    'S',
+  );
 
   const x = useSharedValue(graphWidth);
   const dataIndex = useDerivedValue(() => {
@@ -140,7 +147,9 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
             <GraphBackground
               graphHeight={graphHeight}
               graphWidth={graphWidth}
-              arr={arr}
+              line={4}
+              maxValue={graphHeight}
+              gap={graphHeight / 3}
             />
             {!loading && (
               <Path
@@ -206,7 +215,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
 
 const styles = StyleSheet.create({
   graphContainer: {
-    marginVertical: 40,
+    marginVertical: 50,
     paddingHorizontal: graphPadding,
   },
   chartContainer: {
