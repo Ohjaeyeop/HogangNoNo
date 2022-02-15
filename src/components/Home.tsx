@@ -2,6 +2,7 @@ import React, {useRef, useState} from 'react';
 import {
   PermissionsAndroid,
   Platform,
+  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -80,6 +81,7 @@ const Home = () => {
       {Platform.OS === 'ios' && (
         <View style={{height: safeArea.top, backgroundColor: color.main}} />
       )}
+      <StatusBar barStyle={'light-content'} />
       <MapView location={location} handlePress={handlePress} />
       <Animatable.View
         style={[{top: safeArea.top}, styles.header]}
