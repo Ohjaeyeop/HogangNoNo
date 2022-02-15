@@ -7,18 +7,18 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Geolocation from 'react-native-geolocation-service';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MapView from './map/MapView';
 import {Coord} from 'react-native-nmap';
 import {color} from '../theme/color';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
 const AnimatableTouchableOpacity =
   Animatable.createAnimatableComponent(TouchableOpacity);
 
 const Home = () => {
+  const safeArea = useSafeAreaInsets();
   const [location, setLocation] = useState<Coord>({
     latitude: 37.50882651313064,
     longitude: 127.06310347509722,
@@ -77,13 +77,17 @@ const Home = () => {
 
   return (
     <View style={{flex: 1}}>
-      {Platform.OS === 'ios' && <View style={styles.statusBar} />}
+      {Platform.OS === 'ios' && (
+        <View style={{height: safeArea.top, backgroundColor: color.main}} />
+      )}
       <MapView location={location} handlePress={handlePress} />
-      <Animatable.View style={styles.header} ref={headerRef}>
+      <Animatable.View
+        style={[{top: safeArea.top}, styles.header]}
+        ref={headerRef}>
         <Icon name={'home-filled'} size={20} style={{color: 'white'}} />
       </Animatable.View>
       <AnimatableTouchableOpacity
-        style={styles.myLocation}
+        style={[{top: safeArea.top + 60}, styles.myLocation]}
         onPress={() => getMyLocation()}
         ref={myLocationRef}>
         <Icon name={'my-location'} size={18} style={styles.locationIcon} />
@@ -93,13 +97,8 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
-  statusBar: {
-    height: statusBarHeight,
-    backgroundColor: color.main,
-  },
   header: {
     position: 'absolute',
-    top: statusBarHeight,
     backgroundColor: color.main,
     width: '100%',
     height: 40,
@@ -112,7 +111,6 @@ const styles = StyleSheet.create({
   myLocation: {
     position: 'absolute',
     right: 15,
-    top: statusBarHeight + 60,
     width: 32,
     height: 32,
     backgroundColor: 'white',
