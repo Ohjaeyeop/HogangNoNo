@@ -14,9 +14,9 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
         day < 10 ? `0${day}` : day
       }`;
       const {hundredMillion, tenMillion} = displayedAmount(dealAmount);
-      const amount = `${hundredMillion} ${tenMillion}${
-        monthlyRent > 0 ? `/${monthlyRent}` : ''
-      }`;
+      const amount =
+        `${hundredMillion} ${tenMillion}`.trim() +
+        `${monthlyRent > 0 ? `/${monthlyRent}` : ''}`;
       return [dealDate, amount, `${floor}층`];
     },
   );

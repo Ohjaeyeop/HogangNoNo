@@ -108,7 +108,7 @@ const DealInfo = ({
             최근 실거래 기준 1개월 평균
           </Text>
           <Text style={{color: color.main, fontSize: 20, fontWeight: 'bold'}}>
-            {hundredMillion ? `${hundredMillion} ${tenMillion}` : tenMillion}
+            {`${hundredMillion} ${tenMillion}`.trim()}
           </Text>
         </View>
         <DealInfoGraph
