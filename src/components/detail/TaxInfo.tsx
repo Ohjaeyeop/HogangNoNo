@@ -19,11 +19,11 @@ type Tax = {
   tax: number;
 };
 
-const graphWidth = (Dimensions.get('window').width - 40) * 0.7;
+const graphWidth = (Dimensions.get('window').width - 40) * 0.8;
 const graphHeight = 80;
-const barWidth = 20;
-const gap = (graphWidth - barWidth * 4) / 2;
-
+const barWidth = 30;
+const gap = (graphWidth - barWidth * 3) / 3 + barWidth;
+console.log(gap);
 const TaxInfo = ({amount}: {amount: number}) => {
   const columnNames = ['년도', '공시가', '재산세', '종부세', '합계'];
   const boldColumns = [1, 4];
@@ -64,7 +64,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
       gap,
       graphHeight,
       taxList.map(tax => tax.tax),
-      barWidth * 2,
+      gap / 2,
       'L',
     );
     wealthPath.current = getGraphPath(
@@ -73,7 +73,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
       gap,
       graphHeight,
       taxList.map(tax => tax.wealthTax),
-      barWidth * 2,
+      gap / 2,
       'L',
     );
     setExpectedTaxList(taxList);
@@ -92,7 +92,13 @@ const TaxInfo = ({amount}: {amount: number}) => {
   return (
     <View style={{padding: 20}}>
       <Text style={{fontSize: 16, marginBottom: 20}}>보유세</Text>
-      <View style={{width: '100%', marginBottom: 30, alignItems: 'center'}}>
+      <View
+        style={{
+          width: '100%',
+          marginBottom: 40,
+          alignItems: 'flex-end',
+          right: 10,
+        }}>
         <View
           style={{
             width: graphWidth,
@@ -176,7 +182,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
                         position: 'absolute',
                         bottom: -20,
                         width: 40,
-                        left: -10,
+                        left: -5,
                       }}>
                       <Text
                         style={{
