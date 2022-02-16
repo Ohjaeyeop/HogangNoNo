@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {View, Text, StyleSheet, Dimensions} from 'react-native';
 import {getDefaultTax, getTax, getWealthTax} from '../../libs/tax';
 import Table from '../../share/Table';
-import DisplayedAmount from '../../libs/displayedAmount';
+import {displayedAmount} from '../../libs/displayedAmount';
 import Svg, {Path} from 'react-native-svg';
 import {color} from '../../theme/color';
 import GraphBackground from './GraphBackground';
@@ -53,6 +53,11 @@ const TaxInfo = ({amount}: {amount: number}) => {
     return taxList;
   };
 
+  const getTaxText = (amount: number) => {
+    const {hundredMillion, tenThousand} = displayedAmount(amount);
+    return hundredMillion + tenThousand;
+  };
+
   useEffect(() => {
     const taxList = getTaxList(amount, increaseRate);
     maximum.current = calculateGraphAxisInfo(taxList[2].tax).maxValue;
@@ -80,13 +85,17 @@ const TaxInfo = ({amount}: {amount: number}) => {
     setTableData(
       taxList.map(data => {
         const year = data.year.toString();
-        const price = DisplayedAmount.averageDealAmount(data.price);
-        const defaultTax = DisplayedAmount.taxAmount(data.defaultTax);
+        const price = getTaxText(data.price);
+        const defaultTax =
+          data.defaultTax > 0 ? getTaxText(data.defaultTax) + '만' : '없음';
         const wealthTax =
-          data.wealthTax > 0
-            ? DisplayedAmount.taxAmount(data.wealthTax)
-            : '없음';
-        const tax = DisplayedAmount.taxAmount(data.tax);
+          data.wealthTax > 0 ? getTaxText(data.wealthTax) + '만' : '없음';
+        const tax =
+          data.tax >= 10000
+            ? displayedAmount(data.tax).tenThousand
+              ? getTaxText(data.tax) + '만'
+              : getTaxText(data.tax)
+            : getTaxText(data.tax) + '만원';
         return [year, price, defaultTax, wealthTax, tax];
       }),
     );
@@ -133,7 +142,11 @@ const TaxInfo = ({amount}: {amount: number}) => {
                 key={index}>
                 {index === 0
                   ? 0
-                  : `${DisplayedAmonut.taxAmount(axisGap * index)}`}
+                  : displayedAmount(axisGap * index).tenThousand
+                  ? axisGap * index > 10000
+                    ? `${getTaxText(axisGap * index)}만`
+                    : `${getTaxText(axisGap * index)}만원`
+                  : getTaxText(axisGap * index)}
               </Text>
             ))}
           </View>
@@ -226,6 +239,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
         columnNames={columnNames}
         boldColumns={boldColumns}
         tableData={tableData}
+        flexes={[1, 2, 1.7, 2, 2]}
       />
     </View>
   );

@@ -1,6 +1,6 @@
 import {getDate} from '../db/db';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
-import DisplayedAmount from './displayedAmount';
+import {displayedAmount} from './displayedAmount';
 
 export type DealInfoGroupType = {
   amount: number;
@@ -27,9 +27,11 @@ export const getGraphData = (dealInfoGroup: ResultSetRowList) => {
         count: dealInfoGroup.item(j).count,
         month: dealInfoGroup.item(j).month,
         year: dealInfoGroup.item(j).year,
-        displayedAmount: DisplayedAmount.averageDealAmount(
-          dealInfoGroup.item(j).avg,
-        ),
+        displayedAmount: (
+          displayedAmount(dealInfoGroup.item(j).avg).hundredMillion +
+          ' ' +
+          displayedAmount(dealInfoGroup.item(j).avg).tenMillion
+        ).trim(),
       });
       j++;
     } else {

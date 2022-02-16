@@ -13,6 +13,7 @@ export const getGraphPath = (
       : ((maxValue - graphData[0]) / diff) * graphHeight;
   let x = startPoint;
   let prevX = 0;
+  let prevY = y;
   let path = `M${startPoint} ${y} `;
 
   for (let i = 1; i < graphData.length; i++) {
@@ -21,8 +22,11 @@ export const getGraphPath = (
     }
     x += gap;
     path +=
-      lineType === 'S' ? `S${prevX + gap / 2} ${y}, ${x} ${y} ` : `L${x} ${y} `;
+      lineType === 'S'
+        ? `S${prevX + gap / 2} ${y}, ${x} ${y} `
+        : `S${prevX + gap / 2} ${prevY} ${x} ${y} `;
     prevX = x;
+    prevY = y;
   }
 
   return path;

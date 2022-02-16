@@ -5,14 +5,15 @@ type Props = {
   columnNames: string[];
   tableData: string[][];
   boldColumns: number[];
+  flexes: number[];
 };
 
-const Table = ({columnNames, tableData, boldColumns}: Props) => {
+const Table = ({columnNames, tableData, boldColumns, flexes}: Props) => {
   return (
     <View style={styles.table}>
       <View style={styles.tableHeader}>
-        {columnNames.map(name => (
-          <View style={[styles.column, {flex: 1}]} key={name}>
+        {columnNames.map((name, index) => (
+          <View style={[styles.column, {flex: flexes[index]}]} key={name}>
             <Text style={styles.text}>{name}</Text>
           </View>
         ))}
@@ -23,7 +24,9 @@ const Table = ({columnNames, tableData, boldColumns}: Props) => {
             <View style={styles.tableBody} key={index}>
               {row.map((data, index) => {
                 return (
-                  <View style={[styles.column, {flex: 1}]} key={index}>
+                  <View
+                    style={[styles.column, {flex: flexes[index]}]}
+                    key={index}>
                     <Text
                       style={[
                         styles.text,

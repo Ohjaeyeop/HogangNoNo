@@ -11,7 +11,7 @@ import {ResultSetRowList} from 'react-native-sqlite-storage';
 import DealInfoGraph from './DealInfoGraph';
 import DealList from './DealList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import DisplayedAmount from '../../libs/displayedAmount';
+import {displayedAmount} from '../../libs/displayedAmount';
 import {color} from '../../theme/color';
 
 type Props = {
@@ -39,6 +39,7 @@ const DealInfo = ({
   type,
   changeType,
 }: Props) => {
+  const {hundredMillion, tenMillion} = displayedAmount(amount);
   const onShare = async () => {
     try {
       const result = await Share.share({
@@ -107,7 +108,7 @@ const DealInfo = ({
             최근 실거래 기준 1개월 평균
           </Text>
           <Text style={{color: color.main, fontSize: 20, fontWeight: 'bold'}}>
-            {DisplayedAmount.averageDealAmount(amount)}
+            {hundredMillion ? `${hundredMillion} ${tenMillion}` : tenMillion}
           </Text>
         </View>
         <DealInfoGraph
