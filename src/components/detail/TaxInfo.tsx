@@ -23,7 +23,7 @@ const graphWidth = (Dimensions.get('window').width - 40) * 0.8;
 const graphHeight = 80;
 const barWidth = 30;
 const gap = (graphWidth - barWidth * 3) / 3 + barWidth;
-console.log(gap);
+
 const TaxInfo = ({amount}: {amount: number}) => {
   const columnNames = ['년도', '공시가', '재산세', '종부세', '합계'];
   const boldColumns = [1, 4];
@@ -81,9 +81,12 @@ const TaxInfo = ({amount}: {amount: number}) => {
       taxList.map(data => {
         const year = data.year.toString();
         const price = DisplayedAmount.averageDealAmount(data.price);
-        const defaultTax = `${data.defaultTax}만`;
-        const wealthTax = data.wealthTax > 0 ? `${data.wealthTax}만` : '없음';
-        const tax = `${data.tax}만원`;
+        const defaultTax = DisplayedAmount.taxAmount(data.defaultTax);
+        const wealthTax =
+          data.wealthTax > 0
+            ? DisplayedAmount.taxAmount(data.wealthTax)
+            : '없음';
+        const tax = DisplayedAmount.taxAmount(data.tax);
         return [year, price, defaultTax, wealthTax, tax];
       }),
     );
@@ -182,7 +185,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
                         position: 'absolute',
                         bottom: -20,
                         width: 40,
-                        left: -5,
+                        left: (barWidth - 40) / 2,
                       }}>
                       <Text
                         style={{
@@ -231,8 +234,8 @@ const TaxInfo = ({amount}: {amount: number}) => {
 const styles = StyleSheet.create({
   chartContainer: {
     width: graphWidth,
-    height: graphHeight + 2,
-    borderBottomWidth: 2,
+    height: graphHeight + 1,
+    borderBottomWidth: 1,
     borderColor: 'gray',
     flexDirection: 'row',
     justifyContent: 'space-around',
