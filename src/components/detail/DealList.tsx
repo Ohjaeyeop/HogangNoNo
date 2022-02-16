@@ -1,6 +1,6 @@
 import React from 'react';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
-import {displayedAmount} from '../../libs/displayedAmount';
+import DisplayedAmount from '../../libs/displayedAmount';
 import Table from '../../share/Table';
 
 const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
@@ -13,7 +13,7 @@ const DealList = ({dealInfoList}: {dealInfoList: ResultSetRowList}) => {
       const dealDate = `${year}.${month < 10 ? `0${month}` : month}.${
         day < 10 ? `0${day}` : day
       }`;
-      const amount = `${displayedAmount(dealAmount)}${
+      const amount = `${DisplayedAmount.averageDealAmount(dealAmount)}${
         monthlyRent > 0 ? `/${monthlyRent}` : ''
       }`;
       return [dealDate, amount, `${floor}층`];

@@ -354,7 +354,5 @@ export const getPropertyTypeByZoom = (zoom: number): PropertyType => {
     ? 'Apartment'
     : zoom >= zoomScale.dong
     ? 'Dong'
-    : zoom >= zoomScale.gu
-    ? 'Gu'
-    : ('City' as any);
+    : 'Gu';
 };

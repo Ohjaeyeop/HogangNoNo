@@ -11,7 +11,7 @@ import {ResultSetRowList} from 'react-native-sqlite-storage';
 import DealInfoGraph from './DealInfoGraph';
 import DealList from './DealList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {displayedAmount} from '../../libs/displayedAmount';
+import DisplayedAmount from '../../libs/displayedAmount';
 import {color} from '../../theme/color';
 
 type Props = {
@@ -107,7 +107,7 @@ const DealInfo = ({
             최근 실거래 기준 1개월 평균
           </Text>
           <Text style={{color: color.main, fontSize: 20, fontWeight: 'bold'}}>
-            {displayedAmount(amount)}
+            {DisplayedAmount.averageDealAmount(amount)}
           </Text>
         </View>
         <DealInfoGraph

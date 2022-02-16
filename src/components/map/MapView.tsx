@@ -9,6 +9,8 @@ import {
 } from '../../db/db';
 import {useNavigation} from '@react-navigation/native';
 import {HomeProps} from '../../App';
+import {View, Text, Pressable} from 'react-native';
+import {color} from '../../theme/color';
 
 type Props = {
   location: Coord;
@@ -24,6 +26,7 @@ const MapView = ({location, handlePress}: Props) => {
   const mapRef = useRef<NaverMapView>(null);
   const [center, setCenter] = useState<Coord>(location);
   const [centerZoom, setCenterZoom] = useState(14);
+  const [isOver, setIsOver] = useState(false);
 
   useEffect(() => {
     setCenter(location);
@@ -31,7 +34,8 @@ const MapView = ({location, handlePress}: Props) => {
 
   async function handleCameraChange(event: any) {
     setZoom(event.zoom);
-    if (event.zoom > 6) {
+    if (event.zoom >= 9) {
+      setIsOver(false);
       const {zoom, contentRegion} = event;
       await getDisplayedData(
         {
@@ -44,6 +48,8 @@ const MapView = ({location, handlePress}: Props) => {
       )
         .then(res => setApartments(res))
         .catch(err => console.log(err.message));
+    } else {
+      setIsOver(true);
     }
   }
 
@@ -85,10 +91,26 @@ const MapView = ({location, handlePress}: Props) => {
       center={{...center, zoom: centerZoom}}
       onCameraChange={handleCameraChange}
       maxZoomLevel={20}
-      minZoomLevel={6}
+      minZoomLevel={7}
       rotateGesturesEnabled={false}
-      onMapClick={() => handlePress()}>
-      {apartments &&
+      onMapClick={() => handlePress()}
+      useTextureView={true}>
+      {isOver ? (
+        <Pressable
+          style={{
+            position: 'absolute',
+            top: 350,
+            left: 100,
+            backgroundColor: color.main,
+            paddingVertical: 15,
+            paddingHorizontal: 30,
+            opacity: 0.9,
+          }}
+          onPress={() => console.log(isOver)}>
+          <Text style={{color: 'white'}}>지도를 좀 더 확대해 주세요</Text>
+        </Pressable>
+      ) : (
+        apartments &&
         apartments.map((apartment, index) =>
           apartment.dealAmount ? (
             <ItemMarker
@@ -98,7 +120,8 @@ const MapView = ({location, handlePress}: Props) => {
               type={getPropertyTypeByZoom(zoom)}
             />
           ) : null,
-        )}
+        )
+      )}
     </NaverMapView>
   );
 };
