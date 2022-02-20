@@ -18,11 +18,10 @@ type Tax = {
   tax: number;
 };
 
-const graphWidth = Dimensions.get('window').width - 40 - 40;
-const chartWidth = Dimensions.get('window').width * 0.6;
-const chartHeight = 80;
-const barWidth = 20;
-const gap = (chartWidth - barWidth * 4) / 2;
+const graphWidth = (Dimensions.get('window').width - 40) * 0.8;
+const graphHeight = 80;
+const barWidth = 30;
+const gap = (graphWidth - barWidth * 3) / 3 + barWidth;
 
 const TaxInfo = ({amount}: {amount: number}) => {
   const columnNames = ['년도', '공시가', '재산세', '종부세', '합계'];
@@ -53,6 +52,11 @@ const TaxInfo = ({amount}: {amount: number}) => {
     return taxList;
   };
 
+  const getTaxText = (amount: number) => {
+    const {hundredMillion, tenThousand} = displayedAmount(amount);
+    return hundredMillion + tenThousand;
+  };
+
   useEffect(() => {
     const taxList = getTaxList(amount, increaseRate);
     maximum.current = calculateGraphAxisInfo(taxList[2].tax).maxValue;
@@ -62,28 +66,35 @@ const TaxInfo = ({amount}: {amount: number}) => {
       maximum.current,
       maximum.current,
       gap,
-      chartHeight,
+      graphHeight,
       taxList.map(tax => tax.tax),
-      barWidth * 2,
-      'L',
+      gap / 2,
+      'Q',
     );
     wealthPath.current = getGraphPath(
       maximum.current,
       maximum.current,
       gap,
-      chartHeight,
+      graphHeight,
       taxList.map(tax => tax.wealthTax),
-      barWidth * 2,
-      'L',
+      gap / 2,
+      'Q',
     );
     setExpectedTaxList(taxList);
     setTableData(
       taxList.map(data => {
         const year = data.year.toString();
-        const price = displayedAmount(data.price);
-        const defaultTax = `${data.defaultTax}만`;
-        const wealthTax = data.wealthTax > 0 ? `${data.wealthTax}만` : '없음';
-        const tax = `${data.tax}만원`;
+        const price = getTaxText(data.price);
+        const defaultTax =
+          data.defaultTax > 0 ? getTaxText(data.defaultTax) + '만' : '없음';
+        const wealthTax =
+          data.wealthTax > 0 ? getTaxText(data.wealthTax) + '만' : '없음';
+        const tax =
+          data.tax >= 10000
+            ? displayedAmount(data.tax).tenThousand
+              ? getTaxText(data.tax) + '만'
+              : getTaxText(data.tax)
+            : getTaxText(data.tax) + '만원';
         return [year, price, defaultTax, wealthTax, tax];
       }),
     );
@@ -94,55 +105,115 @@ const TaxInfo = ({amount}: {amount: number}) => {
       <Text style={{fontSize: 16, marginBottom: 20}}>보유세</Text>
       <View
         style={{
-          width: chartWidth,
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          marginBottom: 15,
+          width: '100%',
+          marginBottom: 40,
+          alignItems: 'flex-end',
+          right: 10,
         }}>
-        <Text style={{fontSize: 12, color: color.main}}>종부세 </Text>
-        <Text style={{fontSize: 12, color: '#FA6400'}}> 재산세</Text>
-      </View>
-      <View style={{alignItems: 'center'}}>
-        <Svg height={chartHeight} width={graphWidth} style={{marginBottom: 30}}>
-          <GraphBackground
-            graphHeight={chartHeight}
-            graphWidth={chartWidth}
-            line={line}
-            maxValue={maximum.current}
-            gap={axisGap}
-          />
-          <Path d={defaultPath.current} fill="none" stroke={'#FA6400'} />
-          <Path d={wealthPath.current} fill="none" stroke={color.main} />
-          <View style={styles.chartContainer}>
-            {expectedTaxList.map((taxObj, index) => {
-              return (
-                <View
-                  key={index}
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: barWidth * 1.5 + gap * index,
-                    width: barWidth,
-                  }}>
-                  <View
-                    style={{
-                      height:
-                        (chartHeight * taxObj.defaultTax) / maximum.current,
-                      backgroundColor: '#FA6400',
-                    }}
-                  />
-                  <View
-                    style={{
-                      height:
-                        (chartHeight * taxObj.wealthTax) / maximum.current,
-                      backgroundColor: color.main,
-                    }}
-                  />
-                </View>
-              );
-            })}
+        <View
+          style={{
+            width: graphWidth,
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            marginBottom: 15,
+          }}>
+          <Text style={{fontSize: 12, color: color.main}}>종부세 </Text>
+          <Text style={{fontSize: 12, color: '#FA6400'}}> 재산세</Text>
+        </View>
+        <View style={{flexDirection: 'row'}}>
+          <View
+            style={{
+              alignItems: 'flex-end',
+              height: graphHeight + 2,
+              marginRight: 5,
+            }}>
+            {[...new Array(line).keys()].map(index => (
+              <Text
+                style={{
+                  position: 'absolute',
+                  color: 'gray',
+                  fontSize: 12,
+                  top:
+                    graphHeight -
+                    ((graphHeight * axisGap) / maximum.current) * index -
+                    6,
+                }}
+                key={index}>
+                {index === 0
+                  ? 0
+                  : displayedAmount(axisGap * index).tenThousand
+                  ? axisGap * index > 10000
+                    ? `${getTaxText(axisGap * index)}만`
+                    : `${getTaxText(axisGap * index)}만원`
+                  : getTaxText(axisGap * index)}
+              </Text>
+            ))}
           </View>
-        </Svg>
+          <Svg
+            height={graphHeight + 2}
+            width={graphWidth}
+            viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
+            <GraphBackground
+              graphHeight={graphHeight}
+              graphWidth={graphWidth}
+              line={line}
+              maxValue={maximum.current}
+              gap={axisGap}
+            />
+            <Path
+              d={defaultPath.current}
+              fill="none"
+              stroke={'#FA6400'}
+              strokeWidth={2}
+            />
+            <Path
+              d={wealthPath.current}
+              fill="none"
+              stroke={color.main}
+              strokeWidth={2}
+            />
+            <View style={styles.chartContainer}>
+              {expectedTaxList.map((taxObj, index) => {
+                return (
+                  <View key={index}>
+                    <View
+                      style={{
+                        width: barWidth,
+                        height:
+                          (graphHeight * taxObj.defaultTax) / maximum.current,
+                        backgroundColor: '#FA6400',
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: barWidth,
+                        height:
+                          (graphHeight * taxObj.wealthTax) / maximum.current,
+                        backgroundColor: color.main,
+                      }}
+                    />
+                    <View
+                      style={{
+                        position: 'absolute',
+                        bottom: -20,
+                        width: 40,
+                        left: (barWidth - 40) / 2,
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: 'gray',
+                          textAlign: 'center',
+                        }}>
+                        {taxObj.year}년
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </Svg>
+        </View>
       </View>
       <View style={styles.taxInfo}>
         <View>
@@ -167,6 +238,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
         columnNames={columnNames}
         boldColumns={boldColumns}
         tableData={tableData}
+        flexes={[1, 2, 1.7, 2, 2]}
       />
     </View>
   );
@@ -174,10 +246,13 @@ const TaxInfo = ({amount}: {amount: number}) => {
 
 const styles = StyleSheet.create({
   chartContainer: {
-    width: chartWidth,
-    height: chartHeight,
+    width: graphWidth,
+    height: graphHeight + 1,
     borderBottomWidth: 1,
     borderColor: 'gray',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
   },
   taxInfo: {
     flexDirection: 'row',

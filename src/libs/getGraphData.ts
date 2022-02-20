@@ -27,7 +27,11 @@ export const getGraphData = (dealInfoGroup: ResultSetRowList) => {
         count: dealInfoGroup.item(j).count,
         month: dealInfoGroup.item(j).month,
         year: dealInfoGroup.item(j).year,
-        displayedAmount: displayedAmount(dealInfoGroup.item(j).avg),
+        displayedAmount: (
+          displayedAmount(dealInfoGroup.item(j).avg).hundredMillion +
+          ' ' +
+          displayedAmount(dealInfoGroup.item(j).avg).tenMillion
+        ).trim(),
       });
       j++;
     } else {

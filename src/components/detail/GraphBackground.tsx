@@ -1,6 +1,7 @@
 import React from 'react';
 import {Line, Text} from 'react-native-svg';
 import {color} from '../../theme/color';
+import {View} from 'react-native';
 
 type Props = {
   graphHeight: number;

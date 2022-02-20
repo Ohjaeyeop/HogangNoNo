@@ -21,8 +21,8 @@ type Props = {
   dealInfoList: ResultSetRowList;
   dealInfoGroup: ResultSetRowList;
   modalOpen: () => void;
-  loading1: boolean;
-  loading2: boolean;
+  areaChangingLoading: boolean;
+  typeChangingLoading: boolean;
   type: 'Deal' | 'Lease';
   changeType: (type: 'Deal' | 'Lease') => void;
 };
@@ -34,11 +34,12 @@ const DealInfo = ({
   dealInfoList,
   dealInfoGroup,
   modalOpen,
-  loading1,
-  loading2,
+  areaChangingLoading,
+  typeChangingLoading,
   type,
   changeType,
 }: Props) => {
+  const {hundredMillion, tenMillion} = displayedAmount(amount);
   const onShare = async () => {
     try {
       const result = await Share.share({
@@ -69,8 +70,8 @@ const DealInfo = ({
                 styles.typeBox,
                 {backgroundColor: type === 'Deal' ? color.main : undefined},
               ]}
-              onPress={() => changeType('Deal')}>
-              {type === 'Deal' && loading2 ? (
+              onPress={() => type === 'Lease' && changeType('Deal')}>
+              {type === 'Lease' && typeChangingLoading ? (
                 <ActivityIndicator />
               ) : (
                 <Text style={{color: type === 'Deal' ? 'white' : color.main}}>
@@ -83,8 +84,8 @@ const DealInfo = ({
                 styles.typeBox,
                 {backgroundColor: type === 'Lease' ? color.main : undefined},
               ]}
-              onPress={() => changeType('Lease')}>
-              {type === 'Lease' && loading2 ? (
+              onPress={() => type === 'Deal' && changeType('Lease')}>
+              {type === 'Deal' && typeChangingLoading ? (
                 <ActivityIndicator />
               ) : (
                 <Text style={{color: type === 'Lease' ? 'white' : color.main}}>
@@ -94,7 +95,7 @@ const DealInfo = ({
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.selectBox} onPress={modalOpen}>
-            {loading1 ? (
+            {areaChangingLoading ? (
               <ActivityIndicator />
             ) : (
               <Text style={[styles.text, {marginRight: 10}]}>{area}평</Text>
@@ -107,13 +108,13 @@ const DealInfo = ({
             최근 실거래 기준 1개월 평균
           </Text>
           <Text style={{color: color.main, fontSize: 20, fontWeight: 'bold'}}>
-            {displayedAmount(amount)}
+            {`${hundredMillion} ${tenMillion}`.trim()}
           </Text>
         </View>
         <DealInfoGraph
           dealInfoGroup={dealInfoGroup}
           type={type}
-          loading={loading1 || loading2}
+          loading={areaChangingLoading || typeChangingLoading}
         />
         <DealList dealInfoList={dealInfoList} />
       </View>

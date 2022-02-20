@@ -10,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
 import {color} from '../theme/color';
@@ -19,12 +18,12 @@ import {getAreaList, getDealInfo, getRecentDealAmount} from '../db/db';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
 import {useFocusEffect} from '@react-navigation/native';
 import TaxInfo from './detail/TaxInfo';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const statusBarHeight = Platform.OS === 'ios' ? getStatusBarHeight(true) : 0;
-console.log(statusBarHeight);
 const rowHeight = 70;
 
 const Detail = ({navigation, route}: DetailProps) => {
+  const safeArea = useSafeAreaInsets();
   const {dealAmount, buildYear, name, area} = route.params;
   const [selectedArea, setArea] = useState(area);
   const [amount, setAmount] = useState(dealAmount);
@@ -65,8 +64,10 @@ const Detail = ({navigation, route}: DetailProps) => {
 
   const changeType = (type: 'Deal' | 'Lease') => {
     setTypeChangingLoading(true);
-    getData(type, name, selectedArea).then(() => setTypeChangingLoading(false));
-    setType(type);
+    getData(type, name, selectedArea).then(() => {
+      setTypeChangingLoading(false);
+      setType(type);
+    });
     typeModalRef.current?.close();
   };
 
@@ -104,7 +105,14 @@ const Detail = ({navigation, route}: DetailProps) => {
     </View>
   ) : (
     <View style={{flex: 1, backgroundColor: 'white'}}>
-      {Platform.OS === 'ios' && <View style={styles.statusBar} />}
+      {Platform.OS === 'ios' && (
+        <View
+          style={{
+            height: safeArea.top,
+            backgroundColor: color.main,
+          }}
+        />
+      )}
       <View style={styles.header}>
         <View
           style={{
@@ -113,7 +121,9 @@ const Detail = ({navigation, route}: DetailProps) => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Text style={styles.title}>{name}</Text>
+          <Text style={styles.title} numberOfLines={1}>
+            {name}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={() => navigation.pop()}
@@ -151,8 +161,8 @@ const Detail = ({navigation, route}: DetailProps) => {
           dealInfoList={dealInfoList}
           dealInfoGroup={dealInfoGroup}
           modalOpen={modalOpen}
-          loading1={areaChangingLoading}
-          loading2={typeChangingLoading}
+          areaChangingLoading={areaChangingLoading}
+          typeChangingLoading={typeChangingLoading}
           type={type}
           changeType={changeType}
         />
@@ -253,10 +263,6 @@ const Detail = ({navigation, route}: DetailProps) => {
 };
 
 const styles = StyleSheet.create({
-  statusBar: {
-    height: statusBarHeight,
-    backgroundColor: color.main,
-  },
   header: {
     backgroundColor: color.main,
     height: 40,
