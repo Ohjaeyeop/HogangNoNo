@@ -9,7 +9,6 @@ import GraphBackground from './GraphBackground';
 import {getGraphPath} from '../../libs/getGraphPath';
 import Slider from '../../share/Slider';
 import {calculateGraphAxisInfo} from '../../libs/calculateGraphAxisInfo';
-import DisplayedAmonut from '../../libs/displayedAmount';
 
 type Tax = {
   year: number;
@@ -70,7 +69,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
       graphHeight,
       taxList.map(tax => tax.tax),
       gap / 2,
-      'L',
+      'Q',
     );
     wealthPath.current = getGraphPath(
       maximum.current,
@@ -79,7 +78,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
       graphHeight,
       taxList.map(tax => tax.wealthTax),
       gap / 2,
-      'L',
+      'Q',
     );
     setExpectedTaxList(taxList);
     setTableData(
