@@ -64,8 +64,10 @@ const Detail = ({navigation, route}: DetailProps) => {
 
   const changeType = (type: 'Deal' | 'Lease') => {
     setTypeChangingLoading(true);
-    getData(type, name, selectedArea).then(() => setTypeChangingLoading(false));
-    setType(type);
+    getData(type, name, selectedArea).then(() => {
+      setTypeChangingLoading(false);
+      setType(type);
+    });
     typeModalRef.current?.close();
   };
 
@@ -119,7 +121,9 @@ const Detail = ({navigation, route}: DetailProps) => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Text style={styles.title}>{name}</Text>
+          <Text style={styles.title} numberOfLines={1}>
+            {name}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={() => navigation.pop()}
@@ -157,8 +161,8 @@ const Detail = ({navigation, route}: DetailProps) => {
           dealInfoList={dealInfoList}
           dealInfoGroup={dealInfoGroup}
           modalOpen={modalOpen}
-          loading1={areaChangingLoading}
-          loading2={typeChangingLoading}
+          areaChangingLoading={areaChangingLoading}
+          typeChangingLoading={typeChangingLoading}
           type={type}
           changeType={changeType}
         />

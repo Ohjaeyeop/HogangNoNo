@@ -24,6 +24,7 @@ const graphHeight = graphWidth * 0.4;
 const graphPadding = 20;
 const chartHeight = 40;
 const radius = 5;
+const gap = graphWidth / 36;
 
 type Props = {
   dealInfoGroup: ResultSetRowList;
@@ -47,7 +48,6 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
     ) - 1;
   const maxCount = Math.max(...graphData.map(value => value.count));
 
-  const gap = graphWidth / 36;
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
   const path = getGraphPath(
     maxValue,
@@ -65,7 +65,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
       Math.max(Math.round(x.value / gap), 0),
       graphData.length - 1,
     );
-  });
+  }, [x]);
 
   useAnimatedReaction(
     () => dataIndex.value,
@@ -151,61 +151,50 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
               maxValue={graphHeight}
               gap={graphHeight / 3}
             />
-            {!loading && (
-              <Path
-                d={path}
-                fill="none"
-                stroke={type === 'Deal' ? color.main : '#3D9752'}
-                strokeWidth={3}
-              />
-            )}
-          </Svg>
-          {!loading && (
-            <Animated.View style={[styles.line, lineAnimatedStyle]} />
-          )}
-          {!loading && (
-            <Animated.View
-              style={[
-                styles.circle,
-                circleAnimatedStyle,
-                {backgroundColor: type === 'Deal' ? color.main : '#3D9752'},
-              ]}
+            <Path
+              d={path}
+              fill="none"
+              stroke={type === 'Deal' ? color.main : '#3D9752'}
+              strokeWidth={3}
             />
-          )}
-          {!loading && (
-            <Animated.View
-              style={[styles.tooltip, tooltipAnimatedStyle]}
-              onLayout={event =>
-                setTooltipWidth(event.nativeEvent.layout.width)
-              }>
-              <Text style={{color: 'white', fontWeight: '500'}}>
-                {tooltipText}
-              </Text>
-            </Animated.View>
-          )}
+          </Svg>
+          <Animated.View style={[styles.line, lineAnimatedStyle]} />
+          <Animated.View
+            style={[
+              styles.circle,
+              circleAnimatedStyle,
+              {backgroundColor: type === 'Deal' ? color.main : '#3D9752'},
+            ]}
+          />
+          <Animated.View
+            style={[styles.tooltip, tooltipAnimatedStyle]}
+            onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
+            <Text style={{color: 'white', fontWeight: '500'}}>
+              {tooltipText}
+            </Text>
+          </Animated.View>
           <View style={styles.chartContainer}>
-            {!loading &&
-              graphData.map((data, index) => (
-                <Animated.View
-                  key={index}
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: -gap / 4 + gap * index,
-                    width: gap / 2,
-                    height:
-                      maxCount > 0
-                        ? ((data.count / maxCount) * chartHeight) / 1.5
-                        : 0,
-                    backgroundColor:
-                      dataIndex.value === index
-                        ? type === 'Deal'
-                          ? color.main
-                          : '#3D9752'
-                        : 'darkgray',
-                  }}
-                />
-              ))}
+            {graphData.map((data, index) => (
+              <Animated.View
+                key={index}
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: -gap / 4 + gap * index,
+                  width: gap / 2,
+                  height:
+                    maxCount > 0
+                      ? ((data.count / maxCount) * chartHeight) / 1.5
+                      : 0,
+                  backgroundColor:
+                    dataIndex.value === index
+                      ? type === 'Deal'
+                        ? color.main
+                        : '#3D9752'
+                      : 'darkgray',
+                }}
+              />
+            ))}
           </View>
         </Animated.View>
       </PanGestureHandler>
