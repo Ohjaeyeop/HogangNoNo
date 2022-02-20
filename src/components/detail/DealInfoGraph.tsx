@@ -65,7 +65,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
       Math.max(Math.round(x.value / gap), 0),
       graphData.length - 1,
     );
-  }, [x]);
+  });
 
   useAnimatedReaction(
     () => dataIndex.value,
@@ -83,6 +83,14 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   );
 
   const circleAnimatedStyle = useAnimatedStyle(() => {
+    console.log(
+      graphData[dataIndex.value].amount === 0
+        ? -radius - 2
+        : ((maxValue - graphData[dataIndex.value].amount / 10000) / diff - 1) *
+            graphHeight -
+            radius -
+            2,
+    );
     return {
       transform: [
         {translateX: x.value - radius},
@@ -151,51 +159,63 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
               maxValue={graphHeight}
               gap={graphHeight / 3}
             />
-            <Path
-              d={path}
-              fill="none"
-              stroke={type === 'Deal' ? color.main : '#3D9752'}
-              strokeWidth={3}
-            />
-          </Svg>
-          <Animated.View style={[styles.line, lineAnimatedStyle]} />
-          <Animated.View
-            style={[
-              styles.circle,
-              circleAnimatedStyle,
-              {backgroundColor: type === 'Deal' ? color.main : '#3D9752'},
-            ]}
-          />
-          <Animated.View
-            style={[styles.tooltip, tooltipAnimatedStyle]}
-            onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
-            <Text style={{color: 'white', fontWeight: '500'}}>
-              {tooltipText}
-            </Text>
-          </Animated.View>
-          <View style={styles.chartContainer}>
-            {graphData.map((data, index) => (
-              <Animated.View
-                key={index}
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: -gap / 4 + gap * index,
-                  width: gap / 2,
-                  height:
-                    maxCount > 0
-                      ? ((data.count / maxCount) * chartHeight) / 1.5
-                      : 0,
-                  backgroundColor:
-                    dataIndex.value === index
-                      ? type === 'Deal'
-                        ? color.main
-                        : '#3D9752'
-                      : 'darkgray',
-                }}
+            {!loading && (
+              <Path
+                d={path}
+                fill="none"
+                stroke={type === 'Deal' ? color.main : '#3D9752'}
+                strokeWidth={3}
               />
-            ))}
-          </View>
+            )}
+          </Svg>
+          {!loading && (
+            <>
+              <Animated.View style={[styles.line, lineAnimatedStyle]} />
+              <Animated.View
+                style={[
+                  circleAnimatedStyle,
+                  {
+                    width: radius * 2,
+                    height: radius * 2,
+                    borderRadius: radius,
+                    backgroundColor: type === 'Deal' ? color.main : '#3D9752',
+                  },
+                ]}
+              />
+              <Animated.View
+                style={[styles.tooltip, tooltipAnimatedStyle]}
+                onLayout={event =>
+                  setTooltipWidth(event.nativeEvent.layout.width)
+                }>
+                <Text style={{color: 'white', fontWeight: '500'}}>
+                  {tooltipText}
+                </Text>
+              </Animated.View>
+              <View style={styles.chartContainer}>
+                {graphData.map((data, index) => (
+                  <Animated.View
+                    key={index}
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: -gap / 4 + gap * index,
+                      width: gap / 2,
+                      height:
+                        maxCount > 0
+                          ? ((data.count / maxCount) * chartHeight) / 1.5
+                          : 0,
+                      backgroundColor:
+                        dataIndex.value === index
+                          ? type === 'Deal'
+                            ? color.main
+                            : '#3D9752'
+                          : 'darkgray',
+                    }}
+                  />
+                ))}
+              </View>
+            </>
+          )}
         </Animated.View>
       </PanGestureHandler>
     </GestureHandlerRootView>
@@ -211,11 +231,6 @@ const styles = StyleSheet.create({
     height: chartHeight,
     borderBottomWidth: 0.5,
     borderColor: 'lightgray',
-  },
-  circle: {
-    width: radius * 2,
-    height: radius * 2,
-    borderRadius: radius,
   },
   line: {
     position: 'absolute',
@@ -236,4 +251,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DealInfoGraph;
+export default React.memo(DealInfoGraph);
