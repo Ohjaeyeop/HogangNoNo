@@ -4,6 +4,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -37,6 +38,29 @@ const Detail = ({navigation, route}: DetailProps) => {
 
   const typeModalRef = useRef<Modal>(null);
   const areaModalRef = useRef<Modal>(null);
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: encodeURI(
+          `hohoho://detail/${name.replace(
+            ' ',
+            '',
+          )}/${dealAmount}/${buildYear}/${area}`,
+        )
+          .replace(/\(/g, '%28')
+          .replace(/\)/g, '%29'),
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+        } else {
+        }
+      } else if (result.action === Share.dismissedAction) {
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getData = async (
     type: 'Deal' | 'Lease',
@@ -152,6 +176,7 @@ const Detail = ({navigation, route}: DetailProps) => {
         loading2={typeChangingLoading}
         type={type}
         changeType={changeType}
+        onShare={onShare}
       />
       <Modal
         animationDuration={0}

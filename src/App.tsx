@@ -9,6 +9,7 @@ import {
 } from '@react-navigation/native-stack';
 import Detail from './components/Detail';
 import {Linking} from 'react-native';
+import {dong} from './data/regionInfos';
 
 type StackParamList = {
   Home: undefined;
@@ -26,7 +27,26 @@ const App = () => {
     config: {
       screens: {
         Home: 'home',
-        Detail: 'detail',
+        Detail: {
+          path: 'detail/:name/:dealAmount/:buildYear/:area',
+          parse: {
+            name: (name: string) => {
+              const decodedName = decodeURI(name);
+              for (let i = 0; i < dong.length; i++) {
+                if (decodedName.indexOf(dong[i].split(' ')[1]) === 0) {
+                  return (
+                    decodedName.slice(0, dong[i].split(' ')[1].length) +
+                    ' ' +
+                    decodedName.slice(dong[i].split(' ')[1].length)
+                  );
+                }
+              }
+            },
+            dealAmount: Number,
+            buildYear: Number,
+            area: Number,
+          },
+        },
       },
     },
     async getInitialURL() {
@@ -34,10 +54,9 @@ const App = () => {
     },
     subscribe(listener: any) {
       const onReceiveURL = ({url}: {url: string}) => listener(url);
-      Linking.addEventListener('url', onReceiveURL);
-
+      const subscriber = Linking.addEventListener('url', onReceiveURL);
       return () => {
-        Linking.removeEventListener('url', onReceiveURL);
+        subscriber.remove();
       };
     },
   };

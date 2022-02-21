@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -25,6 +24,7 @@ type Props = {
   loading2: boolean;
   type: 'Deal' | 'Lease';
   changeType: (type: 'Deal' | 'Lease') => void;
+  onShare: () => Promise<void>;
 };
 
 const DealInfo = ({
@@ -38,28 +38,18 @@ const DealInfo = ({
   loading2,
   type,
   changeType,
+  onShare,
 }: Props) => {
-  const onShare = async () => {
-    try {
-      const result = await Share.share({
-        message: 'hohoho://home',
-      });
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-        } else {
-        }
-      } else if (result.action === Share.dismissedAction) {
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   return (
     <View>
       <View style={styles.apartmentInfo}>
         <Text style={{fontSize: 14, color: 'black'}}>{buildYear}년</Text>
-        <Icon name={'share'} size={20} color={color.main} onPress={onShare} />
+        <Icon
+          name={'share'}
+          size={20}
+          color={color.main}
+          onPress={() => onShare()}
+        />
       </View>
       <View style={styles.dealInfoContainer}>
         <View style={styles.selectorView}>
