@@ -8,6 +8,8 @@ import {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import Detail from './components/Detail';
+import {Linking} from 'react-native';
+import {dong} from './data/regionInfos';
 
 type StackParamList = {
   Home: undefined;
@@ -20,11 +22,50 @@ export type DetailProps = NativeStackScreenProps<StackParamList, 'Detail'>;
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const App = () => {
+  const linking = {
+    prefixes: ['hohoho://'],
+    config: {
+      screens: {
+        Home: 'home',
+        Detail: {
+          path: 'detail/:name/:dealAmount/:buildYear/:area',
+          parse: {
+            name: (name: string) => {
+              const decodedName = decodeURI(name);
+              for (let i = 0; i < dong.length; i++) {
+                if (decodedName.indexOf(dong[i].split(' ')[1]) === 0) {
+                  return (
+                    decodedName.slice(0, dong[i].split(' ')[1].length) +
+                    ' ' +
+                    decodedName.slice(dong[i].split(' ')[1].length)
+                  );
+                }
+              }
+            },
+            dealAmount: Number,
+            buildYear: Number,
+            area: Number,
+          },
+        },
+      },
+    },
+    async getInitialURL() {
+      return await Linking.getInitialURL();
+    },
+    subscribe(listener: any) {
+      const onReceiveURL = ({url}: {url: string}) => listener(url);
+      const subscriber = Linking.addEventListener('url', onReceiveURL);
+      return () => {
+        subscriber.remove();
+      };
+    },
+  };
+
   useEffect(() => {
     db.init();
   }, []);
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator>
         <Stack.Screen
           name="Home"
