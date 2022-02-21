@@ -35,6 +35,7 @@ type Props = {
 const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
+  const x = useSharedValue(graphWidth);
   const graphData = getGraphData(dealInfoGroup);
 
   const maxValue = Math.ceil(
@@ -59,7 +60,6 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
     'S',
   );
 
-  const x = useSharedValue(graphWidth);
   const dataIndex = useDerivedValue(() => {
     return Math.min(
       Math.max(Math.round(x.value / gap), 0),
@@ -98,7 +98,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
         },
       ],
     };
-  });
+  }, [x, dataIndex, graphData]);
 
   const lineAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -190,7 +190,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
                     style={{
                       position: 'absolute',
                       bottom: 0,
-                      left: -gap / 4 + gap * index,
+                      left: -gap / 4 + gap * index + 0.25,
                       width: gap / 2,
                       height:
                         maxCount > 0

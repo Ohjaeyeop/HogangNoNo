@@ -12,7 +12,7 @@ import {HomeProps} from '../../App';
 
 type Props = {
   location: Coord;
-  myLocation: Coord;
+  myLocation: Coord | undefined;
   handlePress: () => void;
 };
 
