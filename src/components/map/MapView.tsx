@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import NaverMapView, {Coord} from 'react-native-nmap';
+import NaverMapView, {Coord, Marker} from 'react-native-nmap';
 import ItemMarker from './ItemMarker';
 import {
   getDisplayedData,
@@ -9,15 +9,14 @@ import {
 } from '../../db/db';
 import {useNavigation} from '@react-navigation/native';
 import {HomeProps} from '../../App';
-import {View, Text, Pressable} from 'react-native';
-import {color} from '../../theme/color';
 
 type Props = {
   location: Coord;
+  myLocation: Coord;
   handlePress: () => void;
 };
 
-const MapView = ({location, handlePress}: Props) => {
+const MapView = ({location, myLocation, handlePress}: Props) => {
   const [apartments, setApartments] = useState<
     Property<'Apartment'>[] | undefined
   >([]);
@@ -91,25 +90,11 @@ const MapView = ({location, handlePress}: Props) => {
       center={{...center, zoom: centerZoom}}
       onCameraChange={handleCameraChange}
       maxZoomLevel={20}
-      minZoomLevel={7}
+      minZoomLevel={8}
       rotateGesturesEnabled={false}
       onMapClick={() => handlePress()}
       useTextureView={true}>
-      {isOver ? (
-        <Pressable
-          style={{
-            position: 'absolute',
-            top: 350,
-            left: 100,
-            backgroundColor: color.main,
-            paddingVertical: 15,
-            paddingHorizontal: 30,
-            opacity: 0.9,
-          }}
-          onPress={() => console.log(isOver)}>
-          <Text style={{color: 'white'}}>지도를 좀 더 확대해 주세요</Text>
-        </Pressable>
-      ) : (
+      {!isOver &&
         apartments &&
         apartments.map((apartment, index) =>
           apartment.dealAmount ? (
@@ -120,7 +105,15 @@ const MapView = ({location, handlePress}: Props) => {
               type={getPropertyTypeByZoom(zoom)}
             />
           ) : null,
-        )
+        )}
+      {myLocation && (
+        <Marker
+          coordinate={{
+            latitude: location.latitude,
+            longitude: location.longitude,
+          }}
+          zIndex={1}
+        />
       )}
     </NaverMapView>
   );

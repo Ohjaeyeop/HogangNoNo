@@ -24,6 +24,7 @@ const Home = () => {
     latitude: 37.50882651313064,
     longitude: 127.06310347509722,
   });
+  const [myLocation, setMyLocation] = useState<Coord>();
   const [visible, setVisible] = useState(true);
   const headerRef = useRef<Animatable.View & View>(null);
   const myLocationRef = useRef<
@@ -51,10 +52,8 @@ const Home = () => {
         Geolocation.getCurrentPosition(
           position => {
             const {latitude, longitude} = position.coords;
-            setLocation({
-              latitude,
-              longitude,
-            });
+            setMyLocation({latitude, longitude});
+            setLocation({latitude, longitude});
           },
           error => {
             console.log(error.code, error.message);
@@ -82,7 +81,11 @@ const Home = () => {
         <View style={{height: safeArea.top, backgroundColor: color.main}} />
       )}
       <StatusBar barStyle={'light-content'} />
-      <MapView location={location} handlePress={handlePress} />
+      <MapView
+        location={location}
+        myLocation={myLocation}
+        handlePress={handlePress}
+      />
       <Animatable.View
         style={[{top: safeArea.top}, styles.header]}
         ref={headerRef}>

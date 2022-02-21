@@ -83,14 +83,6 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   );
 
   const circleAnimatedStyle = useAnimatedStyle(() => {
-    console.log(
-      graphData[dataIndex.value].amount === 0
-        ? -radius - 2
-        : ((maxValue - graphData[dataIndex.value].amount / 10000) / diff - 1) *
-            graphHeight -
-            radius -
-            2,
-    );
     return {
       transform: [
         {translateX: x.value - radius},
