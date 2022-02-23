@@ -28,7 +28,7 @@ const MapView = ({location, myLocation, handlePress}: Props) => {
   const [isOver, setIsOver] = useState(false);
 
   useEffect(() => {
-    setCenter(location);
+    mapRef.current?.animateToCoordinate(location);
   }, [location]);
 
   async function handleCameraChange(event: any) {
