@@ -17,7 +17,7 @@ import {color} from '../theme/color';
 import Modal from 'react-native-modalbox';
 import {getAreaList, getDealInfo, getRecentDealAmount} from '../db/db';
 import {ResultSetRowList} from 'react-native-sqlite-storage';
-import {useFocusEffect} from '@react-navigation/native';
+import {StackActions, useFocusEffect} from '@react-navigation/native';
 import TaxInfo from './detail/TaxInfo';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -123,6 +123,14 @@ const Detail = ({navigation, route}: DetailProps) => {
     }
   }, [areaList, dealInfoGroup, dealInfoList]);
 
+  const handleBackButton = () => {
+    if (navigation.canGoBack()) {
+      navigation.pop();
+    } else {
+      navigation.dispatch(StackActions.replace('Home'));
+    }
+  };
+
   return loading || !dealInfoGroup || !dealInfoList || !areaList ? (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <ActivityIndicator size="large" />
@@ -150,7 +158,7 @@ const Detail = ({navigation, route}: DetailProps) => {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => navigation.pop()}
+          onPress={() => handleBackButton()}
           style={{position: 'absolute', left: 20, width: 44}}>
           <Icon
             size={25}

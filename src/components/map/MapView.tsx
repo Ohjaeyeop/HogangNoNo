@@ -36,7 +36,7 @@ const MapView = ({location, myLocation, handlePress}: Props) => {
     if (event.zoom >= 9) {
       setIsOver(false);
       const {zoom, contentRegion} = event;
-      await getDisplayedData(
+      const data = await getDisplayedData(
         {
           startX: contentRegion[0].latitude,
           startY: contentRegion[0].longitude,
@@ -44,9 +44,8 @@ const MapView = ({location, myLocation, handlePress}: Props) => {
           endY: contentRegion[2].longitude,
         },
         zoom,
-      )
-        .then(res => setApartments(res))
-        .catch(err => console.log(err.message));
+      );
+      setApartments(data);
     } else {
       setIsOver(true);
     }

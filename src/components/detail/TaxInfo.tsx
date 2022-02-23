@@ -57,6 +57,10 @@ const TaxInfo = ({amount}: {amount: number}) => {
     return hundredMillion + tenThousand;
   };
 
+  const changeRate = (rate: number) => {
+    setIncreaseRate(rate);
+  };
+
   useEffect(() => {
     const taxList = getTaxList(amount, increaseRate);
     maximum.current = calculateGraphAxisInfo(taxList[2].tax).maxValue;
@@ -179,16 +183,18 @@ const TaxInfo = ({amount}: {amount: number}) => {
                     <View
                       style={{
                         width: barWidth,
-                        height:
+                        height: Math.round(
                           (graphHeight * taxObj.defaultTax) / maximum.current,
+                        ),
                         backgroundColor: '#FA6400',
                       }}
                     />
                     <View
                       style={{
                         width: barWidth,
-                        height:
+                        height: Math.round(
                           (graphHeight * taxObj.wealthTax) / maximum.current,
+                        ),
                         backgroundColor: color.main,
                       }}
                     />
@@ -230,7 +236,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
             width={140}
             maxValue={50}
             startValue={22}
-            setIncreaseRate={setIncreaseRate}
+            changeRate={changeRate}
           />
         </View>
       </View>

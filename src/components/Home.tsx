@@ -56,15 +56,16 @@ const Home = () => {
             setLocation({latitude, longitude});
           },
           error => {
-            console.log(error.code, error.message);
+            console.log(error.message);
           },
-          {enableHighAccuracy: true, timeout: 15000, maximumAge: 1000},
+          {enableHighAccuracy: false, timeout: 2000, maximumAge: 0},
         );
       }
     });
   }
 
   const handlePress = () => {
+    console.log(visible);
     if (visible) {
       headerRef.current?.fadeOutUp?.(500);
       myLocationRef.current?.fadeOutRight?.(500);
@@ -91,12 +92,20 @@ const Home = () => {
         ref={headerRef}>
         <Icon name={'home-filled'} size={20} style={{color: 'white'}} />
       </Animatable.View>
-      <AnimatableTouchableOpacity
+      <Animatable.View
         style={[{top: safeArea.top + 60}, styles.myLocation]}
-        onPress={() => getMyLocation()}
         ref={myLocationRef}>
-        <Icon name={'my-location'} size={18} style={styles.locationIcon} />
-      </AnimatableTouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => getMyLocation()}>
+          <Icon name={'my-location'} size={18} style={styles.locationIcon} />
+        </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 };

@@ -12,33 +12,36 @@ export const init = async () => {
     {
       name: 'propertyDB.db',
       location: 'default',
+      createFromLocation: '~www/propertyDB.db',
     },
     () => {},
     error => {
       console.log(error.message);
     },
   );
-  /*  await dropTable(db);
-  await createTable(db);*/
-  // await insertAddressData(db);
-  /*await insertPropertyData(db);
-  await updateApartment();
-  await updateDong();
-  await updateGu();*/
-  //await insertLeasePropertyData(db);
+  const isTable: number = await db
+    .executeSql("SELECT COUNT(*) as c FROM sqlite_master where name='Lease'")
+    .then(res => res[0].rows.item(0).c);
+  if (!isTable) {
+    await createTable(db);
+    await insertAddressData(db);
+    await insertPropertyData(db);
+    await updateApartment();
+    await updateDong();
+    await updateGu();
+    await insertLeasePropertyData(db);
+  }
 };
 
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
-  /*  await db.executeSql('Drop TABLE Gu');
+  await db.executeSql('Drop TABLE Gu');
   await db.executeSql('Drop TABLE Dong');
   await db.executeSql('Drop TABLE Apartment');
-  await db.executeSql('Drop TABLE Deal');*/
-  await db.executeSql('Drop TABLE Lease');
-  console.log(1);
+  await db.executeSql('Drop TABLE Deal');
 };
 
 const createTable = async (db: SQLite.SQLiteDatabase) => {
-  /*  await db.executeSql(
+  await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );
   await db.executeSql(
@@ -49,13 +52,12 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
   );
   await db.executeSql(
     'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
-  );*/
+  );
   await db
     .executeSql(
       'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, PRIMARY KEY("id" AUTOINCREMENT) )',
     )
     .catch(err => console.log(err.message));
-  console.log(2);
 };
 
 // 구, 동 정보 삽입
@@ -74,17 +76,19 @@ const insertAddressData = async (db: SQLite.SQLiteDatabase) => {
 
   for (const value of dong) {
     const arr = value.split(' ');
-    const res = await addrToCoord(`서울특별시 ${value}`);
-    if (res) {
-      const {x, y} = res;
-      await db
-        .executeSql(
-          `INSERT INTO Dong(name, gu, latitude, longitude) values ('${value}', '${arr[0]}', ${y}, ${x})`,
-        )
-        .catch(err => console.log(err.message, arr[1]));
+    if (gu.includes(arr[0])) {
+      const res = await addrToCoord(`서울특별시 ${value}`);
+      if (res) {
+        const {x, y} = res;
+        await db
+          .executeSql(
+            `INSERT INTO Dong(name, gu, latitude, longitude) values ('${value}', '${arr[0]}', ${y}, ${x})`,
+          )
+          .catch(err => console.log(err.message));
+      }
     }
   }
-  console.log(3);
+  console.log('insertAddr');
 };
 
 export const getDate = () => {
@@ -102,11 +106,11 @@ export const getDate = () => {
 // 거래정보 삽입
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-
+  ymd = 201902;
+  date = 202202;
   while (ymd <= date) {
-    console.log(ymd, date);
+    console.log(ymd);
     for (const code in regionCodes) {
-      console.log(code);
       await propertyApi(code, ymd.toString()).then(async items => {
         for (const item of items) {
           await db
@@ -134,16 +138,16 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
     ymd =
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
   }
-  console.log(4);
+  console.log('insertProperty');
 };
 
 const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 202103;
+  ymd = 201902;
+  date = 202202;
   while (ymd <= date) {
-    console.log(ymd, date);
+    // console.log(ymd);
     for (const code in regionCodes) {
-      console.log(code);
       await leasePropertyApi(code, ymd.toString())
         .then(async items => {
           for (const item of items) {
@@ -163,7 +167,7 @@ const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
     ymd =
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
   }
-  console.log(4);
+  console.log('insertLeaseProperty');
 };
 
 export const getRecentDealAmount = async (
@@ -188,7 +192,6 @@ const updateApartment = async () => {
   const apartments = await db
     .executeSql(`SELECT name FROM Apartment`)
     .then(res => res[0].rows);
-
   for (let i = 0; i < apartments.length; i++) {
     const {name} = apartments.item(i);
     const maxCount = await db.executeSql(
@@ -201,13 +204,12 @@ const updateApartment = async () => {
         }`,
       )
       .then(res => res[0].rows.item(0).area);
-    const dealAmount = getRecentDealAmount('Deal', name, area);
+    const dealAmount = await getRecentDealAmount('Deal', name, area);
 
     await db.executeSql(
       `UPDATE Apartment SET area = ${area}, dealAmount=${dealAmount} WHERE name="${name}"`,
     );
   }
-  console.log(5);
 };
 
 const updateDong = async () => {
@@ -226,7 +228,7 @@ const updateDong = async () => {
       } WHERE name = "${dong}"`,
     );
   }
-  console.log(6);
+  console.log(2);
 };
 
 const updateGu = async () => {
@@ -244,7 +246,7 @@ const updateGu = async () => {
       } WHERE name = "${gu}"`,
     );
   }
-  console.log(7);
+  console.log(3);
 };
 
 const selectData = async (
@@ -261,7 +263,6 @@ const selectData = async (
         items.push(res[0].rows.item(i));
       }
     }
-
     return items;
   } catch (err) {
     throw err;

@@ -29,10 +29,9 @@ const gap = graphWidth / 36;
 type Props = {
   dealInfoGroup: ResultSetRowList;
   type: 'Deal' | 'Lease';
-  loading: boolean;
 };
 
-const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
+const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
   const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
   const x = useSharedValue(graphWidth);
@@ -98,7 +97,7 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
         },
       ],
     };
-  }, [x, dataIndex, graphData]);
+  }, [x.value, dataIndex, graphData]);
 
   const lineAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -137,80 +136,68 @@ const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   });
 
   return (
-    <GestureHandlerRootView>
-      <PanGestureHandler onGestureEvent={gestureHandler}>
-        <Animated.View style={styles.graphContainer}>
-          <Svg
-            height={graphHeight + 4}
-            width={graphWidth}
-            viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
-            <GraphBackground
-              graphHeight={graphHeight}
-              graphWidth={graphWidth}
-              line={4}
-              maxValue={graphHeight}
-              gap={graphHeight / 3}
-            />
-            {!loading && (
-              <Path
-                d={path}
-                fill="none"
-                stroke={type === 'Deal' ? color.main : '#3D9752'}
-                strokeWidth={3}
-              />
-            )}
-          </Svg>
-          {!loading && (
-            <>
-              <Animated.View style={[styles.line, lineAnimatedStyle]} />
-              <Animated.View
-                style={[
-                  circleAnimatedStyle,
-                  {
-                    width: radius * 2,
-                    height: radius * 2,
-                    borderRadius: radius,
-                    backgroundColor: type === 'Deal' ? color.main : '#3D9752',
-                  },
-                ]}
-              />
-              <Animated.View
-                style={[styles.tooltip, tooltipAnimatedStyle]}
-                onLayout={event =>
-                  setTooltipWidth(event.nativeEvent.layout.width)
-                }>
-                <Text style={{color: 'white', fontWeight: '500'}}>
-                  {tooltipText}
-                </Text>
-              </Animated.View>
-              <View style={styles.chartContainer}>
-                {graphData.map((data, index) => (
-                  <Animated.View
-                    key={index}
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: -gap / 4 + gap * index + 0.25,
-                      width: gap / 2,
-                      height:
-                        maxCount > 0
-                          ? ((data.count / maxCount) * chartHeight) / 1.5
-                          : 0,
-                      backgroundColor:
-                        dataIndex.value === index
-                          ? type === 'Deal'
-                            ? color.main
-                            : '#3D9752'
-                          : 'darkgray',
-                    }}
-                  />
-                ))}
-              </View>
-            </>
-          )}
+    <PanGestureHandler onGestureEvent={gestureHandler}>
+      <Animated.View style={styles.graphContainer}>
+        <Svg
+          height={graphHeight + 4}
+          width={graphWidth}
+          viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
+          <GraphBackground
+            graphHeight={graphHeight}
+            graphWidth={graphWidth}
+            line={4}
+            maxValue={graphHeight}
+            gap={graphHeight / 3}
+          />
+          <Path
+            d={path}
+            fill="none"
+            stroke={type === 'Deal' ? color.main : '#3D9752'}
+            strokeWidth={3}
+          />
+        </Svg>
+        <Animated.View style={[styles.line, lineAnimatedStyle]} />
+        <Animated.View
+          style={[
+            circleAnimatedStyle,
+            {
+              width: radius * 2,
+              height: radius * 2,
+              borderRadius: radius,
+              backgroundColor: type === 'Deal' ? color.main : '#3D9752',
+            },
+          ]}
+        />
+        <Animated.View
+          style={[styles.tooltip, tooltipAnimatedStyle]}
+          onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
+          <Text style={{color: 'white', fontWeight: '500'}}>{tooltipText}</Text>
         </Animated.View>
-      </PanGestureHandler>
-    </GestureHandlerRootView>
+        <View style={styles.chartContainer}>
+          {graphData.map((data, index) => (
+            <Animated.View
+              key={index}
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: -gap / 4 + gap * index + 0.25,
+                width: gap / 2,
+                height:
+                  maxCount > 0
+                    ? ((data.count / maxCount) * chartHeight) / 1.5
+                    : 0,
+                backgroundColor:
+                  dataIndex.value === index
+                    ? type === 'Deal'
+                      ? color.main
+                      : '#3D9752'
+                    : 'darkgray',
+              }}
+            />
+          ))}
+        </View>
+      </Animated.View>
+    </PanGestureHandler>
   );
 };
 

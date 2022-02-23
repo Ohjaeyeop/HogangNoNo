@@ -24,7 +24,7 @@ export const getGraphPath = (
     path +=
       lineType === 'S'
         ? `S${prevX + gap / 2} ${y}, ${x} ${y} `
-        : graphData[i] === 0
+        : graphData[i] === 0 || graphData[i - 1] === 0
         ? `M${x} ${y} `
         : `Q${prevX * 0.8 + x * 0.2} ${prevY} ${x} ${y} `;
     prevX = x;

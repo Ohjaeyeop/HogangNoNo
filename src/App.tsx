@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Home from './components/Home';
 import * as db from './db/db';
 import {NavigationContainer} from '@react-navigation/native';
@@ -8,7 +8,7 @@ import {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import Detail from './components/Detail';
-import {Linking} from 'react-native';
+import {ActivityIndicator, Linking} from 'react-native';
 import {dong} from './data/regionInfos';
 
 type StackParamList = {
@@ -22,6 +22,7 @@ export type DetailProps = NativeStackScreenProps<StackParamList, 'Detail'>;
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const App = () => {
+  const [loading, setLoading] = useState(true);
   const linking = {
     prefixes: ['hohoho://'],
     config: {
@@ -62,9 +63,11 @@ const App = () => {
   };
 
   useEffect(() => {
-    db.init();
+    db.init().then(() => setLoading(false));
   }, []);
-  return (
+  return loading ? (
+    <ActivityIndicator />
+  ) : (
     <NavigationContainer linking={linking}>
       <Stack.Navigator>
         <Stack.Screen

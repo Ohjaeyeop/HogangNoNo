@@ -46,12 +46,11 @@ const DealInfo = ({
     <View>
       <View style={styles.apartmentInfo}>
         <Text style={{fontSize: 14, color: 'black'}}>{buildYear}년</Text>
-        <Icon
-          name={'share'}
-          size={20}
-          color={color.main}
-          onPress={() => onShare()}
-        />
+        <TouchableOpacity
+          style={{height: '100%', width: 44, alignItems: 'center'}}
+          onPress={() => onShare()}>
+          <Icon name={'share'} size={20} color={color.main} />
+        </TouchableOpacity>
       </View>
       <View style={styles.dealInfoContainer}>
         <View style={styles.selectorView}>
@@ -102,11 +101,7 @@ const DealInfo = ({
             {`${hundredMillion} ${tenMillion}`.trim()}
           </Text>
         </View>
-        <DealInfoGraph
-          dealInfoGroup={dealInfoGroup}
-          type={type}
-          loading={areaChangingLoading || typeChangingLoading}
-        />
+        <DealInfoGraph dealInfoGroup={dealInfoGroup} type={type} />
         <DealList dealInfoList={dealInfoList} />
       </View>
     </View>
@@ -147,7 +142,7 @@ const styles = StyleSheet.create({
   },
   apartmentInfo: {
     padding: 12,
-    paddingHorizontal: 20,
+    paddingLeft: 20,
     borderBottomWidth: 10,
     borderColor: color.gray,
     flexDirection: 'row',
