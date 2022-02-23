@@ -12,7 +12,7 @@ export const getGraphPath = (
       ? graphHeight
       : ((maxValue - graphData[0]) / diff) * graphHeight;
   let x = startPoint;
-  let prevX = 0;
+  let prevX = x;
   let prevY = y;
   let path = `M${startPoint} ${y} `;
 
