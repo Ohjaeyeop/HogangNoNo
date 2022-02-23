@@ -25,7 +25,7 @@ const ItemMarker = ({
           width={64}
           height={54}
           anchor={{x: -1, y: 1}}>
-          <ImageBackground
+          {/*<ImageBackground
             source={require('../../../assets/images/marker.png')}
             resizeMode="stretch"
             style={{
@@ -47,7 +47,7 @@ const ItemMarker = ({
                 : item.dealAmount}
               억
             </Text>
-          </ImageBackground>
+          </ImageBackground>*/}
         </Marker>
       ) : (
         <Marker
