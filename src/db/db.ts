@@ -271,6 +271,8 @@ export const getDealInfo = async (
 ) => {
   let dealInfoList: Deal<typeof table>[] = [];
   let dealInfoGroup: GroupByDate[] = [];
+  let count = 0;
+  let sum = 0;
 
   await firestore()
     .collection(table)
@@ -280,8 +282,9 @@ export const getDealInfo = async (
     .orderBy('month', 'desc')
     .orderBy('day', 'desc')
     .get()
-    .then(querySnapshot =>
-      querySnapshot.docs.map(doc =>
+    .then(querySnapshot => {
+      const {year, month} = querySnapshot.docs[0].data();
+      querySnapshot.docs.map(doc => {
         dealInfoList.push({
           year: doc.data().year,
           month: doc.data().month,
@@ -291,9 +294,20 @@ export const getDealInfo = async (
           apartmentName: doc.data().apartmentName,
           floor: doc.data().floor,
           monthlyRent: doc.data().monthlyRent && doc.data().monthlyRent,
-        }),
-      ),
-    );
+        });
+        if (doc.data().year === year && doc.data().month === month) {
+          count++;
+          sum += doc.data().dealAmount;
+        }
+      });
+    })
+    .catch(() => {
+      return {
+        dealInfoList: [],
+        dealIngoGroup: [],
+        recentDealAmount: 0,
+      };
+    });
 
   dealInfoList.forEach(dealInfo => {
     let flag = false;
@@ -322,40 +336,11 @@ export const getDealInfo = async (
     }
   });
 
-  return {dealInfoList, dealInfoGroup};
-};
-
-export const getRecentDealAmount = async (
-  table: 'Deal' | 'Lease',
-  name: string,
-  area: number,
-) => {
-  let count = 0;
-  let sum = 0;
-
-  await firestore()
-    .collection(table)
-    .where('apartmentName', '==', name)
-    .where('area', '==', area)
-    .orderBy('year', 'desc')
-    .orderBy('month', 'desc')
-    .get()
-    .then(querySnapshot => {
-      const {year, month} = querySnapshot.docs[0].data();
-      for (let i = 0; i < querySnapshot.docs.length; i++) {
-        if (
-          querySnapshot.docs[i].data().year === year &&
-          querySnapshot.docs[i].data().month === month
-        ) {
-          count++;
-          sum += querySnapshot.docs[i].data().dealAmount;
-        } else {
-          break;
-        }
-      }
-    });
-
-  return Math.round((sum / count) * 10) / 10;
+  return {
+    dealInfoList,
+    dealInfoGroup,
+    recentDealAmount: Math.round((sum / count) * 10) / 10,
+  };
 };
 
 export const getAreaList = async (apartmentName: string) => {

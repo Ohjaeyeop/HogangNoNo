@@ -11,7 +11,7 @@ export type DealInfoGroupType = {
 
 export const getGraphData = (dealInfoGroup: GroupByDate[]) => {
   let i = 0;
-  let j = 0;
+  let j = dealInfoGroup.length - 1;
   let {date, ymd} = getDate();
   const arr: DealInfoGroupType[] = [];
   ymd = 201902;
@@ -19,7 +19,7 @@ export const getGraphData = (dealInfoGroup: GroupByDate[]) => {
 
   while (ymd <= date) {
     if (
-      j < dealInfoGroup.length &&
+      j >= 0 &&
       ymd === dealInfoGroup[j].year * 100 + dealInfoGroup[j].month
     ) {
       arr.push({
@@ -33,7 +33,7 @@ export const getGraphData = (dealInfoGroup: GroupByDate[]) => {
           displayedAmount(dealInfoGroup[j].avg).tenMillion
         ).trim(),
       });
-      j++;
+      j--;
     } else {
       arr.push({
         amount: i > 0 ? arr[i - 1].amount : 0,

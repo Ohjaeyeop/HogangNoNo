@@ -15,13 +15,7 @@ import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
 import {color} from '../theme/color';
 import Modal from 'react-native-modalbox';
-import {
-  Deal,
-  getAreaList,
-  getDealInfo,
-  getRecentDealAmount,
-  GroupByDate,
-} from '../db/db';
+import {Deal, getAreaList, getDealInfo, GroupByDate} from '../db/db';
 import {StackActions, useFocusEffect} from '@react-navigation/native';
 import TaxInfo from './detail/TaxInfo';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -76,10 +70,8 @@ const Detail = ({navigation, route}: DetailProps) => {
     await getDealInfo(type, name, selectedArea).then(res => {
       setDealInfoList(res.dealInfoList);
       setDealInfoGroup(res.dealInfoGroup);
+      setAmount(res.recentDealAmount);
     });
-    await getRecentDealAmount(type, name, selectedArea)
-      .then(res => setAmount(res))
-      .catch(() => setAmount(0));
   };
 
   const changeArea = (area: number) => {
@@ -115,7 +107,7 @@ const Detail = ({navigation, route}: DetailProps) => {
     if (
       dealInfoList !== undefined &&
       dealInfoGroup !== undefined &&
-      areaList !== undefined
+      areaList.length !== 0
     ) {
       setLoading(false);
     }
@@ -129,7 +121,7 @@ const Detail = ({navigation, route}: DetailProps) => {
     }
   };
 
-  return loading || !dealInfoGroup || !dealInfoList || !areaList ? (
+  return loading || !dealInfoGroup || !dealInfoList || !areaList.length ? (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <ActivityIndicator size="large" />
     </View>
