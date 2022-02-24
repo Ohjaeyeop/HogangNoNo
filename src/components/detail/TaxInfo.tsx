@@ -9,6 +9,7 @@ import GraphBackground from './GraphBackground';
 import {getGraphPath} from '../../libs/getGraphPath';
 import Slider from '../../share/Slider';
 import {calculateGraphAxisInfo} from '../../libs/calculateGraphAxisInfo';
+import useDebounceEvent from '../../hooks/useDebounceEvent';
 
 type Tax = {
   year: number;
@@ -21,7 +22,7 @@ type Tax = {
 const graphWidth = (Dimensions.get('window').width - 40) * 0.8;
 const graphHeight = 80;
 const barWidth = 30;
-const gap = (graphWidth - barWidth * 3) / 3 + barWidth;
+const xgap = (graphWidth - barWidth * 3) / 3 + barWidth;
 
 const TaxInfo = ({amount}: {amount: number}) => {
   const columnNames = ['년도', '공시가', '재산세', '종부세', '합계'];
@@ -57,27 +58,33 @@ const TaxInfo = ({amount}: {amount: number}) => {
     return hundredMillion + tenThousand;
   };
 
+  const changeRate = (rate: number) => {
+    setIncreaseRate(rate);
+  };
+  const enqueueChangeRate = useDebounceEvent(100);
+
   useEffect(() => {
     const taxList = getTaxList(amount, increaseRate);
-    maximum.current = calculateGraphAxisInfo(taxList[2].tax).maxValue;
-    setLine(calculateGraphAxisInfo(taxList[2].tax).line);
-    setAxisGap(calculateGraphAxisInfo(taxList[2].tax).gap);
+    const {maxValue, line, gap} = calculateGraphAxisInfo(taxList[2].tax);
+    maximum.current = maxValue;
+    setLine(line);
+    setAxisGap(gap);
     defaultPath.current = getGraphPath(
       maximum.current,
       maximum.current,
-      gap,
+      xgap,
       graphHeight,
       taxList.map(tax => tax.tax),
-      gap / 2,
+      xgap / 2,
       'Q',
     );
     wealthPath.current = getGraphPath(
       maximum.current,
       maximum.current,
-      gap,
+      xgap,
       graphHeight,
       taxList.map(tax => tax.wealthTax),
-      gap / 2,
+      xgap / 2,
       'Q',
     );
     setExpectedTaxList(taxList);
@@ -179,16 +186,18 @@ const TaxInfo = ({amount}: {amount: number}) => {
                     <View
                       style={{
                         width: barWidth,
-                        height:
+                        height: Math.round(
                           (graphHeight * taxObj.defaultTax) / maximum.current,
+                        ),
                         backgroundColor: '#FA6400',
                       }}
                     />
                     <View
                       style={{
                         width: barWidth,
-                        height:
+                        height: Math.round(
                           (graphHeight * taxObj.wealthTax) / maximum.current,
+                        ),
                         backgroundColor: color.main,
                       }}
                     />
@@ -230,7 +239,7 @@ const TaxInfo = ({amount}: {amount: number}) => {
             width={140}
             maxValue={50}
             startValue={22}
-            setIncreaseRate={setIncreaseRate}
+            changeRate={enqueueChangeRate(changeRate)}
           />
         </View>
       </View>

@@ -1,15 +1,15 @@
 import 'react-native-gesture-handler';
 import React, {useEffect} from 'react';
 import Home from './components/Home';
-import * as db from './db/db';
 import {NavigationContainer} from '@react-navigation/native';
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import Detail from './components/Detail';
-import {Linking} from 'react-native';
+import {Linking, View} from 'react-native';
 import {dong} from './data/regionInfos';
+import * as db from './db/db';
 
 type StackParamList = {
   Home: undefined;
@@ -61,9 +61,6 @@ const App = () => {
     },
   };
 
-  useEffect(() => {
-    db.init();
-  }, []);
   return (
     <NavigationContainer linking={linking}>
       <Stack.Navigator>

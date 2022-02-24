@@ -2,6 +2,7 @@ import SQLite from 'react-native-sqlite-storage';
 import {propertyApi, leasePropertyApi} from '../apis/PropertyApi';
 import {dong, gu, regionCodes} from '../data/regionInfos';
 import {addrToCoord} from '../apis/GeocodeApi';
+import firestore from '@react-native-firebase/firestore';
 
 SQLite.enablePromise(true);
 
@@ -12,33 +13,37 @@ export const init = async () => {
     {
       name: 'propertyDB.db',
       location: 'default',
+      createFromLocation: '~www/propertyDB.db',
     },
     () => {},
     error => {
       console.log(error.message);
     },
   );
-  /*  await dropTable(db);
-  await createTable(db);*/
-  // await insertAddressData(db);
-  /*await insertPropertyData(db);
-  await updateApartment();
-  await updateDong();
-  await updateGu();*/
-  //await insertLeasePropertyData(db);
+
+  /*  const isTable: number = await db
+    .executeSql("SELECT COUNT(*) as c FROM sqlite_master where name='Lease'")
+    .then(res => res[0].rows.item(0).c);
+  if (!isTable) {
+    await createTable(db);
+    await insertAddressData(db);
+    await insertPropertyData(db);
+    await updateApartment();
+    await updateDong();
+    await updateGu();
+    await insertLeasePropertyData(db);
+  }*/
 };
 
 const dropTable = async (db: SQLite.SQLiteDatabase) => {
-  /*  await db.executeSql('Drop TABLE Gu');
+  await db.executeSql('Drop TABLE Gu');
   await db.executeSql('Drop TABLE Dong');
   await db.executeSql('Drop TABLE Apartment');
-  await db.executeSql('Drop TABLE Deal');*/
-  await db.executeSql('Drop TABLE Lease');
-  console.log(1);
+  await db.executeSql('Drop TABLE Deal');
 };
 
 const createTable = async (db: SQLite.SQLiteDatabase) => {
-  /*  await db.executeSql(
+  await db.executeSql(
     'CREATE TABLE "Gu" ( "name" TEXT, "dealAmount" NUMERIC DEFAULT 0, "latitude" NUMERIC, "longitude" NUMERIC, PRIMARY KEY("name") )',
   );
   await db.executeSql(
@@ -49,13 +54,12 @@ const createTable = async (db: SQLite.SQLiteDatabase) => {
   );
   await db.executeSql(
     'CREATE TABLE "Deal" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, FOREIGN KEY("apartmentName") REFERENCES "Apartment"("name"), PRIMARY KEY("id" AUTOINCREMENT) )',
-  );*/
+  );
   await db
     .executeSql(
       'CREATE TABLE "Lease" ( "id" INTEGER UNIQUE, "year" INTEGER, "month" INTEGER, "day" INTEGER, "dealAmount" INTEGER, "monthlyRent" INTEGER, "area" NUMERIC, "apartmentName" TEXT, "floor" INTEGER, PRIMARY KEY("id" AUTOINCREMENT) )',
     )
     .catch(err => console.log(err.message));
-  console.log(2);
 };
 
 // 구, 동 정보 삽입
@@ -74,17 +78,18 @@ const insertAddressData = async (db: SQLite.SQLiteDatabase) => {
 
   for (const value of dong) {
     const arr = value.split(' ');
-    const res = await addrToCoord(`서울특별시 ${value}`);
-    if (res) {
-      const {x, y} = res;
-      await db
-        .executeSql(
-          `INSERT INTO Dong(name, gu, latitude, longitude) values ('${value}', '${arr[0]}', ${y}, ${x})`,
-        )
-        .catch(err => console.log(err.message, arr[1]));
+    if (gu.includes(arr[0])) {
+      const res = await addrToCoord(`서울특별시 ${value}`);
+      if (res) {
+        const {x, y} = res;
+        await db
+          .executeSql(
+            `INSERT INTO Dong(name, gu, latitude, longitude) values ('${value}', '${arr[0]}', ${y}, ${x})`,
+          )
+          .catch(err => console.log(err.message));
+      }
     }
   }
-  console.log(3);
 };
 
 export const getDate = () => {
@@ -102,11 +107,10 @@ export const getDate = () => {
 // 거래정보 삽입
 const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-
+  ymd = 201902;
+  date = 202202;
   while (ymd <= date) {
-    console.log(ymd, date);
     for (const code in regionCodes) {
-      console.log(code);
       await propertyApi(code, ymd.toString()).then(async items => {
         for (const item of items) {
           await db
@@ -134,16 +138,15 @@ const insertPropertyData = async (db: SQLite.SQLiteDatabase) => {
     ymd =
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
   }
-  console.log(4);
 };
 
 const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
   let {date, ymd} = getDate();
-  ymd = 202103;
+  ymd = 201902;
+  date = 202202;
   while (ymd <= date) {
-    console.log(ymd, date);
+    // console.log(ymd);
     for (const code in regionCodes) {
-      console.log(code);
       await leasePropertyApi(code, ymd.toString())
         .then(async items => {
           for (const item of items) {
@@ -163,23 +166,6 @@ const insertLeasePropertyData = async (db: SQLite.SQLiteDatabase) => {
     ymd =
       (ymd + 1) % 100 === 13 ? (Math.floor(ymd / 100) + 1) * 100 + 1 : ymd + 1;
   }
-  console.log(4);
-};
-
-export const getRecentDealAmount = async (
-  table: string,
-  name: string,
-  area: number,
-) => {
-  try {
-    return await db
-      .executeSql(
-        `SELECT avg(dealAmount) as dealAmount FROM ${table} WHERE apartmentName = "${name}" and area = ${area} group by year, month order by year desc, month desc`,
-      )
-      .then(res => Math.round(res[0].rows.item(0).dealAmount * 10) / 10);
-  } catch (err) {
-    throw err;
-  }
 };
 
 const updateApartment = async () => {
@@ -188,7 +174,6 @@ const updateApartment = async () => {
   const apartments = await db
     .executeSql(`SELECT name FROM Apartment`)
     .then(res => res[0].rows);
-
   for (let i = 0; i < apartments.length; i++) {
     const {name} = apartments.item(i);
     const maxCount = await db.executeSql(
@@ -201,13 +186,12 @@ const updateApartment = async () => {
         }`,
       )
       .then(res => res[0].rows.item(0).area);
-    const dealAmount = getRecentDealAmount('Deal', name, area);
+    const dealAmount = await getRecentDealAmount('Deal', name, area);
 
     await db.executeSql(
       `UPDATE Apartment SET area = ${area}, dealAmount=${dealAmount} WHERE name="${name}"`,
     );
   }
-  console.log(5);
 };
 
 const updateDong = async () => {
@@ -226,7 +210,6 @@ const updateDong = async () => {
       } WHERE name = "${dong}"`,
     );
   }
-  console.log(6);
 };
 
 const updateGu = async () => {
@@ -244,28 +227,26 @@ const updateGu = async () => {
       } WHERE name = "${gu}"`,
     );
   }
-  console.log(7);
 };
 
 const selectData = async (
   {startX, startY, endX, endY}: CoordType,
   table: PropertyType,
 ) => {
-  try {
-    const res = await db.executeSql(
-      `SELECT * FROM ${table} WHERE latitude >= ${startX} and latitude <= ${endX} and longitude >= ${startY} and longitude <= ${endY} `,
+  let items: Property<typeof table>[] = [];
+  await firestore()
+    .collection(table)
+    .where('latitude', '>=', startX)
+    .where('latitude', '<=', endX)
+    .get()
+    .then(querySnapshot =>
+      querySnapshot.docs.map(doc =>
+        items.push(doc.data() as Property<typeof table>),
+      ),
     );
-    let items: Property<typeof table>[] = [];
-    if (res) {
-      for (let i = 0; i < res[0].rows.length; i++) {
-        items.push(res[0].rows.item(i));
-      }
-    }
-
-    return items;
-  } catch (err) {
-    throw err;
-  }
+  return items.filter(
+    item => item.longitude >= startY && item.longitude <= endY,
+  );
 };
 
 const zoomScale = {
@@ -284,33 +265,98 @@ export const getDisplayedData = async (
 };
 
 export const getDealInfo = async (
-  table: string,
+  table: 'Deal' | 'Lease',
   apartmentName: string,
   area: number,
 ) => {
-  const selectQuery = `SELECT * FROM ${table} WHERE apartmentName="${apartmentName}" and area=${area} order by year desc, month desc, day desc`;
-  try {
-    const dealInfoList = await db
-      .executeSql(selectQuery)
-      .then(res => res[0].rows);
-    const dealInfoGroup = await db
-      .executeSql(
-        `SELECT count(*) as count, avg(dealAmount) as avg, year, month FROM (${selectQuery}) group by year, month`,
-      )
-      .then(res => res[0].rows);
+  let dealInfoList: Deal<typeof table>[] = [];
+  let dealInfoGroup: GroupByDate[] = [];
+  let count = 0;
+  let sum = 0;
 
-    return {dealInfoList, dealInfoGroup};
-  } catch (err) {
-    throw err;
-  }
+  await firestore()
+    .collection(table)
+    .where('apartmentName', '==', apartmentName)
+    .where('area', '==', area)
+    .orderBy('year', 'desc')
+    .orderBy('month', 'desc')
+    .orderBy('day', 'desc')
+    .get()
+    .then(querySnapshot => {
+      const {year, month} = querySnapshot.docs[0].data();
+      querySnapshot.docs.map(doc => {
+        dealInfoList.push({
+          year: doc.data().year,
+          month: doc.data().month,
+          day: doc.data().day,
+          dealAmount: doc.data().dealAmount,
+          area: doc.data().area,
+          apartmentName: doc.data().apartmentName,
+          floor: doc.data().floor,
+          monthlyRent: doc.data().monthlyRent && doc.data().monthlyRent,
+        });
+        if (doc.data().year === year && doc.data().month === month) {
+          count++;
+          sum += doc.data().dealAmount;
+        }
+      });
+    })
+    .catch(() => {
+      return {
+        dealInfoList: [],
+        dealIngoGroup: [],
+        recentDealAmount: 0,
+      };
+    });
+
+  dealInfoList.forEach(dealInfo => {
+    let flag = false;
+    for (let i = 0; i < dealInfoGroup.length; i++) {
+      if (
+        dealInfoGroup[i].month === dealInfo.month &&
+        dealInfoGroup[i].year === dealInfo.year
+      ) {
+        dealInfoGroup[i].avg =
+          (dealInfoGroup[i].avg * dealInfoGroup[i].count +
+            dealInfo.dealAmount) /
+          (dealInfoGroup[i].count + 1);
+        dealInfoGroup[i].count++;
+        flag = true;
+        break;
+      }
+    }
+
+    if (!flag) {
+      dealInfoGroup.push({
+        month: dealInfo.month,
+        year: dealInfo.year,
+        count: 1,
+        avg: dealInfo.dealAmount,
+      });
+    }
+  });
+
+  return {
+    dealInfoList,
+    dealInfoGroup,
+    recentDealAmount: Math.round((sum / count) * 10) / 10,
+  };
 };
 
 export const getAreaList = async (apartmentName: string) => {
-  return await db
-    .executeSql(
-      `SELECT DISTINCT area FROM Deal WHERE apartmentName="${apartmentName}" order by area asc`,
-    )
-    .then(res => res[0].rows);
+  let area: number[] = [];
+  await firestore()
+    .collection('Deal')
+    .where('apartmentName', '==', apartmentName)
+    .orderBy('area', 'asc')
+    .get()
+    .then(querySnapshot => {
+      querySnapshot.docs.map(
+        doc => !area.includes(doc.data().area) && area.push(doc.data().area),
+      );
+    });
+
+  return area;
 };
 
 type CoordType = {
@@ -334,8 +380,7 @@ export type Property<T extends PropertyType> = {
   area: T extends 'Apartment' ? number : never;
 };
 
-export type DealType = {
-  id: number;
+export type Deal<T extends 'Deal' | 'Lease'> = {
   year: number;
   month: number;
   day: number;
@@ -343,10 +388,14 @@ export type DealType = {
   area: number;
   apartmentName: string;
   floor: number;
+  monthlyRent: T extends 'Lease' ? number : never;
 };
 
-export type LeaseType = DealType & {
-  monthlyRent: number;
+export type GroupByDate = {
+  month: number;
+  year: number;
+  count: number;
+  avg: number;
 };
 
 export const getPropertyTypeByZoom = (zoom: number): PropertyType => {

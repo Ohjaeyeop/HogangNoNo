@@ -24,6 +24,7 @@ const Home = () => {
     latitude: 37.50882651313064,
     longitude: 127.06310347509722,
   });
+  const [myLocation, setMyLocation] = useState<Coord>();
   const [visible, setVisible] = useState(true);
   const headerRef = useRef<Animatable.View & View>(null);
   const myLocationRef = useRef<
@@ -51,15 +52,13 @@ const Home = () => {
         Geolocation.getCurrentPosition(
           position => {
             const {latitude, longitude} = position.coords;
-            setLocation({
-              latitude,
-              longitude,
-            });
+            setMyLocation({latitude, longitude});
+            setLocation({latitude, longitude});
           },
           error => {
-            console.log(error.code, error.message);
+            console.log(error.message);
           },
-          {enableHighAccuracy: true, timeout: 15000, maximumAge: 1000},
+          {enableHighAccuracy: false, timeout: 2000, maximumAge: 0},
         );
       }
     });
@@ -82,18 +81,30 @@ const Home = () => {
         <View style={{height: safeArea.top, backgroundColor: color.main}} />
       )}
       <StatusBar barStyle={'light-content'} />
-      <MapView location={location} handlePress={handlePress} />
+      <MapView
+        location={location}
+        myLocation={myLocation}
+        handlePress={handlePress}
+      />
       <Animatable.View
         style={[{top: safeArea.top}, styles.header]}
         ref={headerRef}>
         <Icon name={'home-filled'} size={20} style={{color: 'white'}} />
       </Animatable.View>
-      <AnimatableTouchableOpacity
+      <Animatable.View
         style={[{top: safeArea.top + 60}, styles.myLocation]}
-        onPress={() => getMyLocation()}
         ref={myLocationRef}>
-        <Icon name={'my-location'} size={18} style={styles.locationIcon} />
-      </AnimatableTouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => getMyLocation()}>
+          <Icon name={'my-location'} size={18} style={styles.locationIcon} />
+        </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 };

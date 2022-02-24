@@ -14,18 +14,12 @@ type Props = {
   width: number;
   maxValue: number;
   startValue: number;
-  setIncreaseRate: React.Dispatch<React.SetStateAction<number>>;
+  changeRate: (rate: number) => void;
 };
 
 const radius = 10;
 
-const Slider = ({
-  height,
-  width,
-  startValue,
-  maxValue,
-  setIncreaseRate,
-}: Props) => {
+const Slider = ({height, width, startValue, maxValue, changeRate}: Props) => {
   const offset = useSharedValue((width * startValue) / maxValue - radius);
 
   const animatedCircleStyles = useAnimatedStyle(() => {
@@ -46,7 +40,7 @@ const Slider = ({
         width - radius,
         Math.max(0, event.translationX + start.value),
       );
-      runOnJS(setIncreaseRate)(
+      runOnJS(changeRate)(
         Math.round((maxValue * offset.value) / (width - radius)),
       );
     },

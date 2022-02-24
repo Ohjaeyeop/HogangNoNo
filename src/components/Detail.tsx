@@ -15,9 +15,8 @@ import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
 import {color} from '../theme/color';
 import Modal from 'react-native-modalbox';
-import {getAreaList, getDealInfo, getRecentDealAmount} from '../db/db';
-import {ResultSetRowList} from 'react-native-sqlite-storage';
-import {useFocusEffect} from '@react-navigation/native';
+import {Deal, getAreaList, getDealInfo, GroupByDate} from '../db/db';
+import {StackActions, useFocusEffect} from '@react-navigation/native';
 import TaxInfo from './detail/TaxInfo';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -34,8 +33,8 @@ const Detail = ({navigation, route}: DetailProps) => {
   const [type, setType] = useState<'Deal' | 'Lease'>('Deal');
 
   const [areaList, setAreaList] = useState<number[]>([]);
-  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
-  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
+  const [dealInfoList, setDealInfoList] = useState<Deal<typeof type>[]>();
+  const [dealInfoGroup, setDealInfoGroup] = useState<GroupByDate[]>();
 
   const typeModalRef = useRef<Modal>(null);
   const areaModalRef = useRef<Modal>(null);
@@ -71,10 +70,8 @@ const Detail = ({navigation, route}: DetailProps) => {
     await getDealInfo(type, name, selectedArea).then(res => {
       setDealInfoList(res.dealInfoList);
       setDealInfoGroup(res.dealInfoGroup);
+      setAmount(res.recentDealAmount);
     });
-    await getRecentDealAmount(type, name, selectedArea)
-      .then(res => setAmount(res))
-      .catch(() => setAmount(0));
   };
 
   const changeArea = (area: number) => {
@@ -102,14 +99,7 @@ const Detail = ({navigation, route}: DetailProps) => {
   useFocusEffect(
     useCallback(() => {
       getData('Deal', name, area);
-      getAreaList(name).then(res => {
-        const arr: number[] = [];
-        [...new Array(res.length).keys()].map(index => {
-          const area = res.item(index).area;
-          arr.push(area);
-        });
-        setAreaList(arr);
-      });
+      getAreaList(name).then(res => setAreaList(res));
     }, [name, area]),
   );
 
@@ -117,13 +107,21 @@ const Detail = ({navigation, route}: DetailProps) => {
     if (
       dealInfoList !== undefined &&
       dealInfoGroup !== undefined &&
-      areaList !== undefined
+      areaList.length !== 0
     ) {
       setLoading(false);
     }
   }, [areaList, dealInfoGroup, dealInfoList]);
 
-  return loading || !dealInfoGroup || !dealInfoList || !areaList ? (
+  const handleBackButton = () => {
+    if (navigation.canGoBack()) {
+      navigation.pop();
+    } else {
+      navigation.dispatch(StackActions.replace('Home'));
+    }
+  };
+
+  return loading || !dealInfoGroup || !dealInfoList || !areaList.length ? (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <ActivityIndicator size="large" />
     </View>
@@ -150,7 +148,7 @@ const Detail = ({navigation, route}: DetailProps) => {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => navigation.pop()}
+          onPress={() => handleBackButton()}
           style={{position: 'absolute', left: 20, width: 44}}>
           <Icon
             size={25}

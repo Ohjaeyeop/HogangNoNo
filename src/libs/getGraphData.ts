@@ -1,5 +1,4 @@
-import {getDate} from '../db/db';
-import {ResultSetRowList} from 'react-native-sqlite-storage';
+import {getDate, GroupByDate} from '../db/db';
 import {displayedAmount} from './displayedAmount';
 
 export type DealInfoGroupType = {
@@ -10,30 +9,31 @@ export type DealInfoGroupType = {
   displayedAmount: string;
 };
 
-export const getGraphData = (dealInfoGroup: ResultSetRowList) => {
+export const getGraphData = (dealInfoGroup: GroupByDate[]) => {
   let i = 0;
-  let j = 0;
+  let j = dealInfoGroup.length - 1;
   let {date, ymd} = getDate();
   const arr: DealInfoGroupType[] = [];
   ymd = 201902;
+  date = 202202;
 
   while (ymd <= date) {
     if (
-      j < dealInfoGroup.length &&
-      ymd === dealInfoGroup.item(j).year * 100 + dealInfoGroup.item(j).month
+      j >= 0 &&
+      ymd === dealInfoGroup[j].year * 100 + dealInfoGroup[j].month
     ) {
       arr.push({
-        amount: Math.floor(dealInfoGroup.item(j).avg),
-        count: dealInfoGroup.item(j).count,
-        month: dealInfoGroup.item(j).month,
-        year: dealInfoGroup.item(j).year,
+        amount: Math.floor(dealInfoGroup[j].avg),
+        count: dealInfoGroup[j].count,
+        month: dealInfoGroup[j].month,
+        year: dealInfoGroup[j].year,
         displayedAmount: (
-          displayedAmount(dealInfoGroup.item(j).avg).hundredMillion +
+          displayedAmount(dealInfoGroup[j].avg).hundredMillion +
           ' ' +
-          displayedAmount(dealInfoGroup.item(j).avg).tenMillion
+          displayedAmount(dealInfoGroup[j].avg).tenMillion
         ).trim(),
       });
-      j++;
+      j--;
     } else {
       arr.push({
         amount: i > 0 ? arr[i - 1].amount : 0,

@@ -6,19 +6,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {ResultSetRowList} from 'react-native-sqlite-storage';
 import DealInfoGraph from './DealInfoGraph';
 import DealList from './DealList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {displayedAmount} from '../../libs/displayedAmount';
 import {color} from '../../theme/color';
+import {Deal, GroupByDate} from '../../db/db';
 
 type Props = {
   amount: number;
   area: number;
   buildYear: number;
-  dealInfoList: ResultSetRowList;
-  dealInfoGroup: ResultSetRowList;
+  dealInfoList: Deal<'Deal' | 'Lease'>[];
+  dealInfoGroup: GroupByDate[];
   modalOpen: () => void;
   areaChangingLoading: boolean;
   typeChangingLoading: boolean;
@@ -46,12 +46,11 @@ const DealInfo = ({
     <View>
       <View style={styles.apartmentInfo}>
         <Text style={{fontSize: 14, color: 'black'}}>{buildYear}년</Text>
-        <Icon
-          name={'share'}
-          size={20}
-          color={color.main}
-          onPress={() => onShare()}
-        />
+        <TouchableOpacity
+          style={{height: '100%', width: 44, alignItems: 'center'}}
+          onPress={() => onShare()}>
+          <Icon name={'share'} size={20} color={color.main} />
+        </TouchableOpacity>
       </View>
       <View style={styles.dealInfoContainer}>
         <View style={styles.selectorView}>
@@ -102,11 +101,7 @@ const DealInfo = ({
             {`${hundredMillion} ${tenMillion}`.trim()}
           </Text>
         </View>
-        <DealInfoGraph
-          dealInfoGroup={dealInfoGroup}
-          type={type}
-          loading={areaChangingLoading || typeChangingLoading}
-        />
+        <DealInfoGraph dealInfoGroup={dealInfoGroup} type={type} />
         <DealList dealInfoList={dealInfoList} />
       </View>
     </View>
@@ -147,7 +142,7 @@ const styles = StyleSheet.create({
   },
   apartmentInfo: {
     padding: 12,
-    paddingHorizontal: 20,
+    paddingLeft: 20,
     borderBottomWidth: 10,
     borderColor: color.gray,
     flexDirection: 'row',
