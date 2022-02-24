@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
-import {ResultSetRowList} from 'react-native-sqlite-storage';
 import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
@@ -15,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {getGraphPath} from '../../libs/getGraphPath';
 import GraphBackground from './GraphBackground';
+import {GroupByDate} from '../../db/db';
 
 const graphWidth = Dimensions.get('window').width - 40 - 40;
 const graphHeight = graphWidth * 0.4;
@@ -24,7 +24,7 @@ const radius = 5;
 const gap = graphWidth / 36;
 
 type Props = {
-  dealInfoGroup: ResultSetRowList;
+  dealInfoGroup: GroupByDate[];
   type: 'Deal' | 'Lease';
 };
 

@@ -6,19 +6,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {ResultSetRowList} from 'react-native-sqlite-storage';
 import DealInfoGraph from './DealInfoGraph';
 import DealList from './DealList';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {displayedAmount} from '../../libs/displayedAmount';
 import {color} from '../../theme/color';
+import {Deal, GroupByDate} from '../../db/db';
 
 type Props = {
   amount: number;
   area: number;
   buildYear: number;
-  dealInfoList: ResultSetRowList;
-  dealInfoGroup: ResultSetRowList;
+  dealInfoList: Deal<'Deal' | 'Lease'>[];
+  dealInfoGroup: GroupByDate[];
   modalOpen: () => void;
   areaChangingLoading: boolean;
   typeChangingLoading: boolean;

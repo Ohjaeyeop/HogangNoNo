@@ -65,7 +65,6 @@ const Home = () => {
   }
 
   const handlePress = () => {
-    console.log(visible);
     if (visible) {
       headerRef.current?.fadeOutUp?.(500);
       myLocationRef.current?.fadeOutRight?.(500);

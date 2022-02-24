@@ -26,6 +26,7 @@ const MapView = ({location, myLocation, handlePress}: Props) => {
   const [center, setCenter] = useState<Coord>(location);
   const [centerZoom, setCenterZoom] = useState(14);
   const [isOver, setIsOver] = useState(false);
+  const isFirst = useRef(true);
 
   useEffect(() => {
     mapRef.current?.animateToCoordinate(location);
@@ -33,10 +34,10 @@ const MapView = ({location, myLocation, handlePress}: Props) => {
 
   async function handleCameraChange(event: any) {
     setZoom(event.zoom);
-    if (event.zoom >= 9) {
+    if (event.zoom >= 9 && !isFirst.current) {
       setIsOver(false);
       const {zoom, contentRegion} = event;
-      const data = await getDisplayedData(
+      await getDisplayedData(
         {
           startX: contentRegion[0].latitude,
           startY: contentRegion[0].longitude,
@@ -44,11 +45,11 @@ const MapView = ({location, myLocation, handlePress}: Props) => {
           endY: contentRegion[2].longitude,
         },
         zoom,
-      );
-      setApartments(data);
+      ).then(data => setApartments(data));
     } else {
       setIsOver(true);
     }
+    isFirst.current = false;
   }
 
   const onPressApartment = (item: Property<'Apartment'>) => {

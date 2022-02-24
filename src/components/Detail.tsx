@@ -15,8 +15,13 @@ import {DetailProps} from '../App';
 import DealInfo from './detail/DealInfo';
 import {color} from '../theme/color';
 import Modal from 'react-native-modalbox';
-import {getAreaList, getDealInfo, getRecentDealAmount} from '../db/db';
-import {ResultSetRowList} from 'react-native-sqlite-storage';
+import {
+  Deal,
+  getAreaList,
+  getDealInfo,
+  getRecentDealAmount,
+  GroupByDate,
+} from '../db/db';
 import {StackActions, useFocusEffect} from '@react-navigation/native';
 import TaxInfo from './detail/TaxInfo';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -34,8 +39,8 @@ const Detail = ({navigation, route}: DetailProps) => {
   const [type, setType] = useState<'Deal' | 'Lease'>('Deal');
 
   const [areaList, setAreaList] = useState<number[]>([]);
-  const [dealInfoList, setDealInfoList] = useState<ResultSetRowList>();
-  const [dealInfoGroup, setDealInfoGroup] = useState<ResultSetRowList>();
+  const [dealInfoList, setDealInfoList] = useState<Deal<typeof type>[]>();
+  const [dealInfoGroup, setDealInfoGroup] = useState<GroupByDate[]>();
 
   const typeModalRef = useRef<Modal>(null);
   const areaModalRef = useRef<Modal>(null);
@@ -102,14 +107,7 @@ const Detail = ({navigation, route}: DetailProps) => {
   useFocusEffect(
     useCallback(() => {
       getData('Deal', name, area);
-      getAreaList(name).then(res => {
-        const arr: number[] = [];
-        [...new Array(res.length).keys()].map(index => {
-          const area = res.item(index).area;
-          arr.push(area);
-        });
-        setAreaList(arr);
-      });
+      getAreaList(name).then(res => setAreaList(res));
     }, [name, area]),
   );
 
