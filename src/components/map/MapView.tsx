@@ -113,6 +113,7 @@ const MapView = ({location, myLocation, handlePress}: Props) => {
             longitude: location.longitude,
           }}
           zIndex={1}
+          pinColor={'red'}
         />
       )}
     </NaverMapView>

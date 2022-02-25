@@ -18,7 +18,9 @@ const Table = ({columnNames, tableData, boldColumns, flexes}: Props) => {
           </View>
         ))}
       </View>
-      <ScrollView style={{width: '100%', maxHeight: 180}}>
+      <ScrollView
+        style={{width: '100%', maxHeight: 180}}
+        nestedScrollEnabled={true}>
         {tableData.map((row, index) => {
           return (
             <View style={styles.tableBody} key={index}>

@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import {Align, Marker} from 'react-native-nmap';
 import {Property, PropertyType} from '../../db/db';
+import {color} from '../../theme/color';
 
 const ItemMarker = ({
   item,
@@ -24,7 +25,8 @@ const ItemMarker = ({
           coordinate={{latitude: item.latitude, longitude: item.longitude}}
           width={64}
           height={54}
-          anchor={{x: -1, y: 1}}>
+          anchor={{x: -1, y: 1}}
+          pinColor={'black'}>
           {/*<ImageBackground
             source={require('../../../assets/images/marker.png')}
             resizeMode="stretch"
