@@ -15,6 +15,7 @@ import Animated, {
 import {getGraphPath} from '../../libs/getGraphPath';
 import GraphBackground from './GraphBackground';
 import {GroupByDate} from '../../db/db';
+import useDebounceEvent from '../../hooks/useDebounceEvent';
 
 const graphWidth = Dimensions.get('window').width - 40 - 40;
 const graphHeight = graphWidth * 0.4;
@@ -29,10 +30,29 @@ type Props = {
 };
 
 const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
-  const [tooltipText, setTooltipText] = useState('');
   const [tooltipWidth, setTooltipWidth] = useState(0);
   const x = useSharedValue(graphWidth);
   const graphData = getGraphData(dealInfoGroup);
+  const [tooltipText, setTooltipText] = useState(
+    `${graphData[graphData.length - 1].year}.${
+      graphData[graphData.length - 1].month < 10
+        ? `0${graphData[graphData.length - 1].month}`
+        : graphData[graphData.length - 1].month
+    } 평균 ${graphData[graphData.length - 1].displayedAmount} (${
+      graphData[graphData.length - 1].count
+    }건)`,
+  );
+  const enqueueSetTooltipText = useDebounceEvent(100);
+  const changeTooltipText = (index: number) => {
+    setTooltipText(
+      `${graphData[index].year}.${
+        graphData[index].month < 10
+          ? `0${graphData[index].month}`
+          : graphData[index].month
+      } 평균 ${graphData[index].displayedAmount} (${graphData[index].count}건)`,
+    );
+  };
+  const enqueueChangeText = enqueueSetTooltipText(changeTooltipText);
 
   const maxValue = Math.ceil(
     Math.max(...graphData.map(value => value.amount)) / 10000,
@@ -66,15 +86,7 @@ const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
   useAnimatedReaction(
     () => dataIndex.value,
     index => {
-      runOnJS(setTooltipText)(
-        `${graphData[index].year}.${
-          graphData[index].month < 10
-            ? `0${graphData[index].month}`
-            : graphData[index].month
-        } 평균 ${graphData[index].displayedAmount} (${
-          graphData[index].count
-        }건)`,
-      );
+      runOnJS(enqueueChangeText)(index);
     },
   );
 
