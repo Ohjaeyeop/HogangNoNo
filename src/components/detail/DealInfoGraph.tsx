@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {Dimensions, StyleSheet, Text, Vibration, View} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
@@ -16,6 +16,7 @@ import {getGraphPath} from '../../libs/getGraphPath';
 import GraphBackground from './GraphBackground';
 import {GroupByDate} from '../../db/db';
 import useDebounceEvent from '../../hooks/useDebounceEvent';
+import {run} from 'jest';
 
 const graphWidth = Dimensions.get('window').width - 40 - 40;
 const graphHeight = graphWidth * 0.4;
@@ -30,8 +31,8 @@ type Props = {
 };
 
 const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
-  const [tooltipWidth, setTooltipWidth] = useState(0);
   const x = useSharedValue(graphWidth);
+  const tooltipWidth = useSharedValue(0);
   const graphData = getGraphData(dealInfoGroup);
   const [tooltipText, setTooltipText] = useState(
     `${graphData[graphData.length - 1].year}.${
@@ -66,14 +67,18 @@ const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
   const maxCount = Math.max(...graphData.map(value => value.count));
 
   const diff = maxValue !== minValue ? maxValue - minValue : 1;
-  const path = getGraphPath(
-    maxValue,
-    diff,
-    gap,
-    graphHeight,
-    graphData.map(data => data.amount / 10000),
-    0,
-    'S',
+  const path = useMemo(
+    () =>
+      getGraphPath(
+        maxValue,
+        diff,
+        gap,
+        graphHeight,
+        graphData.map(data => data.amount / 10000),
+        0,
+        'S',
+      ),
+    [diff, graphData, maxValue],
   );
 
   const dataIndex = useDerivedValue(() => {
@@ -119,10 +124,10 @@ const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
       transform: [
         {
           translateX:
-            graphWidth - x.value + graphPadding >= tooltipWidth / 2
-              ? x.value - tooltipWidth / 2 > -graphPadding
-                ? x.value - graphWidth - graphPadding + tooltipWidth / 2
-                : -graphWidth - graphPadding * 2 + tooltipWidth
+            graphWidth - x.value + graphPadding >= tooltipWidth.value / 2
+              ? x.value - tooltipWidth.value / 2 > -graphPadding
+                ? x.value - graphWidth - graphPadding + tooltipWidth.value / 2
+                : -graphWidth - graphPadding * 2 + tooltipWidth.value
               : 0,
         },
       ],
@@ -168,18 +173,20 @@ const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
         <Animated.View style={[styles.line, lineAnimatedStyle]} />
         <Animated.View
           style={[
-            circleAnimatedStyle,
             {
               width: radius * 2,
               height: radius * 2,
               borderRadius: radius,
               backgroundColor: type === 'Deal' ? color.main : '#3D9752',
             },
+            circleAnimatedStyle,
           ]}
         />
         <Animated.View
           style={[styles.tooltip, tooltipAnimatedStyle]}
-          onLayout={event => setTooltipWidth(event.nativeEvent.layout.width)}>
+          onLayout={event =>
+            (tooltipWidth.value = event.nativeEvent.layout.width)
+          }>
           <Text style={{color: 'white', fontWeight: '500'}}>{tooltipText}</Text>
         </Animated.View>
         <View style={styles.chartContainer}>
