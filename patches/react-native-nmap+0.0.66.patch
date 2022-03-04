@@ -1,0 +1,33 @@
+diff --git a/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarker.java b/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarker.java
+index 010ae1e..b8deb37 100644
+--- a/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarker.java
++++ b/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarker.java
+@@ -156,6 +156,8 @@ public class RNNaverMapMarker extends ClickableRNNaverMapFeature<Marker> impleme
+         feature.setCaptionAligns(aligns);
+     }
+ 
++    public void setSubCaptionText(String message) { feature.setSubCaptionText(message); feature.setSubCaptionTextSize(12); feature.setSubCaptionColor(Color.WHITE); feature.setSubCaptionHaloColor(Color.TRANSPARENT); }
++
+     public void removeCaption() {
+         feature.setCaptionText("");
+     }
+diff --git a/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarkerManager.java b/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarkerManager.java
+index 406136b..be04162 100644
+--- a/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarkerManager.java
++++ b/node_modules/react-native-nmap/android/src/main/java/com/github/quadflask/react/navermap/RNNaverMapMarkerManager.java
+@@ -135,12 +135,13 @@ public class RNNaverMapMarkerManager extends EventEmittableViewGroupManager<RNNa
+         String text = map.getString("text");
+         int textSize = map.hasKey("textSize") ? map.getInt("textSize") : 16;
+         int color = map.hasKey("color") ? parseColorString(map.getString("color")) : Color.BLACK;
+-        int haloColor = map.hasKey("haloColor") ? parseColorString(map.getString("haloColor")) : Color.WHITE;
+         Align align = map.hasKey("align") ? parseAlign(map.getInt("align")) : DEFAULT_CAPTION_ALIGN;
+ 
+-        view.setCaption(text, textSize, color, haloColor, align);
++        view.setCaption(text, textSize, color, Color.TRANSPARENT, align);
+     }
+ 
++    @ReactProp(name = "subcaption" ) public void setSubCaptionText(RNNaverMapMarker view, String message) { view.setSubCaptionText(message); }
++
+     @Override
+     public void addView(RNNaverMapMarker parent, View child, int index) {
+         parent.setCustomView(child, index);

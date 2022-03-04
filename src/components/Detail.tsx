@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  unstable_batchedUpdates,
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -68,9 +69,11 @@ const Detail = ({navigation, route}: DetailProps) => {
     selectedArea: number,
   ) => {
     await getDealInfo(type, name, selectedArea).then(res => {
-      setDealInfoList(res.dealInfoList);
-      setDealInfoGroup(res.dealInfoGroup);
-      setAmount(res.recentDealAmount);
+      unstable_batchedUpdates(() => {
+        setDealInfoList(res.dealInfoList);
+        setDealInfoGroup(res.dealInfoGroup);
+        setAmount(res.recentDealAmount);
+      });
     });
   };
 
@@ -86,8 +89,10 @@ const Detail = ({navigation, route}: DetailProps) => {
   const changeType = (type: 'Deal' | 'Lease') => {
     setTypeChangingLoading(true);
     getData(type, name, selectedArea).then(() => {
-      setTypeChangingLoading(false);
-      setType(type);
+      unstable_batchedUpdates(() => {
+        setTypeChangingLoading(false);
+        setType(type);
+      });
     });
     typeModalRef.current?.close();
   };

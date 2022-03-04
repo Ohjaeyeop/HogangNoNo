@@ -19,8 +19,7 @@ export const propertyApi = async (code: string, ymd: string) => {
     .then(resText => {
       const parser = new XMLParser();
       return parser.parse(resText);
-    })
-    .catch(err => console.log(err.message));
+    });
 
   let items = item.map((obj: any) => {
     return {

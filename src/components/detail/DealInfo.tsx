@@ -41,7 +41,6 @@ const DealInfo = ({
   onShare,
 }: Props) => {
   const {hundredMillion, tenMillion} = displayedAmount(amount);
-
   return (
     <View>
       <View style={styles.apartmentInfo}>
@@ -101,7 +100,11 @@ const DealInfo = ({
             {`${hundredMillion} ${tenMillion}`.trim()}
           </Text>
         </View>
-        <DealInfoGraph dealInfoGroup={dealInfoGroup} type={type} />
+        <DealInfoGraph
+          dealInfoGroup={dealInfoGroup}
+          type={type}
+          loading={areaChangingLoading || typeChangingLoading}
+        />
         <DealList dealInfoList={dealInfoList} />
       </View>
     </View>

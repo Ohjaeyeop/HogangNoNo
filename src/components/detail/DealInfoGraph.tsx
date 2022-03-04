@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from 'react';
-import {Dimensions, StyleSheet, Text, Vibration, View} from 'react-native';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import {getGraphData} from '../../libs/getGraphData';
 import {color} from '../../theme/color';
@@ -16,7 +16,6 @@ import {getGraphPath} from '../../libs/getGraphPath';
 import GraphBackground from './GraphBackground';
 import {GroupByDate} from '../../db/db';
 import useDebounceEvent from '../../hooks/useDebounceEvent';
-import {run} from 'jest';
 
 const graphWidth = Dimensions.get('window').width - 40 - 40;
 const graphHeight = graphWidth * 0.4;
@@ -28,9 +27,10 @@ const gap = graphWidth / 36;
 type Props = {
   dealInfoGroup: GroupByDate[];
   type: 'Deal' | 'Lease';
+  loading: boolean;
 };
 
-const DealInfoGraph = ({dealInfoGroup, type}: Props) => {
+const DealInfoGraph = ({dealInfoGroup, type, loading}: Props) => {
   const x = useSharedValue(graphWidth);
   const tooltipWidth = useSharedValue(0);
   const graphData = getGraphData(dealInfoGroup);
